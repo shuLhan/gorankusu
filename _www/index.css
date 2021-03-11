@@ -1,0 +1,45 @@
+body {
+	background-color: ivory;
+	margin: 0;
+	padding: 0;
+}
+.nav {
+	height: calc(100% - 2em);
+	padding: 1em;
+	position: fixed;
+	width: 14em;
+}
+.nav .nav-item {
+	cursor: pointer;
+	margin-bottom: 1em;
+}
+.nav .footer {
+	bottom: 0;
+	margin-bottom: 1em;
+	position: fixed;
+}
+.main {
+	left: 16em;
+	padding: 1em;
+	position: fixed;
+	width: calc(100% - 18em);
+}
+.input {
+	margin-bottom: 1em;
+}
+.input label {
+	display: inline-block;
+	width: 10em;
+}
+.input input {
+	border: 1px solid lightgray;
+	display: inline-block;
+	padding: 6px;
+	width: calc(100% - 18em);
+}
+.mono {
+	background-color: cornsilk;
+	border-radius: 1em;
+	font-family: monospace;
+	padding: 1em;
+}
