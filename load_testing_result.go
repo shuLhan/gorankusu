@@ -18,7 +18,7 @@ import (
 
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/mlog"
-	vegeta "github.com/tsenart/vegeta/lib"
+	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
 const (

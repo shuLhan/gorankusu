@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	libhttp "github.com/shuLhan/share/lib/http"
-	vegeta "github.com/tsenart/vegeta/lib"
+	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
 type HttpRunHandler func(target *Target, runRequest *RunRequest) ([]byte, error)
