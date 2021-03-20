@@ -11,13 +11,12 @@ import (
 )
 
 //
-// Target contains group of HTTP and/or WebSocket endpoints that can be tested
-// by Trunks.
+// Target contains group of HttpTarget that can be tested by Trunks.
 //
 type Target struct {
 	ID          string
 	Name        string
-	AttackOpts  *AttackOptions
+	Opts        *AttackOptions
 	Vars        map[string]string
 	HttpTargets []*HttpTarget
 
@@ -32,11 +31,11 @@ func (target *Target) init() (err error) {
 
 	target.ID = generateID(target.Name)
 
-	if target.AttackOpts == nil {
-		target.AttackOpts = &AttackOptions{}
+	if target.Opts == nil {
+		target.Opts = &AttackOptions{}
 	}
 
-	err = target.AttackOpts.init()
+	err = target.Opts.init()
 	if err != nil {
 		return err
 	}

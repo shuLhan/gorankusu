@@ -44,10 +44,10 @@ type Environment struct {
 	// uniquely identify results on each run.
 	ResultsSuffix string `ini:"trunks:result:suffix"`
 
-	// LoadTestingRunning will be set to non-nil if there is a load
+	// AttackRunning will be set to non-nil if there is a load
 	// testing currently running.
-	LoadTestingRunning *loadTestingResult
-	mtx                sync.Mutex
+	AttackRunning *loadTestingResult
+	mtx           sync.Mutex
 }
 
 func (env *Environment) init() (err error) {
@@ -69,4 +69,18 @@ func (env *Environment) init() (err error) {
 	}
 
 	return nil
+}
+
+func (env *Environment) getRunningAttack() (ltr *loadTestingResult) {
+	env.mtx.Lock()
+	ltr = env.AttackRunning
+	env.mtx.Unlock()
+	return ltr
+}
+
+func (env *Environment) isAttackRunning() (yorn bool) {
+	env.mtx.Lock()
+	yorn = (env.AttackRunning != nil)
+	env.mtx.Unlock()
+	return yorn
 }

@@ -16,9 +16,10 @@ import (
 	"sync"
 	"time"
 
+	vegeta "github.com/tsenart/vegeta/v12/lib"
+
 	libbytes "github.com/shuLhan/share/lib/bytes"
 	"github.com/shuLhan/share/lib/mlog"
-	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
 const (
@@ -39,8 +40,8 @@ type loadTestingResult struct {
 	HistReport []byte // HistReport the result reported as histogram text.
 
 	fullpath string
-	req      *request
 	fout     *os.File
+	encoder  vegeta.Encoder
 	metrics  *vegeta.Metrics
 	hist     *vegeta.Histogram
 }
@@ -48,20 +49,19 @@ type loadTestingResult struct {
 //
 // newLoadTestingResult create new load testing result from request.
 //
-func newLoadTestingResult(env *Environment, target *Target, httpTarget *HttpTarget, req *request) (
+func newLoadTestingResult(env *Environment, rr *RunRequest) (
 	ltr *loadTestingResult, err error,
 ) {
 	ltr = &loadTestingResult{
-		TargetID: httpTarget.ID,
-		req:      req,
+		TargetID: rr.HttpTarget.ID,
 		metrics:  &vegeta.Metrics{},
 		hist:     &vegeta.Histogram{},
 	}
 
 	ltr.Name = fmt.Sprintf("%s.%s.%dx%s.%s.bin", ltr.TargetID,
 		time.Now().Format(outputSuffixDate),
-		target.AttackOpts.RatePerSecond, target.AttackOpts.Duration,
-		req.Env.ResultsSuffix)
+		rr.Target.Opts.RatePerSecond, rr.Target.Opts.Duration,
+		env.ResultsSuffix)
 
 	err = ltr.hist.Buckets.UnmarshalText([]byte(histogramBuckets))
 	if err != nil {
@@ -75,41 +75,21 @@ func newLoadTestingResult(env *Environment, target *Target, httpTarget *HttpTarg
 		return nil, fmt.Errorf("newLoadTestingResult: %w", err)
 	}
 
+	ltr.encoder = vegeta.NewEncoder(ltr.fout)
+
 	return ltr, nil
 }
 
-func (ltr *loadTestingResult) init(path string) (err error) {
-	ltr.fullpath = filepath.Join(path, ltr.Name)
-
-	result, err := ioutil.ReadFile(ltr.fullpath)
+func (ltr *loadTestingResult) add(res *vegeta.Result) (err error) {
+	err = ltr.encoder.Encode(res)
 	if err != nil {
-		return err
+		return fmt.Errorf("loadTestingResult.add: %w", err)
 	}
 
-	dec := vegeta.NewDecoder(bytes.NewReader(result))
+	ltr.metrics.Add(res)
+	ltr.hist.Add(res)
 
-	ltr.metrics = &vegeta.Metrics{}
-	ltr.hist = &vegeta.Histogram{}
-
-	err = ltr.hist.Buckets.UnmarshalText([]byte(histogramBuckets))
-	if err != nil {
-		return err
-	}
-
-	for {
-		var res vegeta.Result
-		err = dec.Decode(&res)
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return err
-		}
-		ltr.metrics.Add(&res)
-		ltr.hist.Add(&res)
-	}
-
-	return ltr.finish()
+	return nil
 }
 
 func (ltr *loadTestingResult) cancel() {
@@ -179,6 +159,40 @@ func (ltr *loadTestingResult) finish() (err error) {
 	ltr.hist = nil
 
 	return nil
+}
+
+func (ltr *loadTestingResult) init(path string) (err error) {
+	ltr.fullpath = filepath.Join(path, ltr.Name)
+
+	result, err := ioutil.ReadFile(ltr.fullpath)
+	if err != nil {
+		return err
+	}
+
+	dec := vegeta.NewDecoder(bytes.NewReader(result))
+
+	ltr.metrics = &vegeta.Metrics{}
+	ltr.hist = &vegeta.Histogram{}
+
+	err = ltr.hist.Buckets.UnmarshalText([]byte(histogramBuckets))
+	if err != nil {
+		return err
+	}
+
+	for {
+		var res vegeta.Result
+		err = dec.Decode(&res)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+		ltr.metrics.Add(&res)
+		ltr.hist.Add(&res)
+	}
+
+	return ltr.finish()
 }
 
 func (ltr *loadTestingResult) pack() (b []byte, err error) {

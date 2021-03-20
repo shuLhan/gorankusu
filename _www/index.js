@@ -88,24 +88,24 @@ function renderTarget(targetID) {
 			<h3> Attack options </h3>
 			<div class="input">
 				<label> Base URL </label>:
-				<input id="BaseUrl" readonly="" value="${target.AttackOpts.BaseUrl}"/>
+				<input id="BaseUrl" readonly="" value="${target.Opts.BaseUrl}"/>
 			</div>
 			<div class="input">
 				<label> Duration </label>:
-				<input id="Duration" value="${target.AttackOpts.Duration / 1e9}"/>
+				<input id="Duration" value="${target.Opts.Duration / 1e9}"/>
 			</div>
 			<div class="input">
 				<label> Rate per second </label>:
-				<input id="RatePerSecond" value="${target.AttackOpts.RatePerSecond}"/>
+				<input id="RatePerSecond" value="${target.Opts.RatePerSecond}"/>
 			</div>
 			<div class="input">
 				<label> Timeout (seconds) </label>:
-				<input id="Timeout" value="${target.AttackOpts.Timeout / 1e9}"/>
+				<input id="Timeout" value="${target.Opts.Timeout / 1e9}"/>
 			</div>
 		</div>
 	`
 
-	if (target.Vars.length > 0) {
+	if (target.Vars && target.Vars.length > 0) {
 		w += `
 			<div class='Vars'>
 				<h3>Variables</h3>
@@ -122,6 +122,7 @@ function renderTarget(targetID) {
 	}
 
 	w += "<div class='HttpTargets'>"
+
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		let http = target.HttpTargets[x]
 
@@ -131,6 +132,9 @@ function renderTarget(targetID) {
 					${http.Name}
 					<button onclick="run('${target.ID}', '${http.ID}')">
 						Run
+					</button>
+					<button onclick="attack('${target.ID}', '${http.ID}')">
+						Attack
 					</button>
 				</h3>
 				<div class="mono">
@@ -150,11 +154,18 @@ function renderTarget(targetID) {
 		}
 
 		w += `
-				<h4>Response</h4>
-				<pre id="${http.ID}_response" class="mono">
-				</pre>
-			</div>
+			<h4>Run response</h4>
+			<pre id="${http.ID}_response" class="mono">
+			</pre>
 		`
+
+		if (http.Results && Object.keys(http.Results).length > 0) {
+			w += "<h4>Attack results</h4>"
+			w += renderHttpAttackResults(target, http)
+		}
+
+		w += "</div>"
+
 	}
 	w += "</div>"
 
@@ -195,6 +206,27 @@ function renderHttpTargetParams(target, http) {
 	return w
 }
 
+function renderHttpAttackResults(target, http) {
+	let w = `<div id="${http.ID}_results">`
+	for (let x = 0; x < http.Results.length; x++) {
+		let result = http.Results[x]
+		w += `
+			<div class="result">
+				<div>${result.Name}</div>
+				<pre class="mono">
+${atob(result.TextReport)}
+				</pre>
+				<pre class="mono">
+${atob(result.HistReport)}
+				</pre>
+			</div>
+		`
+	}
+	w += "</div>"
+	return w
+}
+
+
 async function run(targetID, httpTargetID) {
 	let req = {}
 	req.Target = _targets[targetID]
@@ -214,6 +246,33 @@ async function run(targetID, httpTargetID) {
 	elResponse.innerHTML = JSON.stringify(res, null, 2)
 }
 
+async function attack(targetID, httpTargetID) {
+	let target = _targets[targetID]
+	let httpTarget = getHttpTargetByID(target, httpTargetID)
+
+	let req = {
+		Target: {
+			ID: target.ID,
+			Opts: target.Opts,
+		},
+		HttpTarget: {
+			ID: httpTarget.ID,
+			Headers: httpTarget.Headers,
+			Params: httpTarget.Params,
+		},
+	}
+
+	let fres = await fetch("/_trunks/api/target/attack", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(req),
+	})
+
+	let res = await fres.json()
+}
+
 function getHttpTargetByID(target, id) {
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		if (id == target.HttpTargets[x].ID) {
@@ -228,6 +287,7 @@ function onChangeHttpHeader(targetID, httpTargetID, key, val) {
 	let httpTarget = getHttpTargetByID(target, httpTargetID)
 	httpTarget.Headers[key] = val
 }
+
 function onChangeHttpParam(targetID, httpTargetID, key, val) {
 	let target = _targets[targetID]
 	let httpTarget = getHttpTargetByID(target, httpTargetID)

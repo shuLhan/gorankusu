@@ -23,6 +23,8 @@ body {
 	padding: 1em;
 	position: fixed;
 	width: calc(100% - 18em);
+	height: 100%;
+	overflow: auto;
 }
 .input {
 	margin-bottom: 1em;
@@ -42,4 +44,5 @@ body {
 	border-radius: 1em;
 	font-family: monospace;
 	padding: 1em;
+	overflow: auto;
 }

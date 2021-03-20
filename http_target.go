@@ -12,16 +12,28 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
-type HttpRunHandler func(target *Target, runRequest *RunRequest) ([]byte, error)
-type HttpPreAttackHandler func(target *Target, ht *HttpTarget) vegeta.Targeter
+//
+// HttpRunHandler defiine the function type that will be called when client
+// send request to run the HTTP target.
+//
+type HttpRunHandler func(tgt *Target, rr *RunRequest) ([]byte, error)
+
+//
+// HttpAttackHandler define the function type that will be called when client
+// send request to attack HTTP target.
+//
+type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
+
+// HttpPreAttackHandler define the function type that will be called before
+// the actual Attack being called.
+type HttpPreAttackHandler func(rr *RunRequest)
 
 type HttpTarget struct {
 	// ID of target, optional.
 	// If its empty, it will generated using value from Path.
 	ID string
 
-	// Name of target, optional.
-	// If its empty default to Path.
+	// Name of target, optional, default to Path.
 	Name string
 
 	Method      libhttp.RequestMethod
@@ -30,20 +42,18 @@ type HttpTarget struct {
 	Headers     KeyValue
 	Params      KeyValue
 
-	Run       HttpRunHandler       `json:"-"`
-	PreAttack HttpPreAttackHandler `json:"-"`
-
-	// Status of REST.
-	Status string
+	Run          HttpRunHandler       `json:"-"`
+	Attack       HttpAttackHandler    `json:"-"`
+	PreAttack    HttpPreAttackHandler `json:"-"`
+	AttackLocker sync.Mutex           `json:"-"` // Use this inside the Attack to lock resource.
+	Status       string
 
 	// Results contains list of load testing output.
 	Results []*loadTestingResult
 
-	// AllowLoadTesting if its true, the "Run load testing" will be showed
-	// on user interface.
-	AllowLoadTesting bool
-
-	mtx sync.Mutex
+	// AllowAttack if its true the "Attack" button will be showed on user
+	// interface to allow client to run load testing on this HttpTarget.
+	AllowAttack bool
 }
 
 func (ht *HttpTarget) init() {

@@ -16,7 +16,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"time"
+
+	vegeta "github.com/tsenart/vegeta/v12/lib"
 
 	"github.com/shuLhan/share/lib/debug"
 	libhttp "github.com/shuLhan/share/lib/http"
@@ -43,8 +46,8 @@ const (
 )
 
 //
-// Trunks is the HTTP server with web user interface for running HTTP test and
-// load testing.
+// Trunks is the HTTP server with web user interface and APIs for running and
+// load testing the registered HTTP endpoints.
 //
 type Trunks struct {
 	*libhttp.Server
@@ -52,8 +55,7 @@ type Trunks struct {
 	Env     *Environment
 	targets []*Target
 
-	ltrq    chan *loadTestingResult
-	finishq chan *loadTestingResult
+	attackq chan *RunRequest
 	cancelq chan bool
 }
 
@@ -67,7 +69,9 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	}
 
 	trunks = &Trunks{
-		Env: env,
+		Env:     env,
+		attackq: make(chan *RunRequest, 1),
+		cancelq: make(chan bool, 1),
 	}
 
 	httpdOpts := &libhttp.ServerOptions{
@@ -112,6 +116,9 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 // load testing registered Targets.
 //
 func (trunks *Trunks) Start() (err error) {
+	mlog.Outf("Starting attack worker...\n")
+	go trunks.workerAttackQueue()
+
 	mlog.Outf("starting HTTP server at %s\n", trunks.Env.ListenAddress)
 	return trunks.Server.Start()
 }
@@ -135,7 +142,7 @@ func (trunks *Trunks) Stop() {
 
 func (trunks *Trunks) isLoadTesting() (b bool) {
 	trunks.Env.mtx.Lock()
-	if trunks.Env.LoadTestingRunning != nil {
+	if trunks.Env.AttackRunning != nil {
 		b = true
 	}
 	trunks.Env.mtx.Unlock()
@@ -231,8 +238,60 @@ func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody [
 	return json.Marshal(&res)
 }
 
+//
+// apiTargetAttack run the load testing on HTTP endpoint with target and
+// options defined in request.
+//
 func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	return resbody, nil
+	if trunks.Env.isAttackRunning() {
+		return nil, errAttackConflict(trunks.Env.getRunningAttack())
+	}
+
+	logp := "apiTargetAttack"
+	req := &RunRequest{}
+
+	err = json.Unmarshal(epr.RequestBody, req)
+	if err != nil {
+		return nil, errInternal(err)
+	}
+	if req.Target == nil {
+		return nil, errInvalidTarget("")
+	}
+
+	origTarget := trunks.getTargetByID(req.Target.ID)
+	if origTarget == nil {
+		return nil, errInvalidTarget(req.Target.ID)
+	}
+
+	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+	if origTarget == nil {
+		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
+	}
+
+	if !origHttpTarget.AllowAttack {
+		return nil, errAttackNotAllowed()
+	}
+
+	req.merge(trunks.Env, origTarget, origHttpTarget)
+
+	req.result, err = newLoadTestingResult(trunks.Env, req)
+	if err != nil {
+		return nil, err
+	}
+
+	trunks.attackq <- req
+
+	msg := fmt.Sprintf("attacking %s/%s with %d RPS for %d seconds",
+		req.Target.Opts.BaseUrl, req.HttpTarget.Path,
+		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
+
+	mlog.Outf("%s: %s\n", logp, msg)
+
+	res := libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Message = msg
+
+	return json.Marshal(res)
 }
 
 func (trunks *Trunks) apiTargetAttackCancel(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
@@ -285,6 +344,68 @@ func (trunks *Trunks) getTargetByID(id string) *Target {
 	for _, target := range trunks.targets {
 		if target.ID == id {
 			return target
+		}
+	}
+	return nil
+}
+
+func (trunks *Trunks) workerAttackQueue() (err error) {
+	logp := "workerAttackQueue"
+
+	for rr := range trunks.attackq {
+		rr.HttpTarget.PreAttack(rr)
+
+		isCancelled := false
+		attacker := vegeta.NewAttacker(
+			vegeta.Timeout(rr.Target.Opts.Timeout),
+		)
+
+		for res := range attacker.Attack(
+			rr.HttpTarget.Attack(rr),
+			rr.Target.Opts.ratePerSecond,
+			rr.Target.Opts.Duration,
+			rr.HttpTarget.ID,
+		) {
+			err = rr.result.add(res)
+			if err != nil {
+				attacker.Stop()
+				rr.result.cancel()
+				break
+			}
+
+			select {
+			case <-trunks.cancelq:
+				isCancelled = true
+			default:
+			}
+			if isCancelled {
+				break
+			}
+		}
+
+		if err != nil || isCancelled {
+			attacker.Stop()
+			rr.result.cancel()
+
+			if err != nil {
+				mlog.Errf("%s: %s fail: %w.\n", logp, rr.result.Name, err)
+			} else {
+				mlog.Outf("%s: %s canceled.\n", logp, rr.result.Name)
+				trunks.cancelq <- true
+			}
+		} else {
+			err := rr.result.finish()
+			if err != nil {
+				mlog.Errf("%s %s: %s\n", logp, rr.result.TargetID, err)
+			}
+
+			rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
+
+			sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
+				return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
+			})
+
+			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 		}
 	}
 	return nil

@@ -12,6 +12,29 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
+func errAttackConflict(ltr *loadTestingResult) error {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code:    http.StatusConflict,
+			Message: "another attack is already running",
+			Name:    "ERR_ATTACK_CONFLICT",
+		},
+		Data: ltr,
+	}
+	return res
+}
+
+func errAttackNotAllowed() error {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code:    http.StatusNotAcceptable,
+			Message: "attack is not allowed",
+			Name:    "ERR_ATTACK_NOT_ALLOWED",
+		},
+	}
+	return res
+}
+
 func errInternal(err error) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
