@@ -5,15 +5,17 @@ to test HTTP service, similar to Postman, and for load testing.
 
 For the load testing we use vegeta [1] as the backend.
 
+[![Go Reference](https://pkg.go.dev/badge/git.sr.ht/~shulhan/trunks.svg)](https://pkg.go.dev/git.sr.ht/~shulhan/trunks)
+
 ## Usage
 
 See the
-(Example)[https://git.sr.ht/~shulhan/trunks/tree/main/item/example/] package
-on how to programmatically use create service using this module, or,
+[example](https://git.sr.ht/~shulhan/trunks/tree/main/item/example/) package
+on how to programmatically use and create service using this module, or,
 
-* clone this repository,
-* execute `make run`, and
-* open http://127.0.0.1:8217.
+	* clone this repository,
+	* execute `make run`, and
+	* open http://127.0.0.1:8217.
 
 
 ## Screen shots
