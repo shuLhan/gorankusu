@@ -148,12 +148,14 @@ function renderTarget(targetID) {
 			<div id="${http.ID}" class="HttpTarget">
 				<h3>
 					${http.Name}
-					<button onclick="run('${target.ID}', '${http.ID}')">
-						Run
-					</button>
-					<button onclick="attack('${target.ID}', '${http.ID}')">
-						Attack
-					</button>
+					<span class="HttpTargetActions">
+						<button onclick="run('${target.ID}', '${http.ID}')">
+							Run
+						</button>
+						<button onclick="attack('${target.ID}', '${http.ID}')">
+							Attack
+						</button>
+					</span>
 				</h3>
 
 				<div id="${http.ID}_preview" class="preview mono">
@@ -233,19 +235,18 @@ function renderHttpAttackResults(target, http) {
 	for (let x = 0; x < http.Results.length; x++) {
 		let result = http.Results[x]
 		w += `
-			<div class="result-name">
-				<button onclick="attackResultGet(this, '${result.Name}')">
-					Show
-				</button>
-				&nbsp;
-				--
-				&nbsp;
+			<div class="resultName">
 				${result.Name}
-				&nbsp;
-				<button onclick="attackResultDelete('${result.Name}')">
-					Delete
-				</button>
 
+				<span class="actions">
+					<button onclick="attackResultGet(this, '${result.Name}')">
+						Show
+					</button>
+
+					<button onclick="attackResultDelete('${result.Name}')">
+						Delete
+					</button>
+				</span>
 			</div>
 			<div class="result" id="${result.Name}" style="display: none;">
 			</div>

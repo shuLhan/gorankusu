@@ -38,6 +38,7 @@ body {
 }
 .nav .footer {
 	bottom: 0;
+	font-size: 9pt;
 	margin-bottom: 1em;
 	position: fixed;
 }
@@ -83,6 +84,51 @@ body {
 	padding: 0.5em;
 }
 
-.results > .result-name {
+.results > .resultName {
 	margin-bottom: 1em;
+}
+
+@media screen and (max-width: 740px) {
+	.nav {
+		border-right: unset;
+		height: unset;
+		padding: 1em;
+		position: unset;
+		width: calc(100% - 2em);
+		border-bottom: 1px solid lightgrey;
+	}
+
+	.nav .footer {
+		position: unset;
+	}
+
+	.main {
+		left: 0;
+		position: unset;
+		width: calc(100% - 2em);
+		height: unset;
+	}
+
+	.input label {
+		display: inline-block;
+		width: auto;
+	}
+
+	.input input {
+		display: block;
+		width: calc(100% - 2em);
+	}
+
+	.HttpTargetActions {
+		margin-top: 10px;
+		display: block;
+	}
+
+	.results > .resultName {
+		word-break: break-word;
+	}
+	.results > .resultName .actions {
+		display: block;
+		margin: 0.5em 0px;
+	}
 }
