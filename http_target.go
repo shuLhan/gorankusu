@@ -5,7 +5,7 @@
 package trunks
 
 import (
-	"fmt"
+	"path/filepath"
 	"sync"
 
 	libhttp "github.com/shuLhan/share/lib/http"
@@ -89,18 +89,23 @@ func (ht *HttpTarget) deleteResult(result *AttackResult) {
 	ht.Results = ht.Results[:len(ht.Results)-1]
 }
 
-func (ht *HttpTarget) addResult(path, name string) (err error) {
+func (ht *HttpTarget) addResult(dir, name string) (err error) {
 	ar := &AttackResult{
-		TargetID: ht.ID,
-		Name:     name,
-	}
-
-	err = ar.init(path)
-	if err != nil {
-		return fmt.Errorf("HttpTarget.addResult: %s %s: %w", path, name, err)
+		HttpTargetID: ht.ID,
+		Name:         name,
+		fullpath:     filepath.Join(dir, name),
 	}
 
 	ht.Results = append(ht.Results, ar)
 
+	return nil
+}
+
+func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {
+	for _, result = range ht.Results {
+		if result.Name == name {
+			return result
+		}
+	}
 	return nil
 }

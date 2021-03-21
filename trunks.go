@@ -8,12 +8,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
+	"strings"
 	"time"
 
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
 	"github.com/shuLhan/share/lib/debug"
+	liberrors "github.com/shuLhan/share/lib/errors"
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
@@ -30,11 +33,16 @@ const (
 
 // List of HTTP APIs provided by Trunks HTTP server.
 const (
-	apiEnvironment         = "/_trunks/api/environment"
-	apiTargetAttack        = "/_trunks/api/target/attack"
-	apiTargetAttackResults = "/_trunks/api/target/attack/results"
-	apiTargetRun           = "/_trunks/api/target/run"
-	apiTargets             = "/_trunks/api/targets"
+	apiEnvironment        = "/_trunks/api/environment"
+	apiTargetAttack       = "/_trunks/api/target/attack"
+	apiTargetAttackResult = "/_trunks/api/target/attack/result"
+	apiTargetRun          = "/_trunks/api/target/run"
+	apiTargets            = "/_trunks/api/targets"
+)
+
+// List of HTTP parameters.
+const (
+	paramNameName = "name"
 )
 
 //
@@ -108,10 +116,13 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 // load testing registered Targets.
 //
 func (trunks *Trunks) Start() (err error) {
-	mlog.Outf("Starting attack worker...\n")
+	mlog.Outf("trunks: scanning previous attack results...\n")
+	trunks.scanAttackResults()
+
+	mlog.Outf("trunks: starting attack worker...\n")
 	go trunks.workerAttackQueue()
 
-	mlog.Outf("starting HTTP server at %s\n", trunks.Env.ListenAddress)
+	mlog.Outf("trunks: starting HTTP server at %s\n", trunks.Env.ListenAddress)
 	return trunks.Server.Start()
 }
 
@@ -176,17 +187,17 @@ func (trunks *Trunks) registerHttpApis() (err error) {
 
 	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         apiTargetAttackResults,
+		Path:         apiTargetAttackResult,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttackResultsGet,
+		Call:         trunks.apiTargetAttackResultGet,
 	})
 	if err != nil {
 		return err
 	}
 	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
-		Path:         apiTargetAttackResults,
+		Path:         apiTargetAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         trunks.apiTargetAttackResultsDelete,
@@ -290,8 +301,45 @@ func (trunks *Trunks) apiTargetAttackCancel(epr *libhttp.EndpointRequest) (resbo
 	return resbody, nil
 }
 
-func (trunks *Trunks) apiTargetAttackResultsGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	return resbody, nil
+func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code: http.StatusNotFound,
+			Name: "ERR_ATTACK_RESULT_NOT_FOUND",
+		},
+	}
+
+	name := epr.HttpRequest.Form.Get(paramNameName)
+	if len(name) == 0 {
+		return nil, errInvalidParameter(paramNameName, name)
+	}
+
+	t, ht := trunks.getTargetByResultFilename(name)
+	if t == nil {
+		res.Message = "Target ID not found"
+		return nil, res
+	}
+	if ht == nil {
+		res.Message = "HttpTarget ID not found"
+		return nil, res
+	}
+
+	result := ht.getResultByName(name)
+	if result == nil {
+		res.Message = "Result file not found"
+		return nil, res
+	}
+
+	err = result.load()
+	if err != nil {
+		return nil, err
+	}
+
+	res.Code = http.StatusOK
+	res.Name = "OK_TARGET_ATTACK_RESULT"
+	res.Data = result
+
+	return json.Marshal(res)
 }
 
 func (trunks *Trunks) apiTargetAttackResultsDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
@@ -341,6 +389,79 @@ func (trunks *Trunks) getTargetByID(id string) *Target {
 		}
 	}
 	return nil
+}
+
+func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HttpTarget) {
+	names := strings.Split(name, ".")
+
+	t = trunks.getTargetByID(names[0])
+	if t == nil {
+		return t, nil
+	}
+
+	if len(names) > 0 {
+		ht = t.getHttpTargetByID(names[1])
+	}
+
+	return t, ht
+}
+
+//
+// scanAttackResults scan the environment's ResultsDir for past attack results
+// and add it to each target based on ID.
+// Due to size of output can be big (maybe more than 5000 records), this
+// function only parse the file name and append it to Results field.
+//
+func (trunks *Trunks) scanAttackResults() {
+	logp := "scanAttackResults"
+
+	dir, err := os.Open(trunks.Env.ResultsDir)
+	if err != nil {
+		mlog.Errf("%s: %s\n", logp, err)
+		return
+	}
+
+	fis, err := dir.Readdir(0)
+	if err != nil {
+		mlog.Errf("%s: %s\n", logp, err)
+		return
+	}
+
+	mlog.Outf("--- %s: loading %d files from past results ...\n", logp, len(fis))
+
+	for x, fi := range fis {
+		name := fi.Name()
+		if name == "lost+found" {
+			continue
+		}
+		if name[0] == '.' {
+			continue
+		}
+
+		t, ht := trunks.getTargetByResultFilename(name)
+		if t == nil {
+			mlog.Outf("--- %s %d/%d: Target ID not found for %q\n", logp, x+1, len(fis), name)
+			continue
+		}
+		if ht == nil {
+			mlog.Outf("--- %s %d/%d: HttpTarget ID not found for %q\n", logp, x+1, len(fis), name)
+			continue
+		}
+
+		mlog.Outf("--- %s %d/%d: loading %q with size %d Kb\n", logp, x+1, len(fis), name, fi.Size()/1024)
+
+		ht.addResult(trunks.Env.ResultsDir, name)
+	}
+
+	mlog.Outf("--- %s: all pass results has been loaded ...\n", logp)
+
+	for _, target := range trunks.targets {
+		for _, httpTarget := range target.HttpTargets {
+			sort.Slice(httpTarget.Results, func(x, y int) bool {
+				return httpTarget.Results[x].Name > httpTarget.Results[y].Name
+			})
+		}
+	}
 }
 
 func (trunks *Trunks) workerAttackQueue() (err error) {

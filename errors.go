@@ -46,6 +46,17 @@ func errInternal(err error) error {
 	return res
 }
 
+func errInvalidParameter(key, value string) error {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("invalid or emtpy parameter %q: %q", key, value),
+			Name:    "ERR_INVALID_PARAMETER",
+		},
+	}
+	return res
+}
+
 func errInvalidTarget(id string) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{

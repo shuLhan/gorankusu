@@ -32,7 +32,7 @@ type Example struct {
 //
 func New() (ex *Example, err error) {
 	env := &trunks.Environment{
-		ResultsDir:    "testdata/example/",
+		ResultsDir:    "example/testdata/",
 		ResultsSuffix: "example",
 	}
 
@@ -92,7 +92,7 @@ func (ex *Example) registerEndpoints() (err error) {
 
 func (ex *Example) registerTargets() (err error) {
 	targetHttp := &trunks.Target{
-		Name: "Example HTTP target",
+		Name: "Example",
 		Opts: &trunks.AttackOptions{
 			BaseUrl:       fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
 			Duration:      5 * time.Second,

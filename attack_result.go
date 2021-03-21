@@ -33,10 +33,10 @@ const (
 type AttackResult struct {
 	mtx sync.Mutex
 
-	TargetID   string // TargetID the ID of HTTP target which own the result.
-	Name       string // Name of output file without path.
-	TextReport []byte // TextReport the result reported as text.
-	HistReport []byte // HistReport the result reported as histogram text.
+	HttpTargetID string // ID of HTTP target which own the result.
+	Name         string // Name of output file without path.
+	TextReport   []byte // TextReport the result reported as text.
+	HistReport   []byte // HistReport the result reported as histogram text.
 
 	fullpath string
 	fout     *os.File
@@ -52,9 +52,9 @@ func newAttackResult(env *Environment, rr *RunRequest) (
 	ar *AttackResult, err error,
 ) {
 	ar = &AttackResult{
-		TargetID: rr.HttpTarget.ID,
-		metrics:  &vegeta.Metrics{},
-		hist:     &vegeta.Histogram{},
+		HttpTargetID: rr.HttpTarget.ID,
+		metrics:      &vegeta.Metrics{},
+		hist:         &vegeta.Histogram{},
 	}
 
 	ar.Name = fmt.Sprintf("%s.%s.%s.%dx%s.%s.bin",
@@ -102,14 +102,14 @@ func (ar *AttackResult) cancel() {
 	if ar.fout != nil {
 		err := ar.fout.Close()
 		if err != nil {
-			mlog.Errf("AttackResult.cancel %s: %s\n", ar.TargetID, err)
+			mlog.Errf("AttackResult.cancel %s: %s\n", ar.HttpTargetID, err)
 		}
 		ar.fout = nil
 
 		if len(ar.fullpath) > 0 {
 			err = os.Remove(ar.fullpath)
 			if err != nil {
-				mlog.Errf("AttackResult.cancel %s: %s\n", ar.TargetID, err)
+				mlog.Errf("AttackResult.cancel %s: %s\n", ar.HttpTargetID, err)
 			}
 		}
 	}
@@ -129,7 +129,7 @@ func (ar *AttackResult) finish() (err error) {
 	if ar.fout != nil {
 		err = ar.fout.Close()
 		if err != nil {
-			return fmt.Errorf("%s: %w", ar.TargetID, err)
+			return fmt.Errorf("%s: %w", ar.HttpTargetID, err)
 		}
 		ar.fout = nil
 	}
@@ -157,18 +157,20 @@ func (ar *AttackResult) finish() (err error) {
 	return nil
 }
 
-func (ar *AttackResult) init(path string) (err error) {
-	ar.fullpath = filepath.Join(path, ar.Name)
+func (ar *AttackResult) load() (err error) {
+	if ar.TextReport != nil && ar.HistReport != nil {
+		return nil
+	}
 
 	result, err := ioutil.ReadFile(ar.fullpath)
 	if err != nil {
 		return err
 	}
 
-	dec := vegeta.NewDecoder(bytes.NewReader(result))
-
 	ar.metrics = &vegeta.Metrics{}
 	ar.hist = &vegeta.Histogram{}
+
+	dec := vegeta.NewDecoder(bytes.NewReader(result))
 
 	err = ar.hist.Buckets.UnmarshalText([]byte(histogramBuckets))
 	if err != nil {

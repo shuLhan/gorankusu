@@ -165,7 +165,6 @@ function renderTarget(targetID) {
 		}
 
 		w += "</div>"
-
 	}
 	w += "</div>"
 
@@ -211,21 +210,22 @@ function renderHttpAttackResults(target, http) {
 	for (let x = 0; x < http.Results.length; x++) {
 		let result = http.Results[x]
 		w += `
-			<div class="result">
-				<div>${result.Name}</div>
-				<pre class="mono">
-${atob(result.TextReport)}
-				</pre>
-				<pre class="mono">
-${atob(result.HistReport)}
-				</pre>
+			<div>
+				<button onclick="getAttackResult(this, '${result.Name}')">
+					Show
+				</button>
+				&nbsp;
+				--
+				&nbsp;
+				${result.Name}
+			</div>
+			<div class="result" id="${result.Name}" style="display: none;">
 			</div>
 		`
 	}
 	w += "</div>"
 	return w
 }
-
 
 async function run(targetID, httpTargetID) {
 	let req = {}
@@ -271,6 +271,33 @@ async function attack(targetID, httpTargetID) {
 	})
 
 	let res = await fres.json()
+}
+
+async function getAttackResult(button, name) {
+	let el = document.getElementById(name)
+
+	if (el.style.display === "block") {
+		el.style.display = "none"
+		button.innerHTML = "Show"
+		return
+	}
+
+	let url = "/_trunks/api/target/attack/result?name=" + name
+	let fres = await fetch(url)
+	let res = await fres.json()
+	let result = res.data
+
+	el.innerHTML = `
+		<pre class="mono">
+${atob(result.TextReport)}
+		</pre>
+		<pre class="mono">
+${atob(result.HistReport)}
+		</pre>
+	`
+
+	el.style.display = "block"
+	button.innerHTML = "Hide"
 }
 
 function getHttpTargetByID(target, id) {
