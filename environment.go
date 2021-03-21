@@ -46,7 +46,7 @@ type Environment struct {
 
 	// AttackRunning will be set to non-nil if there is a load
 	// testing currently running.
-	AttackRunning *AttackResult
+	AttackRunning *RunRequest
 	mtx           sync.Mutex
 }
 
@@ -71,11 +71,11 @@ func (env *Environment) init() (err error) {
 	return nil
 }
 
-func (env *Environment) getRunningAttack() (ar *AttackResult) {
+func (env *Environment) getRunningAttack() (rr *RunRequest) {
 	env.mtx.Lock()
-	ar = env.AttackRunning
+	rr = env.AttackRunning
 	env.mtx.Unlock()
-	return ar
+	return rr
 }
 
 func (env *Environment) isAttackRunning() (yorn bool) {

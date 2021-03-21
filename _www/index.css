@@ -30,6 +30,7 @@ body {
 	padding: 1em;
 	position: fixed;
 	width: 14em;
+	border-right: 1px solid lightgrey;
 }
 .nav .nav-item {
 	cursor: pointer;
@@ -48,6 +49,10 @@ body {
 	height: calc(100% - 4em);
 	overflow: auto;
 }
+.main .mainState {
+	border: 1px solid lightgrey;
+	padding: 1em;
+}
 .input {
 	margin-bottom: 1em;
 }
@@ -62,10 +67,20 @@ body {
 	width: calc(100% - 18em);
 }
 .mono {
-	background-color: cornsilk;
+	background-color: lightgrey;
 	font-family: monospace;
 	padding: 1em;
 	overflow: auto;
+}
+
+.HttpTarget {
+	margin-top: 2em;
+}
+
+.HttpTarget h3 {
+	border-left: 10px solid gold;
+	margin-left: 0;
+	padding: 0.5em;
 }
 
 .results > .result-name {

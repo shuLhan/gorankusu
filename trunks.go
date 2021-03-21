@@ -284,7 +284,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 
 	trunks.attackq <- req
 
-	msg := fmt.Sprintf("attacking %s/%s with %d RPS for %d seconds",
+	msg := fmt.Sprintf("Attacking %s/%s with %d RPS for %s seconds",
 		req.Target.Opts.BaseUrl, req.HttpTarget.Path,
 		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
 
@@ -292,13 +292,32 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
+	res.Name = "OK_ATTACK"
 	res.Message = msg
 
 	return json.Marshal(res)
 }
 
 func (trunks *Trunks) apiTargetAttackCancel(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	return resbody, nil
+	res := &libhttp.EndpointResponse{}
+
+	rr := trunks.Env.getRunningAttack()
+	if rr == nil {
+		res.Code = http.StatusNotFound
+		res.Message = "No attack is currently running."
+		res.Name = "ERR_ATTACK_CANCEL_NOT_FOUND"
+		return nil, res
+	}
+
+	trunks.cancelq <- true
+
+	res.Code = http.StatusOK
+	res.Name = "OK_ATTACK_CANCEL"
+	res.Message = fmt.Sprintf(`Attack on target "%s / %s" has been canceled`,
+		rr.Target.Name, rr.HttpTarget.Name)
+	res.Data = rr
+
+	return json.Marshal(res)
 }
 
 func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
@@ -495,6 +514,8 @@ func (trunks *Trunks) workerAttackQueue() (err error) {
 	logp := "workerAttackQueue"
 
 	for rr := range trunks.attackq {
+		trunks.Env.AttackRunning = rr
+
 		rr.HttpTarget.PreAttack(rr)
 
 		isCancelled := false
@@ -534,22 +555,22 @@ func (trunks *Trunks) workerAttackQueue() (err error) {
 				// Inform the caller that the attack has been canceled.
 				trunks.cancelq <- true
 			}
+		} else {
+			err := rr.result.finish()
+			if err != nil {
+				mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
+			}
 
-			return nil
+			rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
+
+			sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
+				return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
+			})
+
+			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 		}
 
-		err := rr.result.finish()
-		if err != nil {
-			mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
-		}
-
-		rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
-
-		sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
-			return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
-		})
-
-		mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
+		trunks.Env.AttackRunning = nil
 	}
 	return nil
 }

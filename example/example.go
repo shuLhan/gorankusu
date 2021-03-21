@@ -95,8 +95,8 @@ func (ex *Example) registerTargets() (err error) {
 		Name: "Example",
 		Opts: &trunks.AttackOptions{
 			BaseUrl:       fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
-			Duration:      5 * time.Second,
-			RatePerSecond: 10,
+			Duration:      300 * time.Second,
+			RatePerSecond: 1,
 		},
 		Vars: map[string]string{
 			"A": "1",

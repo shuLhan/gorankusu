@@ -12,14 +12,15 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-func errAttackConflict(ar *AttackResult) error {
+func errAttackConflict(rr *RunRequest) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
-			Code:    http.StatusConflict,
-			Message: "another attack is already running",
-			Name:    "ERR_ATTACK_CONFLICT",
+			Code: http.StatusConflict,
+			Message: fmt.Sprintf(`Another attack is already running: "%s/%s`,
+				rr.Target.Name, rr.HttpTarget.Name),
+			Name: "ERR_ATTACK_CONFLICT",
 		},
-		Data: ar,
+		Data: rr,
 	}
 	return res
 }

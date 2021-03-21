@@ -20,8 +20,15 @@ let _requestTypes = {
 }
 
 async function main() {
+	await environmentGet()
+
 	let fres = await fetch("/_trunks/api/targets")
 	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
+
 	let targets = res.data
 
 	let w = ""
@@ -39,15 +46,26 @@ async function main() {
 	document.getElementById("nav-content").innerHTML = w
 }
 
-async function environment() {
-	let el = document.getElementById("main-content")
-
+async function environmentGet() {
 	let fres = await fetch("/_trunks/api/environment")
 	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
 
 	_env = res.data
 
-	el.innerHTML = `
+	if (_env.AttackRunning) {
+		updateStateAttack(
+			_env.AttackRunning.Target,
+			_env.AttackRunning.HttpTarget,
+		)
+	}
+}
+
+async function environmentRender() {
+	document.getElementById("main-content").innerHTML = `
 		<h2> Environment </h2>
 		<div class="environment">
 			<div class="input">
@@ -250,6 +268,10 @@ async function run(targetID, httpTargetID) {
 	})
 
 	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
 
 	let elResponse = document.getElementById(httpTargetID + "_response")
 	elResponse.innerHTML = JSON.stringify(res, null, 2)
@@ -280,6 +302,30 @@ async function attack(targetID, httpTargetID) {
 	})
 
 	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
+
+	updateStateAttack(target, httpTarget)
+
+	notif(res.message)
+}
+
+async function attackCancel() {
+	let fres = await fetch("/_trunks/api/target/attack", {
+		method: "DELETE",
+	})
+
+	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
+
+	updateStateAttack(null, null)
+
+	notif(res.message)
 }
 
 async function attackResultDelete(name) {
@@ -325,6 +371,11 @@ async function attackResultGet(button, name) {
 	let url = "/_trunks/api/target/attack/result?name=" + name
 	let fres = await fetch(url)
 	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
+
 	let result = res.data
 
 	el.innerHTML = `
@@ -363,22 +414,37 @@ function onChangeHttpParam(targetID, httpTargetID, key, val) {
 
 function notif(msg) {
 	let root = document.getElementById("notif")
-	let item = document.createElement("div");
+	let item = document.createElement("div")
 	item.innerHTML = msg
 	root.appendChild(item)
 
-	setTimeout(function() {
+	setTimeout(function () {
 		root.removeChild(item)
 	}, 5000)
 }
 
 function notifError(msg) {
 	let root = document.getElementById("notif-error")
-	let item = document.createElement("div");
+	let item = document.createElement("div")
 	item.innerHTML = msg
 	root.appendChild(item)
 
-	setTimeout(function() {
+	setTimeout(function () {
 		root.removeChild(item)
 	}, 5000)
+}
+
+function updateStateAttack(target, httpTarget) {
+	let el = document.getElementById("stateAttack")
+	if (httpTarget) {
+		el.innerHTML = `
+			${target.Name} / ${httpTarget.Name}
+			&nbsp;
+			<button onclick="attackCancel('${target.ID}', '${httpTarget.ID}')">
+			Cancel
+			</button>
+		`
+	} else {
+		el.innerHTML = "-"
+	}
 }
