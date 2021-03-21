@@ -330,6 +330,12 @@ async function attackCancel() {
 }
 
 async function attackResultDelete(name) {
+	let msg = `Are you sure you want to delete the result: ${name}?`
+	let yes = window.confirm(msg)
+	if (!yes) {
+		return;
+	}
+
 	let url = "/_trunks/api/target/attack/result?name=" + name
 	let fres = await fetch(url, {
 		method: "DELETE",
@@ -355,6 +361,7 @@ async function attackResultDelete(name) {
 		if (result.Name == name) {
 			httpTarget.Results.splice(x, 1)
 			renderHttpAttackResults(target, httpTarget)
+			notif(`Result file "${name}" has been deleted.`)
 			return
 		}
 	}
