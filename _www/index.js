@@ -127,7 +127,7 @@ function renderTarget(targetID) {
 		let http = target.HttpTargets[x]
 
 		w += `
-			<div>
+			<div id="${http.ID}" class="HttpTarget">
 				<h3>
 					${http.Name}
 					<button onclick="run('${target.ID}', '${http.ID}')">
@@ -137,42 +137,49 @@ function renderTarget(targetID) {
 						Attack
 					</button>
 				</h3>
-				<div class="mono">
+
+				<div id="${http.ID}_preview" class="preview mono">
 					${_requestMethods[http.Method]} ${http.Path} <br/>
 					Content-Type: ${_requestTypes[http.RequestType]}
 				</div>
+
+				<h4>Headers</h4>
+				<div id="${http.ID}_headers" class="headers"></div>
+
+				<h4>Parameters</h4>
+				<div id="${http.ID}_params" class="params"></div>
+
+				<h4>Run response</h4>
+				<pre id="${http.ID}_response" class="response mono"></pre>
+
+				<h4>Attack results</h4>
+				<div id="${http.ID}_results" class="results"></div>
+			</div>
 		`
-
-		if (Object.keys(http.Headers).length > 0) {
-			w += "<h4>Headers</h4>"
-			w += renderHttpTargetHeaders(target, http)
-		}
-
-		if (Object.keys(http.Params).length > 0) {
-			w += "<h4>Parameters</h4>"
-			w += renderHttpTargetParams(target, http)
-		}
-
-		w += `
-			<h4>Run response</h4>
-			<pre id="${http.ID}_response" class="mono">
-			</pre>
-		`
-
-		if (http.Results && Object.keys(http.Results).length > 0) {
-			w += "<h4>Attack results</h4>"
-			w += renderHttpAttackResults(target, http)
-		}
-
-		w += "</div>"
 	}
 	w += "</div>"
 
 	document.getElementById("main-content").innerHTML = w
+
+	for (let x = 0; x < target.HttpTargets.length; x++) {
+		let http = target.HttpTargets[x]
+
+		if (Object.keys(http.Headers).length > 0) {
+			renderHttpTargetHeaders(target, http)
+		}
+
+		if (Object.keys(http.Params).length > 0) {
+			renderHttpTargetParams(target, http)
+		}
+
+		if (http.Results && Object.keys(http.Results).length > 0) {
+			renderHttpAttackResults(target, http)
+		}
+	}
 }
 
 function renderHttpTargetHeaders(target, http) {
-	let w = `<div id="${http.ID}_headers">`
+	let w = ""
 	for (const k in http.Headers) {
 		w += `
 			<div class="input">
@@ -184,12 +191,11 @@ function renderHttpTargetHeaders(target, http) {
 			</div>
 		`
 	}
-	w += "</div>"
-	return w
+	document.getElementById(`${http.ID}_headers`).innerHTML = w
 }
 
 function renderHttpTargetParams(target, http) {
-	let w = `<div id="${http.ID}_params">`
+	let w = ""
 	for (const k in http.Params) {
 		w += `
 			<div class="input">
@@ -201,30 +207,33 @@ function renderHttpTargetParams(target, http) {
 			</div>
 		`
 	}
-	w += "</div>"
-	return w
+	document.getElementById(`${http.ID}_params`).innerHTML = w
 }
 
 function renderHttpAttackResults(target, http) {
-	let w = `<div id="${http.ID}_results">`
+	let w = ""
 	for (let x = 0; x < http.Results.length; x++) {
 		let result = http.Results[x]
 		w += `
-			<div>
-				<button onclick="getAttackResult(this, '${result.Name}')">
+			<div class="result-name">
+				<button onclick="attackResultGet(this, '${result.Name}')">
 					Show
 				</button>
 				&nbsp;
 				--
 				&nbsp;
 				${result.Name}
+				&nbsp;
+				<button onclick="attackResultDelete('${result.Name}')">
+					Delete
+				</button>
+
 			</div>
 			<div class="result" id="${result.Name}" style="display: none;">
 			</div>
 		`
 	}
-	w += "</div>"
-	return w
+	document.getElementById(`${http.ID}_results`).innerHTML = w
 }
 
 async function run(targetID, httpTargetID) {
@@ -273,7 +282,38 @@ async function attack(targetID, httpTargetID) {
 	let res = await fres.json()
 }
 
-async function getAttackResult(button, name) {
+async function attackResultDelete(name) {
+	let url = "/_trunks/api/target/attack/result?name=" + name
+	let fres = await fetch(url, {
+		method: "DELETE",
+	})
+	let res = await fres.json()
+	if (res.code != 200) {
+		console.log("attackResultDelete: ", res)
+		notifError(res.message)
+		return
+	}
+
+	let ids = name.split(".")
+	let target = _targets[ids[0]]
+	if (!target) {
+		return
+	}
+	let httpTarget = getHttpTargetByID(target, ids[1])
+	if (!httpTarget) {
+		return
+	}
+	for (let x = 0; x < httpTarget.Results.length; x++) {
+		let result = httpTarget.Results[x]
+		if (result.Name == name) {
+			httpTarget.Results.splice(x, 1)
+			renderHttpAttackResults(target, httpTarget)
+			return
+		}
+	}
+}
+
+async function attackResultGet(button, name) {
 	let el = document.getElementById(name)
 
 	if (el.style.display === "block") {
@@ -319,4 +359,26 @@ function onChangeHttpParam(targetID, httpTargetID, key, val) {
 	let target = _targets[targetID]
 	let httpTarget = getHttpTargetByID(target, httpTargetID)
 	httpTarget.Params[key] = val
+}
+
+function notif(msg) {
+	let root = document.getElementById("notif")
+	let item = document.createElement("div");
+	item.innerHTML = msg
+	root.appendChild(item)
+
+	setTimeout(function() {
+		root.removeChild(item)
+	}, 5000)
+}
+
+function notifError(msg) {
+	let root = document.getElementById("notif-error")
+	let item = document.createElement("div");
+	item.innerHTML = msg
+	root.appendChild(item)
+
+	setTimeout(function() {
+		root.removeChild(item)
+	}, 5000)
 }

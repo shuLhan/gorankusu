@@ -200,7 +200,7 @@ func (trunks *Trunks) registerHttpApis() (err error) {
 		Path:         apiTargetAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttackResultsDelete,
+		Call:         trunks.apiTargetAttackResultDelete,
 	})
 	if err != nil {
 		return err
@@ -302,32 +302,14 @@ func (trunks *Trunks) apiTargetAttackCancel(epr *libhttp.EndpointRequest) (resbo
 }
 
 func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	res := &libhttp.EndpointResponse{
-		E: liberrors.E{
-			Code: http.StatusNotFound,
-			Name: "ERR_ATTACK_RESULT_NOT_FOUND",
-		},
-	}
-
 	name := epr.HttpRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
 	}
 
-	t, ht := trunks.getTargetByResultFilename(name)
-	if t == nil {
-		res.Message = "Target ID not found"
-		return nil, res
-	}
-	if ht == nil {
-		res.Message = "HttpTarget ID not found"
-		return nil, res
-	}
-
-	result := ht.getResultByName(name)
-	if result == nil {
-		res.Message = "Result file not found"
-		return nil, res
+	_, _, result, err := trunks.getAttackResultByName(name)
+	if err != nil {
+		return nil, err
 	}
 
 	err = result.load()
@@ -335,15 +317,33 @@ func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (re
 		return nil, err
 	}
 
+	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Name = "OK_TARGET_ATTACK_RESULT"
+	res.Name = "OK_TARGET_ATTACK_RESULT_GET"
 	res.Data = result
 
-	return json.Marshal(res)
+	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetAttackResultsDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	return resbody, nil
+func (trunks *Trunks) apiTargetAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	name := epr.HttpRequest.Form.Get(paramNameName)
+	if len(name) == 0 {
+		return nil, errInvalidParameter(paramNameName, name)
+	}
+
+	_, ht, result, err := trunks.getAttackResultByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	ht.deleteResult(result)
+
+	res := libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Name = "OK_TARGET_ATTACK_RESULT_GET"
+	res.Data = result
+
+	return json.Marshal(&res)
 }
 
 func (trunks *Trunks) apiTargetRun(epr *libhttp.EndpointRequest) ([]byte, error) {
@@ -389,6 +389,33 @@ func (trunks *Trunks) getTargetByID(id string) *Target {
 		}
 	}
 	return nil
+}
+
+func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HttpTarget, result *AttackResult, err error) {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code: http.StatusNotFound,
+			Name: "ERR_ATTACK_RESULT_NOT_FOUND",
+		},
+	}
+
+	t, ht = trunks.getTargetByResultFilename(name)
+	if t == nil {
+		res.Message = "Target ID not found"
+		return nil, nil, nil, res
+	}
+	if ht == nil {
+		res.Message = "HttpTarget ID not found"
+		return nil, nil, nil, res
+	}
+
+	result = ht.getResultByName(name)
+	if result == nil {
+		res.Message = "Result file not found"
+		return nil, nil, nil, res
+	}
+
+	return t, ht, result, nil
 }
 
 func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HttpTarget) {

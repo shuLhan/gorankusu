@@ -3,6 +3,28 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
+#notif,
+#notif-error {
+	position: absolute;
+	top: 1em;
+	left: 10%;
+	width: 80%;
+}
+
+#notif > div {
+	background-color: white;
+	border: 1px solid lightgrey;
+	margin: 1em auto;
+	padding: 1em;
+}
+
+#notif-error > div {
+	background-color: salmon;
+	margin: 1em auto;
+	padding: 1em;
+}
+
 .nav {
 	height: calc(100% - 2em);
 	padding: 1em;
@@ -41,8 +63,11 @@ body {
 }
 .mono {
 	background-color: cornsilk;
-	border-radius: 1em;
 	font-family: monospace;
 	padding: 1em;
 	overflow: auto;
+}
+
+.results > .result-name {
+	margin-bottom: 1em;
 }

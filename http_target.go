@@ -5,10 +5,12 @@
 package trunks
 
 import (
+	"os"
 	"path/filepath"
 	"sync"
 
 	libhttp "github.com/shuLhan/share/lib/http"
+	"github.com/shuLhan/share/lib/mlog"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
@@ -87,6 +89,11 @@ func (ht *HttpTarget) deleteResult(result *AttackResult) {
 	copy(ht.Results[x:], ht.Results[x+1:])
 	ht.Results[len(ht.Results)-1] = nil
 	ht.Results = ht.Results[:len(ht.Results)-1]
+
+	err := os.Remove(result.fullpath)
+	if err != nil {
+		mlog.Errf("deleteResult: %q: %s\n", result.fullpath, err)
+	}
 }
 
 func (ht *HttpTarget) addResult(dir, name string) (err error) {
