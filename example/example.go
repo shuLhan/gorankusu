@@ -17,12 +17,14 @@ import (
 )
 
 const (
-	pathExampleGet = "/example/get"
+	pathExampleGet      = "/example/get"
+	pathExamplePostForm = "/example/post/form"
 )
 
 type Example struct {
-	trunks           *trunks.Trunks
-	targetExampleGet vegeta.Target
+	trunks                *trunks.Trunks
+	targetExampleGet      vegeta.Target
+	targetExamplePostForm vegeta.Target
 }
 
 //
@@ -31,7 +33,7 @@ type Example struct {
 func New() (ex *Example, err error) {
 	env := &trunks.Environment{
 		ResultsDir:    "testdata/example/",
-		ResultsSuffix: "_trunks_example",
+		ResultsSuffix: "example",
 	}
 
 	ex = &Example{}
@@ -73,6 +75,18 @@ func (ex *Example) registerEndpoints() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExampleGet,
 	})
+	if err != nil {
+		return err
+	}
+
+	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         pathExamplePostForm,
+		RequestType:  libhttp.RequestTypeForm,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         ex.pathExamplePostForm,
+	})
+
 	return err
 }
 
@@ -92,13 +106,32 @@ func (ex *Example) registerTargets() (err error) {
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExampleGet,
 			RequestType: libhttp.RequestTypeQuery,
+			Headers: trunks.KeyValue{
+				"X-Get": "1",
+			},
 			Params: trunks.KeyValue{
 				"Param1": "1",
 			},
 			Run:         ex.runExampleGet,
+			AllowAttack: true,
 			Attack:      ex.attackExampleGet,
 			PreAttack:   ex.preattackExampleGet,
+		}, {
+			Name:        "HTTP Post Form",
+			Method:      libhttp.RequestMethodPost,
+			Path:        pathExamplePostForm,
+			RequestType: libhttp.RequestTypeForm,
+			Headers: trunks.KeyValue{
+				"X-PostForm": "1",
+			},
+			Params: trunks.KeyValue{
+				"Param1": "1",
+				"Param2": "a string",
+			},
+			Run:         ex.runExamplePostForm,
 			AllowAttack: true,
+			PreAttack:   ex.preattackExamplePostForm,
+			Attack:      ex.attackExamplePostForm,
 		}},
 	}
 
@@ -116,11 +149,20 @@ func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) 
 	return json.Marshal(&res)
 }
 
-func (ex *Example) runExampleGet(target *trunks.Target, req *trunks.RunRequest) ([]byte, error) {
-	if target.HttpClient == nil {
-		target.HttpClient = libhttp.NewClient(target.Opts.BaseUrl, nil, true)
+func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, error) {
+	res := libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Message = pathExamplePostForm
+	res.Data = epr.HttpRequest.Form
+
+	return json.Marshal(&res)
+}
+
+func (ex *Example) runExampleGet(req *trunks.RunRequest) ([]byte, error) {
+	if req.Target.HttpClient == nil {
+		req.Target.HttpClient = libhttp.NewClient(req.Target.Opts.BaseUrl, nil, true)
 	}
-	_, resbody, err := target.HttpClient.Get(
+	_, resbody, err := req.Target.HttpClient.Get(
 		req.HttpTarget.Path,
 		req.HttpTarget.Headers.ToHttpHeader(),
 		req.HttpTarget.Params.ToUrlValues())
@@ -149,6 +191,44 @@ func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
 		rr.HttpTarget.AttackLocker.Lock()
 		*tgt = ex.targetExampleGet
+		rr.HttpTarget.AttackLocker.Unlock()
+		return nil
+	}
+}
+
+func (ex *Example) runExamplePostForm(req *trunks.RunRequest) ([]byte, error) {
+	if req.Target.HttpClient == nil {
+		req.Target.HttpClient = libhttp.NewClient(req.Target.Opts.BaseUrl, nil, true)
+	}
+	_, resbody, err := req.Target.HttpClient.PostForm(
+		req.HttpTarget.Path,
+		req.HttpTarget.Headers.ToHttpHeader(),
+		req.HttpTarget.Params.ToUrlValues())
+	if err != nil {
+		return nil, err
+	}
+	return resbody, nil
+}
+
+func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
+	ex.targetExamplePostForm = vegeta.Target{
+		Method: rr.HttpTarget.Method.String(),
+		URL:    fmt.Sprintf("%s%s", rr.Target.Opts.BaseUrl, rr.HttpTarget.Path),
+		Header: rr.HttpTarget.Headers.ToHttpHeader(),
+	}
+
+	q := rr.HttpTarget.Params.ToUrlValues().Encode()
+	if len(q) > 0 {
+		ex.targetExamplePostForm.Body = []byte(q)
+	}
+
+	fmt.Printf("preattackExamplePostForm: %+v\n", ex.targetExamplePostForm)
+}
+
+func (ex *Example) attackExamplePostForm(rr *trunks.RunRequest) vegeta.Targeter {
+	return func(tgt *vegeta.Target) error {
+		rr.HttpTarget.AttackLocker.Lock()
+		*tgt = ex.targetExamplePostForm
 		rr.HttpTarget.AttackLocker.Unlock()
 		return nil
 	}

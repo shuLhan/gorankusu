@@ -23,7 +23,7 @@ body {
 	padding: 1em;
 	position: fixed;
 	width: calc(100% - 18em);
-	height: 100%;
+	height: calc(100% - 4em);
 	overflow: auto;
 }
 .input {

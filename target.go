@@ -17,7 +17,7 @@ type Target struct {
 	ID          string
 	Name        string
 	Opts        *AttackOptions
-	Vars        map[string]string
+	Vars        KeyValue
 	HttpTargets []*HttpTarget
 
 	// HttpClient that can be used for running HttpTarget.
@@ -41,7 +41,7 @@ func (target *Target) init() (err error) {
 	}
 
 	if target.Vars == nil {
-		target.Vars = make(map[string]string, 0)
+		target.Vars = KeyValue{}
 	}
 
 	for _, ht := range target.HttpTargets {

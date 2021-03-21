@@ -2,14 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//
-// Module trunks is a library and HTTP service that provide web user interface
-// to test HTTP service, similar to Postman, and for load testing.
-//
-// For the load testing we use vegeta [1] as the backend.
-//
-// [1] https://github.com/tsenart/vegeta
-//
 package trunks
 
 import (
@@ -316,18 +308,20 @@ func (trunks *Trunks) apiTargetRun(epr *libhttp.EndpointRequest) ([]byte, error)
 		return nil, errInvalidTarget("")
 	}
 
-	target := trunks.getTargetByID(req.Target.ID)
-	if target == nil {
+	origTarget := trunks.getTargetByID(req.Target.ID)
+	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
 	}
 
 	if req.HttpTarget != nil {
-		httpTarget := target.getHttpTargetByID(req.HttpTarget.ID)
-		if httpTarget == nil {
+		origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+		if origHttpTarget == nil {
 			return nil, errInvalidHttpTarget(req.HttpTarget.ID)
 		}
 
-		return httpTarget.Run(target, req)
+		req.merge(trunks.Env, origTarget, origHttpTarget)
+
+		return req.HttpTarget.Run(req)
 	}
 
 	return nil, errInvalidHttpTarget("")
@@ -368,8 +362,6 @@ func (trunks *Trunks) workerAttackQueue() (err error) {
 		) {
 			err = rr.result.add(res)
 			if err != nil {
-				attacker.Stop()
-				rr.result.cancel()
 				break
 			}
 
@@ -388,25 +380,28 @@ func (trunks *Trunks) workerAttackQueue() (err error) {
 			rr.result.cancel()
 
 			if err != nil {
-				mlog.Errf("%s: %s fail: %w.\n", logp, rr.result.Name, err)
+				mlog.Errf("%s: %s fail: %s.\n", logp, rr.result.Name, err)
 			} else {
 				mlog.Outf("%s: %s canceled.\n", logp, rr.result.Name)
+				// Inform the caller that the attack has been canceled.
 				trunks.cancelq <- true
 			}
-		} else {
-			err := rr.result.finish()
-			if err != nil {
-				mlog.Errf("%s %s: %s\n", logp, rr.result.TargetID, err)
-			}
 
-			rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
-
-			sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
-				return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
-			})
-
-			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
+			return nil
 		}
+
+		err := rr.result.finish()
+		if err != nil {
+			mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
+		}
+
+		rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
+
+		sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
+			return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
+		})
+
+		mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 	}
 	return nil
 }

@@ -1,4 +1,4 @@
 .PHONY: run
 
 run:
-	DEBUG=2 go run ./cmd/trunks
+	DEBUG=3 go run ./cmd/trunks

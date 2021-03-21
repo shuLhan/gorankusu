@@ -145,7 +145,7 @@ function renderTarget(targetID) {
 
 		if (Object.keys(http.Headers).length > 0) {
 			w += "<h4>Headers</h4>"
-			w += renderHttpTargetHeaders(http)
+			w += renderHttpTargetHeaders(target, http)
 		}
 
 		if (Object.keys(http.Params).length > 0) {
@@ -172,7 +172,7 @@ function renderTarget(targetID) {
 	document.getElementById("main-content").innerHTML = w
 }
 
-function renderHttpTargetHeaders(http) {
+function renderHttpTargetHeaders(target, http) {
 	let w = `<div id="${http.ID}_headers">`
 	for (const k in http.Headers) {
 		w += `

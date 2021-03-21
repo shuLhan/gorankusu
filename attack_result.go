@@ -35,7 +35,6 @@ type AttackResult struct {
 
 	TargetID   string // TargetID the ID of HTTP target which own the result.
 	Name       string // Name of output file without path.
-	IsRunning  bool
 	TextReport []byte // TextReport the result reported as text.
 	HistReport []byte // HistReport the result reported as histogram text.
 
@@ -58,7 +57,8 @@ func newAttackResult(env *Environment, rr *RunRequest) (
 		hist:     &vegeta.Histogram{},
 	}
 
-	ar.Name = fmt.Sprintf("%s.%s.%dx%s.%s.bin", ar.TargetID,
+	ar.Name = fmt.Sprintf("%s.%s.%s.%dx%s.%s.bin",
+		rr.Target.ID, rr.HttpTarget.ID,
 		time.Now().Format(outputSuffixDate),
 		rr.Target.Opts.RatePerSecond, rr.Target.Opts.Duration,
 		env.ResultsSuffix)
@@ -95,8 +95,6 @@ func (ar *AttackResult) cancel() {
 	ar.mtx.Lock()
 	defer ar.mtx.Unlock()
 
-	ar.IsRunning = false
-
 	if ar.metrics != nil {
 		ar.metrics.Close()
 	}
@@ -126,7 +124,6 @@ func (ar *AttackResult) finish() (err error) {
 	ar.mtx.Lock()
 	defer ar.mtx.Unlock()
 
-	ar.IsRunning = false
 	ar.metrics.Close()
 
 	if ar.fout != nil {
