@@ -274,7 +274,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 
 	req.merge(trunks.Env, origTarget, origHttpTarget)
 
-	req.result, err = newLoadTestingResult(trunks.Env, req)
+	req.result, err = newAttackResult(trunks.Env, req)
 	if err != nil {
 		return nil, err
 	}

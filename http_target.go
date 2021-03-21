@@ -49,7 +49,7 @@ type HttpTarget struct {
 	Status       string
 
 	// Results contains list of load testing output.
-	Results []*loadTestingResult
+	Results []*AttackResult
 
 	// AllowAttack if its true the "Attack" button will be showed on user
 	// interface to allow client to run load testing on this HttpTarget.
@@ -71,7 +71,7 @@ func (ht *HttpTarget) init() {
 	}
 }
 
-func (ht *HttpTarget) deleteResult(result *loadTestingResult) {
+func (ht *HttpTarget) deleteResult(result *AttackResult) {
 	var x int
 	for ; x < len(ht.Results); x++ {
 		if ht.Results[x].Name == result.Name {
@@ -90,17 +90,17 @@ func (ht *HttpTarget) deleteResult(result *loadTestingResult) {
 }
 
 func (ht *HttpTarget) addResult(path, name string) (err error) {
-	ltr := &loadTestingResult{
+	ar := &AttackResult{
 		TargetID: ht.ID,
 		Name:     name,
 	}
 
-	err = ltr.init(path)
+	err = ar.init(path)
 	if err != nil {
 		return fmt.Errorf("HttpTarget.addResult: %s %s: %w", path, name, err)
 	}
 
-	ht.Results = append(ht.Results, ltr)
+	ht.Results = append(ht.Results, ar)
 
 	return nil
 }

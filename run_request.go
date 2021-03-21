@@ -16,7 +16,7 @@ type RunRequest struct {
 	Locker     sync.Mutex
 	Target     *Target
 	HttpTarget *HttpTarget
-	result     *loadTestingResult
+	result     *AttackResult
 }
 
 func (rr *RunRequest) String() string {

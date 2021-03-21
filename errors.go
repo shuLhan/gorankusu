@@ -12,14 +12,14 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-func errAttackConflict(ltr *loadTestingResult) error {
+func errAttackConflict(ar *AttackResult) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
 			Code:    http.StatusConflict,
 			Message: "another attack is already running",
 			Name:    "ERR_ATTACK_CONFLICT",
 		},
-		Data: ltr,
+		Data: ar,
 	}
 	return res
 }
