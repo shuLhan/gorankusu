@@ -96,7 +96,7 @@ func (ht *HttpTarget) deleteResult(result *AttackResult) {
 	}
 }
 
-func (ht *HttpTarget) addResult(dir, name string) (err error) {
+func (ht *HttpTarget) addResult(dir, name string) {
 	ar := &AttackResult{
 		HttpTargetID: ht.ID,
 		Name:         name,
@@ -104,8 +104,6 @@ func (ht *HttpTarget) addResult(dir, name string) (err error) {
 	}
 
 	ht.Results = append(ht.Results, ar)
-
-	return nil
 }
 
 func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {

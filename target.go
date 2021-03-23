@@ -56,7 +56,10 @@ func (target *Target) init() (err error) {
 	}
 
 	for _, wst := range target.WebSocketTargets {
-		wst.init()
+		err = wst.init()
+		if err != nil {
+			return fmt.Errorf("Target.init %s: %w", target.Name, err)
+		}
 	}
 
 	return nil

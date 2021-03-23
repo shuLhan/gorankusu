@@ -555,10 +555,11 @@ func (trunks *Trunks) scanResultsDir() {
 	}
 }
 
-func (trunks *Trunks) workerAttackQueue() (err error) {
+func (trunks *Trunks) workerAttackQueue() {
 	logp := "workerAttackQueue"
 
 	for rr := range trunks.attackq {
+		var err error
 		trunks.Env.AttackRunning = rr
 
 		rr.HttpTarget.PreAttack(rr)
@@ -617,5 +618,4 @@ func (trunks *Trunks) workerAttackQueue() (err error) {
 
 		trunks.Env.AttackRunning = nil
 	}
-	return nil
 }

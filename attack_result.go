@@ -6,7 +6,6 @@ package trunks
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -191,11 +190,4 @@ func (ar *AttackResult) load() (err error) {
 	}
 
 	return ar.finish()
-}
-
-func (ar *AttackResult) pack() (b []byte, err error) {
-	ar.mtx.Lock()
-	b, err = json.Marshal(ar)
-	ar.mtx.Unlock()
-	return b, err
 }

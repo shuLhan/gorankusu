@@ -175,7 +175,10 @@ func (ex *Example) registerTargets() (err error) {
 		}},
 	}
 
-	ex.trunks.RegisterTarget(targetHttp)
+	err = ex.trunks.RegisterTarget(targetHttp)
+	if err != nil {
+		return err
+	}
 
 	targetWebSocket := &trunks.Target{
 		Name:    "Example WebSocket",
@@ -193,7 +196,10 @@ func (ex *Example) registerTargets() (err error) {
 		}},
 	}
 
-	ex.trunks.RegisterTarget(targetWebSocket)
+	err = ex.trunks.RegisterTarget(targetWebSocket)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
