@@ -102,12 +102,14 @@ function renderTarget(targetID) {
 	}
 	w = `
 		<h2>${target.Name}</h2>
+
+		<div class="input">
+			<label> Base URL </label>:
+			<input id="BaseUrl" readonly="" value="${target.BaseUrl}"/>
+		</div>
+
 		<div class="AttackOpts">
 			<h3> Attack options </h3>
-			<div class="input">
-				<label> Base URL </label>:
-				<input id="BaseUrl" readonly="" value="${target.Opts.BaseUrl}"/>
-			</div>
 			<div class="input">
 				<label> Duration </label>:
 				<input id="Duration" value="${target.Opts.Duration / 1e9}"/>
@@ -333,7 +335,7 @@ async function attackResultDelete(name) {
 	let msg = `Are you sure you want to delete the result: ${name}?`
 	let yes = window.confirm(msg)
 	if (!yes) {
-		return;
+		return
 	}
 
 	let url = "/_trunks/api/target/attack/result?name=" + name

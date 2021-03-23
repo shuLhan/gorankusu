@@ -48,13 +48,13 @@ type HttpTarget struct {
 	Attack       HttpAttackHandler    `json:"-"`
 	PreAttack    HttpPreAttackHandler `json:"-"`
 	AttackLocker sync.Mutex           `json:"-"` // Use this inside the Attack to lock resource.
-	Status       string
 
 	// Results contains list of load testing output.
 	Results []*AttackResult
 
 	// AllowAttack if its true the "Attack" button will be showed on user
-	// interface to allow client to run load testing on this HttpTarget.
+	// interface and client will be allowed to run load testing on this
+	// HttpTarget.
 	AllowAttack bool
 }
 

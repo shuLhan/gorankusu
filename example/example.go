@@ -92,9 +92,9 @@ func (ex *Example) registerEndpoints() (err error) {
 
 func (ex *Example) registerTargets() (err error) {
 	targetHttp := &trunks.Target{
-		Name: "Example",
+		Name:    "Example HTTP",
+		BaseUrl: fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
 		Opts: &trunks.AttackOptions{
-			BaseUrl:       fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
 			Duration:      300 * time.Second,
 			RatePerSecond: 1,
 		},
@@ -160,7 +160,7 @@ func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, er
 
 func (ex *Example) runExampleGet(req *trunks.RunRequest) ([]byte, error) {
 	if req.Target.HttpClient == nil {
-		req.Target.HttpClient = libhttp.NewClient(req.Target.Opts.BaseUrl, nil, true)
+		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
 	}
 	_, resbody, err := req.Target.HttpClient.Get(
 		req.HttpTarget.Path,
@@ -175,7 +175,7 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) ([]byte, error) {
 func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 	ex.targetExampleGet = vegeta.Target{
 		Method: rr.HttpTarget.Method.String(),
-		URL:    fmt.Sprintf("%s%s", rr.Target.Opts.BaseUrl, rr.HttpTarget.Path),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
 		Header: rr.HttpTarget.Headers.ToHttpHeader(),
 	}
 
@@ -198,7 +198,7 @@ func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 
 func (ex *Example) runExamplePostForm(req *trunks.RunRequest) ([]byte, error) {
 	if req.Target.HttpClient == nil {
-		req.Target.HttpClient = libhttp.NewClient(req.Target.Opts.BaseUrl, nil, true)
+		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
 	}
 	_, resbody, err := req.Target.HttpClient.PostForm(
 		req.HttpTarget.Path,
@@ -213,7 +213,7 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) ([]byte, error) {
 func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
 	ex.targetExamplePostForm = vegeta.Target{
 		Method: rr.HttpTarget.Method.String(),
-		URL:    fmt.Sprintf("%s%s", rr.Target.Opts.BaseUrl, rr.HttpTarget.Path),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
 		Header: rr.HttpTarget.Headers.ToHttpHeader(),
 	}
 

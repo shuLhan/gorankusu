@@ -14,11 +14,18 @@ import (
 // Target contains group of HttpTarget that can be tested by Trunks.
 //
 type Target struct {
-	ID          string
-	Name        string
-	Opts        *AttackOptions
-	Vars        KeyValue
-	HttpTargets []*HttpTarget
+	ID   string
+	Name string
+
+	// BaseUrl contains the target address that serve the service to
+	// be tested.
+	// This field is required.
+	BaseUrl string
+
+	Opts             *AttackOptions
+	Vars             KeyValue
+	HttpTargets      []*HttpTarget
+	WebSocketTargets []*WebSocketTarget
 
 	// HttpClient that can be used for running HttpTarget.
 	HttpClient *libhttp.Client `json:"-"`
@@ -28,6 +35,9 @@ func (target *Target) init() (err error) {
 	if len(target.Name) == 0 {
 		return fmt.Errorf("Target.Name is empty")
 	}
+	if len(target.BaseUrl) == 0 {
+		return fmt.Errorf("Target.BaseUrl is not defined")
+	}
 
 	target.ID = generateID(target.Name)
 
@@ -35,10 +45,7 @@ func (target *Target) init() (err error) {
 		target.Opts = &AttackOptions{}
 	}
 
-	err = target.Opts.init()
-	if err != nil {
-		return err
-	}
+	target.Opts.init()
 
 	if target.Vars == nil {
 		target.Vars = KeyValue{}
@@ -55,6 +62,15 @@ func (target *Target) getHttpTargetByID(id string) *HttpTarget {
 	for _, ht := range target.HttpTargets {
 		if ht.ID == id {
 			return ht
+		}
+	}
+	return nil
+}
+
+func (target *Target) getWebSocketTargetByID(id string) (wst *WebSocketTarget) {
+	for _, wst = range target.WebSocketTargets {
+		if wst.ID == id {
+			return wst
 		}
 	}
 	return nil

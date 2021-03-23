@@ -117,7 +117,7 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 //
 func (trunks *Trunks) Start() (err error) {
 	mlog.Outf("trunks: scanning previous attack results...\n")
-	trunks.scanAttackResults()
+	trunks.scanResultsDir()
 
 	mlog.Outf("trunks: starting attack worker...\n")
 	go trunks.workerAttackQueue()
@@ -285,7 +285,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 	trunks.attackq <- req
 
 	msg := fmt.Sprintf("Attacking %s/%s with %d RPS for %s seconds",
-		req.Target.Opts.BaseUrl, req.HttpTarget.Path,
+		req.Target.BaseUrl, req.HttpTarget.Path,
 		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
 
 	mlog.Outf("%s: %s\n", logp, msg)
@@ -453,13 +453,14 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *Htt
 }
 
 //
-// scanAttackResults scan the environment's ResultsDir for past attack results
-// and add it to each target based on ID.
-// Due to size of output can be big (maybe more than 5000 records), this
+// scanResultsDir scan the environment's ResultsDir for the past attack
+// results and add it to each target based on ID on file name.
+//
+// Due to size of file can be big (maybe more than 5000 records), this
 // function only parse the file name and append it to Results field.
 //
-func (trunks *Trunks) scanAttackResults() {
-	logp := "scanAttackResults"
+func (trunks *Trunks) scanResultsDir() {
+	logp := "scanResultsDir"
 
 	dir, err := os.Open(trunks.Env.ResultsDir)
 	if err != nil {
