@@ -13,10 +13,11 @@ import (
 )
 
 type RunRequest struct {
-	Locker     sync.Mutex
-	Target     *Target
-	HttpTarget *HttpTarget
-	result     *AttackResult
+	Locker          sync.Mutex
+	Target          *Target
+	HttpTarget      *HttpTarget
+	WebSocketTarget *WebSocketTarget
+	result          *AttackResult
 }
 
 func (rr *RunRequest) String() string {
@@ -24,9 +25,10 @@ func (rr *RunRequest) String() string {
 }
 
 //
-// merge the request parameter into original target and HTTP target.
+// mergeHttpTarget merge the request parameter into original target and HTTP
+// target.
 //
-func (rr *RunRequest) merge(env *Environment, origTarget *Target, origHttpTarget *HttpTarget) {
+func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, origHttpTarget *HttpTarget) {
 	if rr.Target.Opts.Duration > 0 &&
 		rr.Target.Opts.Duration <= env.MaxAttackDuration {
 		origTarget.Opts.Duration = rr.Target.Opts.Duration
@@ -52,4 +54,38 @@ func (rr *RunRequest) merge(env *Environment, origTarget *Target, origHttpTarget
 	origHttpTarget.Headers = rr.HttpTarget.Headers
 	origHttpTarget.Params = rr.HttpTarget.Params
 	rr.HttpTarget = origHttpTarget
+}
+
+//
+// mergeWebSocketTarget merge the request parameter into original target and
+// WebSocket target.
+//
+func (rr *RunRequest) mergeWebSocketTarget(env *Environment,
+	origTarget *Target, origWebSocketTarget *WebSocketTarget,
+) {
+	if rr.Target.Opts.Duration > 0 &&
+		rr.Target.Opts.Duration <= env.MaxAttackDuration {
+		origTarget.Opts.Duration = rr.Target.Opts.Duration
+	}
+
+	if rr.Target.Opts.RatePerSecond > 0 &&
+		rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
+		origTarget.Opts.RatePerSecond = rr.Target.Opts.RatePerSecond
+		origTarget.Opts.ratePerSecond = vegeta.Rate{
+			Freq: rr.Target.Opts.RatePerSecond,
+			Per:  time.Second,
+		}
+	}
+
+	if rr.Target.Opts.Timeout > 0 &&
+		rr.Target.Opts.Timeout <= DefaultAttackTimeout {
+		origTarget.Opts.Timeout = rr.Target.Opts.Timeout
+	}
+
+	origTarget.Vars = rr.Target.Vars
+	rr.Target = origTarget
+
+	origWebSocketTarget.Headers = rr.WebSocketTarget.Headers
+	origWebSocketTarget.Params = rr.WebSocketTarget.Params
+	rr.WebSocketTarget = origWebSocketTarget
 }

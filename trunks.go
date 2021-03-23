@@ -36,7 +36,8 @@ const (
 	apiEnvironment        = "/_trunks/api/environment"
 	apiTargetAttack       = "/_trunks/api/target/attack"
 	apiTargetAttackResult = "/_trunks/api/target/attack/result"
-	apiTargetRun          = "/_trunks/api/target/run"
+	apiTargetRunHttp      = "/_trunks/api/target/run/http"
+	apiTargetRunWebSocket = "/_trunks/api/target/run/websocket"
 	apiTargets            = "/_trunks/api/targets"
 )
 
@@ -184,6 +185,9 @@ func (trunks *Trunks) registerHttpApis() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         trunks.apiTargetAttackCancel,
 	})
+	if err != nil {
+		return err
+	}
 
 	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
@@ -208,10 +212,21 @@ func (trunks *Trunks) registerHttpApis() (err error) {
 
 	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         apiTargetRun,
+		Path:         apiTargetRunHttp,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetRun,
+		Call:         trunks.apiTargetRunHttp,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         apiTargetRunWebSocket,
+		RequestType:  libhttp.RequestTypeJSON,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         trunks.apiTargetRunWebSocket,
 	})
 	if err != nil {
 		return err
@@ -275,7 +290,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 		return nil, errAttackNotAllowed()
 	}
 
-	req.merge(trunks.Env, origTarget, origHttpTarget)
+	req.mergeHttpTarget(trunks.Env, origTarget, origHttpTarget)
 
 	req.result, err = newAttackResult(trunks.Env, req)
 	if err != nil {
@@ -365,7 +380,7 @@ func (trunks *Trunks) apiTargetAttackResultDelete(epr *libhttp.EndpointRequest) 
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetRun(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, error) {
 	req := &RunRequest{}
 	err := json.Unmarshal(epr.RequestBody, req)
 	if err != nil {
@@ -380,18 +395,47 @@ func (trunks *Trunks) apiTargetRun(epr *libhttp.EndpointRequest) ([]byte, error)
 		return nil, errInvalidTarget(req.Target.ID)
 	}
 
-	if req.HttpTarget != nil {
-		origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
-		if origHttpTarget == nil {
-			return nil, errInvalidHttpTarget(req.HttpTarget.ID)
-		}
-
-		req.merge(trunks.Env, origTarget, origHttpTarget)
-
-		return req.HttpTarget.Run(req)
+	if req.HttpTarget == nil {
+		return nil, errInvalidHttpTarget("")
 	}
 
-	return nil, errInvalidHttpTarget("")
+	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+	if origHttpTarget == nil {
+		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
+	}
+
+	req.mergeHttpTarget(trunks.Env, origTarget, origHttpTarget)
+
+	return req.HttpTarget.Run(req)
+}
+
+func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byte, error) {
+	req := &RunRequest{}
+	err := json.Unmarshal(epr.RequestBody, req)
+	if err != nil {
+		return nil, errInternal(err)
+	}
+	if req.Target == nil {
+		return nil, errInvalidTarget("")
+	}
+
+	origTarget := trunks.getTargetByID(req.Target.ID)
+	if origTarget == nil {
+		return nil, errInvalidTarget(req.Target.ID)
+	}
+
+	if req.WebSocketTarget == nil {
+		return nil, errInvalidWebSocketTarget("")
+	}
+
+	origWsTarget := origTarget.getWebSocketTargetByID(req.WebSocketTarget.ID)
+	if origWsTarget == nil {
+		return nil, errInvalidWebSocketTarget(req.WebSocketTarget.ID)
+	}
+
+	req.mergeWebSocketTarget(trunks.Env, origTarget, origWsTarget)
+
+	return req.WebSocketTarget.Run(req)
 }
 
 func (trunks *Trunks) apiTargets(epr *libhttp.EndpointRequest) (resbody []byte, err error) {

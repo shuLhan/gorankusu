@@ -79,3 +79,14 @@ func errInvalidHttpTarget(id string) error {
 	}
 	return res
 }
+
+func errInvalidWebSocketTarget(id string) error {
+	res := &libhttp.EndpointResponse{
+		E: liberrors.E{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("invalid or emtpy WebSocketTarget.ID: %q", id),
+			Name:    "ERR_INVALID_WEBSOCKET_TARGET",
+		},
+	}
+	return res
+}

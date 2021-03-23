@@ -141,7 +141,23 @@ function renderTarget(targetID) {
 		w += "</div>"
 	}
 
-	w += "<div class='HttpTargets'>"
+	w += `
+		<div id="${targetID}.HttpTargets" class="HttpTargets"></div>
+		<div id="${targetID}.WebSocketTargets" class="WebSocketTargets"></div>
+	`
+
+	document.getElementById("main-content").innerHTML = w
+
+	renderHttpTargets(target)
+	renderWebSocketTargets(target)
+}
+
+function renderHttpTargets(target) {
+	let w = "";
+
+	if (!target.HttpTargets) {
+		return;
+	}
 
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		let http = target.HttpTargets[x]
@@ -179,9 +195,8 @@ function renderTarget(targetID) {
 			</div>
 		`
 	}
-	w += "</div>"
 
-	document.getElementById("main-content").innerHTML = w
+	document.getElementById(`${target.ID}.HttpTargets`).innerHTML = w
 
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		let http = target.HttpTargets[x]
@@ -199,6 +214,54 @@ function renderTarget(targetID) {
 		}
 	}
 }
+
+function renderWebSocketTargets(target) {
+	let w = "";
+
+	if (!target.WebSocketTargets) {
+		return;
+	}
+
+	for (let x = 0; x < target.WebSocketTargets.length; x++) {
+		let wst = target.WebSocketTargets[x]
+
+		w += `
+			<div id="${wst.ID}" class="WebSocketTarget">
+				<h3>
+					${wst.Name}
+					<span class="WebSocketTargetActions">
+						<button onclick="runWebSocket('${target.ID}', '${wst.ID}')">
+							Run
+						</button>
+					</span>
+				</h3>
+
+				<div id="${wst.ID}_headers" class="headers"></div>
+
+				<h4>Parameters</h4>
+				<div id="${wst.ID}_params" class="params"></div>
+
+				<h4>Run response</h4>
+				<pre id="${wst.ID}_response" class="response mono"></pre>
+			</div>
+		`
+	}
+
+	document.getElementById(`${target.ID}.WebSocketTargets`).innerHTML = w
+
+	for (let x = 0; x < target.WebSocketTargets.length; x++) {
+		let wst = target.WebSocketTargets[x]
+
+		if (wst.Headers && Object.keys(wst.Headers).length > 0) {
+			renderHttpTargetHeaders(target, wst)
+		}
+
+		if (wst.Params && Object.keys(wst.Params).length > 0) {
+			renderHttpTargetParams(target, wst)
+		}
+	}
+}
+
 
 function renderHttpTargetHeaders(target, http) {
 	let w = ""
@@ -262,7 +325,7 @@ async function run(targetID, httpTargetID) {
 	req.Target = _targets[targetID]
 	req.HttpTarget = getHttpTargetByID(req.Target, httpTargetID)
 
-	let fres = await fetch("/_trunks/api/target/run", {
+	let fres = await fetch("/_trunks/api/target/run/http", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -277,6 +340,29 @@ async function run(targetID, httpTargetID) {
 	}
 
 	let elResponse = document.getElementById(httpTargetID + "_response")
+	elResponse.innerHTML = JSON.stringify(res, null, 2)
+}
+
+async function runWebSocket(targetID, wstID) {
+	let req = {}
+	req.Target = _targets[targetID]
+	req.WebSocketTarget = getWebSocketTargetByID(req.Target, wstID)
+
+	let fres = await fetch("/_trunks/api/target/run/websocket", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(req),
+	})
+
+	let res = await fres.json()
+	if (res.code != 200) {
+		notifError(res.message)
+		return
+	}
+
+	let elResponse = document.getElementById(wstID + "_response")
 	elResponse.innerHTML = JSON.stringify(res, null, 2)
 }
 
@@ -405,6 +491,15 @@ function getHttpTargetByID(target, id) {
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		if (id == target.HttpTargets[x].ID) {
 			return target.HttpTargets[x]
+		}
+	}
+	return null
+}
+
+function getWebSocketTargetByID(target, id) {
+	for (let x = 0; x < target.WebSocketTargets.length; x++) {
+		if (id == target.WebSocketTargets[x].ID) {
+			return target.WebSocketTargets[x]
 		}
 	}
 	return null

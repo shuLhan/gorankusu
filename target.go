@@ -55,6 +55,10 @@ func (target *Target) init() (err error) {
 		ht.init()
 	}
 
+	for _, wst := range target.WebSocketTargets {
+		wst.init()
+	}
+
 	return nil
 }
 
