@@ -32,18 +32,46 @@ async function main() {
 	let targets = res.data
 
 	let w = ""
-	for (let x = 0; x < targets.length; x++) {
-		let target = targets[x]
+	for (let target of targets) {
 		_targets[target.ID] = target
 
 		w += `
-			<div class="nav-item">
-				<h3 onclick="renderTarget('${target.ID}')">${target.Name}</h3>
+			<div class="navTarget">
+				<h3 onclick="renderTarget('${target.ID}', '', '')">${target.Name}</h3>
+		`
+
+		if (target.HttpTargets) {
+			for (let ht of target.HttpTargets) {
+				w += `
+					<div
+						class="navHttpTarget"
+						onclick="renderTarget('${target.ID}', '${ht.ID}', '')"
+					>
+						${ht.Name}
+					</div>
+				`
+			}
+		}
+
+		if (target.WebSocketTargets) {
+			for (let wst of target.WebSocketTargets) {
+				w += `
+					<div
+						class="navWebSocketTarget"
+						onclick="renderTarget('${target.ID}', '', '${wst.ID}')"
+					>
+						${wst.Name}
+					</div>
+				`
+			}
+		}
+
+		w += `
 			</div>
 		`
 	}
 
-	document.getElementById("nav-content").innerHTML = w
+	document.getElementById("navContent").innerHTML = w
 }
 
 async function environmentGet() {
@@ -64,7 +92,7 @@ async function environmentGet() {
 	}
 }
 
-async function environmentRender() {
+async function renderEnvironment() {
 	document.getElementById("main-content").innerHTML = `
 		<h2> Environment </h2>
 		<div class="environment">
@@ -94,7 +122,7 @@ async function environmentRender() {
 	`
 }
 
-function renderTarget(targetID) {
+function renderTarget(targetID, htid, wstid) {
 	let target = _targets[targetID]
 	if (target === null) {
 		console.log(`invalid target ${targetID}`)
@@ -150,6 +178,12 @@ function renderTarget(targetID) {
 
 	renderHttpTargets(target)
 	renderWebSocketTargets(target)
+
+	if (htid) {
+		document.getElementById(htid).scrollIntoView()
+	} else if (wstid) {
+		document.getElementById(wstid).scrollIntoView()
+	}
 }
 
 function renderHttpTargets(target) {
@@ -398,8 +432,12 @@ async function run(targetID, httpTargetID) {
 		return
 	}
 
-	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest)
-	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse)
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(
+		res.data.DumpRequest,
+	)
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(
+		res.data.DumpResponse,
+	)
 }
 
 async function runWebSocket(targetID, wstID) {

@@ -26,16 +26,24 @@ body {
 }
 
 .nav {
-	height: calc(100% - 2em);
+	height: calc(100% - 4em);
 	padding: 1em;
 	position: fixed;
 	width: 14em;
 	border-right: 1px solid lightgrey;
+	overflow: auto;
 }
-.nav .nav-item {
+.nav .navTarget {
 	cursor: pointer;
 	margin-bottom: 1em;
 }
+.nav .navHttpTarget,
+.nav .navWebSocketTarget {
+	cursor: pointer;
+	margin-bottom: 1em;
+	margin-left: 1em;
+}
+
 .nav .footer {
 	bottom: 0;
 	font-size: 9pt;
