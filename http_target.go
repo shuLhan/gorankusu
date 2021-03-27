@@ -5,6 +5,7 @@
 package trunks
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -31,12 +32,12 @@ type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
 type HttpPreAttackHandler func(rr *RunRequest)
 
 type HttpTarget struct {
-	// ID of target, optional.
-	// If its empty, it will generated using value from Path.
-	ID string
-
-	// Name of target, optional, default to Path.
+	// Name of target, required.
 	Name string
+
+	// ID of target, optional.
+	// If its empty, it will generated using value from Name.
+	ID string
 
 	Method      libhttp.RequestMethod
 	Path        string
@@ -58,12 +59,13 @@ type HttpTarget struct {
 	AllowAttack bool
 }
 
-func (ht *HttpTarget) init() {
-	if len(ht.ID) == 0 {
-		ht.ID = generateID(ht.Path)
-	}
+func (ht *HttpTarget) init() (err error) {
 	if len(ht.Name) == 0 {
-		ht.Name = ht.Path
+		return fmt.Errorf("HttpTarget.Name is empty")
+
+	}
+	if len(ht.ID) == 0 {
+		ht.ID = generateID(ht.Name)
 	}
 	if ht.Headers == nil {
 		ht.Headers = KeyValue{}
@@ -71,6 +73,10 @@ func (ht *HttpTarget) init() {
 	if ht.Params == nil {
 		ht.Params = KeyValue{}
 	}
+	if len(ht.Path) == 0 {
+		ht.Path = "/"
+	}
+	return nil
 }
 
 func (ht *HttpTarget) deleteResult(result *AttackResult) {
