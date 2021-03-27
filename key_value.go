@@ -26,6 +26,21 @@ func (kv KeyValue) ToHttpHeader() http.Header {
 }
 
 //
+// ToMultipartFormData convert the KeyValue into map of string and raw bytes.
+//
+func (kv KeyValue) ToMultipartFormData() (data map[string][]byte) {
+	if kv == nil || len(kv) == 0 {
+		return nil
+	}
+
+	data = make(map[string][]byte, len(kv))
+	for k, v := range kv {
+		data[k] = []byte(v)
+	}
+	return data
+}
+
+//
 // ToUrlValues convert the KeyValue to the standard url.Values.
 //
 func (kv KeyValue) ToUrlValues() url.Values {

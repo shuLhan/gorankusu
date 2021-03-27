@@ -153,10 +153,10 @@ function renderTarget(targetID) {
 }
 
 function renderHttpTargets(target) {
-	let w = "";
+	let w = ""
 
 	if (!target.HttpTargets) {
-		return;
+		return
 	}
 
 	for (let x = 0; x < target.HttpTargets.length; x++) {
@@ -176,10 +176,7 @@ function renderHttpTargets(target) {
 					</span>
 				</h3>
 
-				<div id="${http.ID}_preview" class="preview mono">
-					${_requestMethods[http.Method]} ${http.Path} <br/>
-					Content-Type: ${_requestTypes[http.RequestType]}
-				</div>
+				<div id="${http.ID}.request" class="request"></div>
 
 				<h4>Headers</h4>
 				<div id="${http.ID}_headers" class="headers"></div>
@@ -201,6 +198,8 @@ function renderHttpTargets(target) {
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		let http = target.HttpTargets[x]
 
+		renderHttpTargetRequest(target, http)
+
 		if (Object.keys(http.Headers).length > 0) {
 			renderHttpTargetHeaders(target, http)
 		}
@@ -216,10 +215,10 @@ function renderHttpTargets(target) {
 }
 
 function renderWebSocketTargets(target) {
-	let w = "";
+	let w = ""
 
 	if (!target.WebSocketTargets) {
-		return;
+		return
 	}
 
 	for (let x = 0; x < target.WebSocketTargets.length; x++) {
@@ -262,7 +261,6 @@ function renderWebSocketTargets(target) {
 	}
 }
 
-
 function renderHttpTargetHeaders(target, http) {
 	let w = ""
 	for (const k in http.Headers) {
@@ -277,6 +275,59 @@ function renderHttpTargetHeaders(target, http) {
 		`
 	}
 	document.getElementById(`${http.ID}_headers`).innerHTML = w
+}
+
+function renderHttpTargetRequest(target, http) {
+	let w = `
+		<div class="input">
+			<label>
+				<select
+					name="method"
+					${http.IsCustomizable ? "" : "disabled"}
+					onchange="onChangeRequestMethod(this, '${target.ID}', '${http.ID}')"
+				>
+	`
+
+	for (const m in _requestMethods) {
+		w += `
+			<option value="${m}" ${http.Method == m ? "selected" : ""}>
+				${_requestMethods[m]}
+			</option>
+		`
+	}
+
+	w += `
+				</select>
+			</label> :
+			<input
+				value="${http.Path}"
+				${http.IsCustomizable ? "" : "readonly"}
+				onchange="onChangeRequestPath(this, '${target.ID}', '${http.ID}')"
+			/>
+		</div>
+
+		<div class="input">
+			<label> Content type </label> :
+			<select
+				${http.IsCustomizable ? "" : "disabled"}
+				onchange="onChangeRequestType(this, '${target.ID}', '${http.ID}')"
+			>
+	`
+
+	for (const ct in _requestTypes) {
+		w += `
+			<option value="${ct}" ${http.RequestType == ct ? "selected" : ""}>
+				${_requestTypes[ct]}
+			</option>
+		`
+	}
+
+	w += `
+			</select>
+		</div>
+	`
+
+	document.getElementById(`${http.ID}.request`).innerHTML = w
 }
 
 function renderHttpTargetParams(target, http) {
@@ -321,9 +372,16 @@ function renderHttpAttackResults(target, http) {
 }
 
 async function run(targetID, httpTargetID) {
+	target = _targets[targetID]
+
 	let req = {}
-	req.Target = _targets[targetID]
-	req.HttpTarget = getHttpTargetByID(req.Target, httpTargetID)
+	req.Target = {
+		ID: target.ID,
+		Opts: target.Opts,
+		Vars: target.Vars,
+	}
+
+	req.HttpTarget = getHttpTargetByID(target, httpTargetID)
 
 	let fres = await fetch("/_trunks/api/target/run/http", {
 		method: "POST",
@@ -340,13 +398,31 @@ async function run(targetID, httpTargetID) {
 	}
 
 	let elResponse = document.getElementById(httpTargetID + "_response")
-	elResponse.innerHTML = JSON.stringify(res, null, 2)
+	let m = _requestMethods[req.HttpTarget.Method]
+	switch (m) {
+		case "GET":
+		case "POST":
+		case "PUT":
+		case "DELETE":
+			elResponse.innerHTML = JSON.stringify(res, null, 2)
+			break
+		default:
+			elResponse.innerHTML = atob(res.data)
+			break
+	}
 }
 
 async function runWebSocket(targetID, wstID) {
+	target = _targets[targetID]
+
 	let req = {}
-	req.Target = _targets[targetID]
-	req.WebSocketTarget = getWebSocketTargetByID(req.Target, wstID)
+	req.Target = {
+		ID: target.ID,
+		Opts: target.Opts,
+		Vars: target.Vars,
+	}
+
+	req.WebSocketTarget = getWebSocketTargetByID(target, wstID)
 
 	let fres = await fetch("/_trunks/api/target/run/websocket", {
 		method: "POST",
@@ -515,6 +591,24 @@ function onChangeHttpParam(targetID, httpTargetID, key, val) {
 	let target = _targets[targetID]
 	let httpTarget = getHttpTargetByID(target, httpTargetID)
 	httpTarget.Params[key] = val
+}
+
+function onChangeRequestMethod(el, tid, htid) {
+	let target = _targets[tid]
+	let httpTarget = getHttpTargetByID(target, htid)
+	httpTarget.Method = parseInt(el.value, 10)
+}
+
+function onChangeRequestPath(el, tid, htid) {
+	let target = _targets[tid]
+	let httpTarget = getHttpTargetByID(target, htid)
+	httpTarget.Path = el.value
+}
+
+function onChangeRequestType(el, tid, htid) {
+	let target = _targets[tid]
+	let httpTarget = getHttpTargetByID(target, htid)
+	httpTarget.RequestType = parseInt(el.value, 10)
 }
 
 function notif(msg) {

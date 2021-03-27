@@ -57,6 +57,10 @@ type HttpTarget struct {
 	// interface and client will be allowed to run load testing on this
 	// HttpTarget.
 	AllowAttack bool
+
+	// IsCustomizable allow client to modify the Method, Path, and
+	// RequestType.
+	IsCustomizable bool
 }
 
 func (ht *HttpTarget) init() (err error) {

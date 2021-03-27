@@ -21,8 +21,7 @@ import (
 )
 
 const (
-	pathExampleGet      = "/example/get"
-	pathExamplePostForm = "/example/post/form"
+	pathExample = "/example"
 )
 
 const (
@@ -101,7 +100,7 @@ func (ex *Example) Stop() {
 func (ex *Example) registerEndpoints() (err error) {
 	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         pathExampleGet,
+		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExampleGet,
@@ -112,7 +111,7 @@ func (ex *Example) registerEndpoints() (err error) {
 
 	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         pathExamplePostForm,
+		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePostForm,
@@ -122,7 +121,7 @@ func (ex *Example) registerEndpoints() (err error) {
 }
 
 func (ex *Example) registerWebSocketEndpoints() (err error) {
-	err = ex.wsServer.RegisterTextHandler(http.MethodGet, pathExampleGet,
+	err = ex.wsServer.RegisterTextHandler(http.MethodGet, pathExample,
 		ex.handleWSExampleGet)
 	if err != nil {
 		return err
@@ -144,7 +143,7 @@ func (ex *Example) registerTargets() (err error) {
 		HttpTargets: []*trunks.HttpTarget{{
 			Name:        "HTTP Get",
 			Method:      libhttp.RequestMethodGet,
-			Path:        pathExampleGet,
+			Path:        pathExample,
 			RequestType: libhttp.RequestTypeQuery,
 			Headers: trunks.KeyValue{
 				"X-Get": "1",
@@ -159,7 +158,7 @@ func (ex *Example) registerTargets() (err error) {
 		}, {
 			Name:        "HTTP Post Form",
 			Method:      libhttp.RequestMethodPost,
-			Path:        pathExamplePostForm,
+			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
 			Headers: trunks.KeyValue{
 				"X-PostForm": "1",
@@ -172,6 +171,18 @@ func (ex *Example) registerTargets() (err error) {
 			AllowAttack: true,
 			PreAttack:   ex.preattackExamplePostForm,
 			Attack:      ex.attackExamplePostForm,
+		}, {
+			Name:        "HTTP free form",
+			Method:      libhttp.RequestMethodGet,
+			Path:        pathExample,
+			RequestType: libhttp.RequestTypeForm,
+			Headers: trunks.KeyValue{
+				"X-FreeForm": "1",
+			},
+			Params: trunks.KeyValue{
+				"Param1": "123",
+			},
+			IsCustomizable: true,
 		}},
 	}
 
@@ -207,7 +218,7 @@ func (ex *Example) registerTargets() (err error) {
 func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Message = pathExampleGet
+	res.Message = pathExample
 	res.Data = epr.HttpRequest.Form
 
 	return json.Marshal(&res)
@@ -216,7 +227,7 @@ func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) 
 func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Message = pathExamplePostForm
+	res.Message = pathExample
 	res.Data = epr.HttpRequest.Form
 
 	return json.Marshal(&res)
@@ -330,7 +341,7 @@ func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (resbody []byte, err e
 	req := websocket.Request{
 		ID:     uint64(time.Now().UnixNano()),
 		Method: http.MethodGet,
-		Target: pathExampleGet,
+		Target: pathExample,
 		Body:   string(body),
 	}
 
