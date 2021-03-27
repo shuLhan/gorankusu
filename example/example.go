@@ -233,18 +233,43 @@ func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, er
 	return json.Marshal(&res)
 }
 
-func (ex *Example) runExampleGet(req *trunks.RunRequest) ([]byte, error) {
+func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
 	if req.Target.HttpClient == nil {
 		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
 	}
-	_, resbody, err := req.Target.HttpClient.Get(
+
+	res = &trunks.RunResponse{}
+
+	headers := req.HttpTarget.Headers.ToHttpHeader()
+	params := req.HttpTarget.Params.ToUrlValues()
+
+	httpRequest, err := req.Target.HttpClient.GenerateHttpRequest(
+		req.HttpTarget.Method,
 		req.HttpTarget.Path,
-		req.HttpTarget.Headers.ToHttpHeader(),
-		req.HttpTarget.Params.ToUrlValues())
+		req.HttpTarget.RequestType,
+		headers,
+		params,
+	)
 	if err != nil {
 		return nil, err
 	}
-	return resbody, nil
+
+	err = res.SetHttpRequest(httpRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	httpResponse, _, err := req.Target.HttpClient.Do(httpRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res.SetHttpResponse(httpResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
@@ -271,18 +296,43 @@ func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 	}
 }
 
-func (ex *Example) runExamplePostForm(req *trunks.RunRequest) ([]byte, error) {
+func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
 	if req.Target.HttpClient == nil {
 		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
 	}
-	_, resbody, err := req.Target.HttpClient.PostForm(
+
+	res = &trunks.RunResponse{}
+
+	headers := req.HttpTarget.Headers.ToHttpHeader()
+	params := req.HttpTarget.Params.ToUrlValues()
+
+	httpRequest, err := req.Target.HttpClient.GenerateHttpRequest(
+		req.HttpTarget.Method,
 		req.HttpTarget.Path,
-		req.HttpTarget.Headers.ToHttpHeader(),
-		req.HttpTarget.Params.ToUrlValues())
+		req.HttpTarget.RequestType,
+		headers,
+		params,
+	)
 	if err != nil {
 		return nil, err
 	}
-	return resbody, nil
+
+	err = res.SetHttpRequest(httpRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	httpResponse, _, err := req.Target.HttpClient.Do(httpRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res.SetHttpResponse(httpResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {

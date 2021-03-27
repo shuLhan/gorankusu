@@ -26,8 +26,8 @@ github.com/mailru/easyjson v0.7.0/go.mod h1:KAzv3t3aY1NaHWoQz1+4F1ccyAH66Jk7yos7
 github.com/mailru/easyjson v0.7.7 h1:UGYAvKxe3sBsEDzO8ZeWOSlIQfWFlxbzLZe7hwFURr0=
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
 github.com/miekg/dns v1.1.17/go.mod h1:WgzbA6oji13JREwiNsRDNfl7jYdPnmz+VEuLrA+/48M=
-github.com/shuLhan/share v0.24.1-0.20210321092144-d4f1f279b631 h1:/aIE4Q48KUHC4NufZhx9fNyCdPJxB5nX53jlXbKQGZc=
-github.com/shuLhan/share v0.24.1-0.20210321092144-d4f1f279b631/go.mod h1:c6xnA1EctNz2KGVlekfydyXoUjpTPjyUHUIyWSELN/c=
+github.com/shuLhan/share v0.24.1-0.20210327143930-4cdd6b01c14b h1:NykUKIze94kWmnUGhxcDvUewYHqiSUVx+dYM9AVXA5U=
+github.com/shuLhan/share v0.24.1-0.20210327143930-4cdd6b01c14b/go.mod h1:c6xnA1EctNz2KGVlekfydyXoUjpTPjyUHUIyWSELN/c=
 github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25 h1:7z3LSn867ex6VSaahyKadf4WtSsJIgne6A1WLOAGM8A=
 github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25/go.mod h1:lbP8tGiBjZ5YWIc2fzuRpTaz0b/53vT6PEs3QuAWzuU=
 github.com/tsenart/go-tsz v0.0.0-20180814232043-cdeb9e1e981e/go.mod h1:SWZznP1z5Ki7hDT2ioqiFKEse8K9tU2OUvaRI0NeGQo=

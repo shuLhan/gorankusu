@@ -184,7 +184,8 @@ function renderHttpTargets(target) {
 				<h4>Parameters</h4>
 				<div id="${http.ID}_params" class="params"></div>
 
-				<h4>Run response</h4>
+				<h4>Run output</h4>
+				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
 
 				<h4>Attack results</h4>
@@ -397,19 +398,8 @@ async function run(targetID, httpTargetID) {
 		return
 	}
 
-	let elResponse = document.getElementById(httpTargetID + "_response")
-	let m = _requestMethods[req.HttpTarget.Method]
-	switch (m) {
-		case "GET":
-		case "POST":
-		case "PUT":
-		case "DELETE":
-			elResponse.innerHTML = JSON.stringify(res, null, 2)
-			break
-		default:
-			elResponse.innerHTML = atob(res.data)
-			break
-	}
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest)
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse)
 }
 
 async function runWebSocket(targetID, wstID) {

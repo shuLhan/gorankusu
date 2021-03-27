@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"sort"
 	"strings"
@@ -405,15 +404,25 @@ func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, er
 		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
 	}
 
-	if req.HttpTarget.Run != nil {
+	var res *RunResponse
+
+	if req.HttpTarget.Run == nil {
+		req.Target.BaseUrl = origTarget.BaseUrl
+		req.Target.Name = origTarget.Name
+		res, err = trunks.runHttpTarget(req)
+	} else {
 		req.mergeHttpTarget(trunks.Env, origTarget, origHttpTarget)
-		return req.HttpTarget.Run(req)
+		res, err = req.HttpTarget.Run(req)
+	}
+	if err != nil {
+		return nil, errInternal(err)
 	}
 
-	req.Target.BaseUrl = origTarget.BaseUrl
-	req.Target.Name = origTarget.Name
+	epres := libhttp.EndpointResponse{}
+	epres.Code = http.StatusOK
+	epres.Data = res
 
-	return trunks.runHttpTarget(req)
+	return json.Marshal(&epres)
 }
 
 func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byte, error) {
@@ -503,99 +512,49 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *Htt
 	return t, ht
 }
 
-func (trunks *Trunks) runHttpTarget(rr *RunRequest) (resbody []byte, err error) {
+func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error) {
 	var (
-		httpRes *http.Response
-		res     = libhttp.EndpointResponse{}
+		logp    = "runHttpTarget"
 		httpc   = libhttp.NewClient(rr.Target.BaseUrl, nil, true)
 		headers = rr.HttpTarget.Headers.ToHttpHeader()
-		params  = rr.HttpTarget.Params.ToUrlValues()
+		params  interface{}
 	)
 
-	switch rr.HttpTarget.Method {
-	case libhttp.RequestMethodGet:
-		httpRes, resbody, err = httpc.Get(rr.HttpTarget.Path, headers, params)
-
-	case libhttp.RequestMethodConnect,
-		libhttp.RequestMethodDelete,
-		libhttp.RequestMethodHead,
-		libhttp.RequestMethodOptions,
-		libhttp.RequestMethodPatch,
-		libhttp.RequestMethodTrace:
-
-		httpReq, err := http.NewRequest(rr.HttpTarget.Method.String(),
-			fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
-			nil)
-		if err != nil {
-			mlog.Errf("runHttpTarget: %s %s: %s\n",
-				rr.HttpTarget.Method.String(),
-				rr.HttpTarget.Path, err)
-			return nil, errInternal(err)
-		}
-
-		httpRes, err = httpc.Do(httpReq)
-		if err != nil {
-			mlog.Errf("runHttpTarget: %s %s: %s\n",
-				rr.HttpTarget.Method.String(),
-				rr.HttpTarget.Path, err)
-			return nil, errInternal(err)
-		}
-
-		dumpres, err := httputil.DumpResponse(httpRes, true)
-		if err != nil {
-			mlog.Errf("runHttpTarget: %s %s: %s\n",
-				rr.HttpTarget.Method.String(),
-				rr.HttpTarget.Path, err)
-			return nil, errInternal(err)
-		}
-
-		res.Code = http.StatusOK
-		res.Data = dumpres
-		return json.Marshal(res)
-
-	case libhttp.RequestMethodPost:
-		switch rr.HttpTarget.RequestType {
-		case libhttp.RequestTypeNone,
-			libhttp.RequestTypeQuery:
-			httpRes, resbody, err = httpc.Post(
-				rr.HttpTarget.Path, headers, params)
-
-		case libhttp.RequestTypeForm:
-			httpRes, resbody, err = httpc.PostForm(
-				rr.HttpTarget.Path, headers, params)
-
-		case libhttp.RequestTypeMultipartForm:
-			httpRes, resbody, err = httpc.PostFormData(
-				rr.HttpTarget.Path, headers,
-				rr.HttpTarget.Params.ToMultipartFormData())
-
-		case libhttp.RequestTypeJSON:
-			httpRes, resbody, err = httpc.PostJSON(
-				rr.HttpTarget.Path, headers,
-				rr.HttpTarget.Params)
-		}
-
-	case libhttp.RequestMethodPut:
-		if rr.HttpTarget.RequestType == libhttp.RequestTypeJSON {
-			httpRes, resbody, err = httpc.PutJSON(
-				rr.HttpTarget.Path, headers,
-				rr.HttpTarget.Params)
-		} else {
-			httpRes, resbody, err = httpc.Put(
-				rr.HttpTarget.Path, headers, nil)
-		}
+	if rr.HttpTarget.RequestType == libhttp.RequestTypeJSON {
+		params = rr.HttpTarget.Params
+	} else {
+		params = rr.HttpTarget.Params.ToUrlValues()
 	}
+
+	res = &RunResponse{}
+
+	httpRequest, err := httpc.GenerateHttpRequest(
+		rr.HttpTarget.Method,
+		rr.HttpTarget.Path,
+		rr.HttpTarget.RequestType,
+		headers,
+		params,
+	)
 	if err != nil {
-		return nil, errInternal(err)
-	}
-	if httpRes.StatusCode != http.StatusOK {
-		res.Code = httpRes.StatusCode
-		res.Message = httpRes.Status
-		res.Data = resbody
-		return json.Marshal(res)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	return resbody, err
+	err = res.SetHttpRequest(httpRequest)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	httpResponse, _, err := httpc.Do(httpRequest)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	err = res.SetHttpResponse(httpResponse)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	return res, nil
 }
 
 //

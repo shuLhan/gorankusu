@@ -19,7 +19,7 @@ import (
 // HttpRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
 //
-type HttpRunHandler func(rr *RunRequest) ([]byte, error)
+type HttpRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
 
 //
 // HttpAttackHandler define the function type that will be called when client
