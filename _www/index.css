@@ -75,6 +75,19 @@ body {
 	padding: 6px;
 	width: calc(100% - 18em);
 }
+.input-rows {
+	margin-bottom: 1em;
+}
+.input-rows label {
+	display: inline-block;
+	margin-bottom: 5px;
+	width: auto;
+}
+.input-rows input {
+	display: block;
+	width: calc(100% - 2em);
+}
+
 .mono {
 	background-color: lightgrey;
 	font-family: monospace;

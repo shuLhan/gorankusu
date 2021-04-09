@@ -153,15 +153,15 @@ function renderTarget(targetID, htid, wstid) {
 		</div>
 	`
 
-	if (target.Vars && target.Vars.length > 0) {
+	if (target.Vars && Object.keys(target.Vars).length > 0) {
 		w += `
 			<div class='Vars'>
 				<h3>Variables</h3>
 		`
 		for (const k in target.Vars) {
 			w += `
-				<div class="input">
-					<label>${k}</label> =
+				<div class="input-rows">
+					<label>${k}</label> :
 					<input value="${target.Vars[k]}"/>
 				</div>
 			`
@@ -300,7 +300,7 @@ function renderHttpTargetHeaders(target, http) {
 	let w = ""
 	for (const k in http.Headers) {
 		w += `
-			<div class="input">
+			<div class="input-rows">
 				<label>${k}</label> :
 				<input
 					value="${http.Headers[k]}"
