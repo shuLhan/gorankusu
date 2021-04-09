@@ -10,7 +10,7 @@ import "fmt"
 // WebSocketRunHandler define a function type that will be called to run the
 // WebSocket target.
 //
-type WebSocketRunHandler func(rr *RunRequest) ([]byte, error)
+type WebSocketRunHandler func(rr *RunRequest) (interface{}, error)
 
 //
 // WebSocketTarget define the target to test WebSocket service.

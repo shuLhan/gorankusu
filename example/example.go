@@ -366,13 +366,13 @@ func (ex *Example) handleWSExampleGet(ctx context.Context, req *websocket.Reques
 	return res
 }
 
-func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (resbody []byte, err error) {
+func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (res interface{}, err error) {
 	var wg sync.WaitGroup
 
 	wsc := &websocket.Client{
 		Endpoint: "ws://" + websocketAddress,
 		HandleText: func(cl *websocket.Client, frame *websocket.Frame) error {
-			resbody = frame.Payload()
+			res = frame.Payload()
 			wg.Done()
 			return nil
 		},
@@ -409,5 +409,5 @@ func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (resbody []byte, err e
 
 	_ = wsc.Close()
 
-	return resbody, err
+	return res, nil
 }
