@@ -140,15 +140,27 @@ function renderTarget(targetID, htid, wstid) {
 			<h3> Attack options </h3>
 			<div class="input">
 				<label> Duration </label>:
-				<input id="Duration" value="${target.Opts.Duration / 1e9}"/>
+				<input
+					id="Duration"
+					value="${target.Opts.Duration / 1e9}"
+					onchange="onChangeTargetDuration('${target.ID}', this.value)"
+				/>
 			</div>
 			<div class="input">
 				<label> Rate per second </label>:
-				<input id="RatePerSecond" value="${target.Opts.RatePerSecond}"/>
+				<input
+					id="RatePerSecond"
+					value="${target.Opts.RatePerSecond}"
+					onchange="onChangeTargetRPS('${target.ID}', this.value)"
+				/>
 			</div>
 			<div class="input">
 				<label> Timeout (seconds) </label>:
-				<input id="Timeout" value="${target.Opts.Timeout / 1e9}"/>
+				<input
+					id="Timeout"
+					value="${target.Opts.Timeout / 1e9}"
+					onchange="onChangeTargetTimeout('${target.ID}', this.value)"
+				/>
 			</div>
 		</div>
 	`
@@ -478,6 +490,7 @@ async function attack(targetID, httpTargetID) {
 		Target: {
 			ID: target.ID,
 			Opts: target.Opts,
+			Vars: target.Vars,
 		},
 		HttpTarget: {
 			ID: httpTarget.ID,
@@ -607,6 +620,21 @@ function getWebSocketTargetByID(target, id) {
 		}
 	}
 	return null
+}
+
+function onChangeTargetDuration(tid, val)
+{
+	_targets[tid].Opts.Duration = val * 1e9
+}
+
+function onChangeTargetRPS(tid, val)
+{
+	_targets[tid].Opts.RatePerSecond = val * 1
+}
+
+function onChangeTargetTimeout(tid, val)
+{
+	_targets[tid].Opts.Timeout = val * 1e9
 }
 
 function onChangeHttpHeader(targetID, httpTargetID, key, val) {
