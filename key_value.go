@@ -14,11 +14,11 @@ type KeyValue map[string]string
 //
 // ToHttpHeader convert the KeyValue to the standard http.Header.
 //
-func (kv KeyValue) ToHttpHeader() http.Header {
+func (kv KeyValue) ToHttpHeader() (headers http.Header) {
+	headers = http.Header{}
 	if kv == nil || len(kv) == 0 {
-		return nil
+		return headers
 	}
-	headers := http.Header{}
 	for k, v := range kv {
 		headers.Set(k, v)
 	}
@@ -29,11 +29,10 @@ func (kv KeyValue) ToHttpHeader() http.Header {
 // ToMultipartFormData convert the KeyValue into map of string and raw bytes.
 //
 func (kv KeyValue) ToMultipartFormData() (data map[string][]byte) {
-	if kv == nil || len(kv) == 0 {
-		return nil
-	}
-
 	data = make(map[string][]byte, len(kv))
+	if kv == nil || len(kv) == 0 {
+		return data
+	}
 	for k, v := range kv {
 		data[k] = []byte(v)
 	}
@@ -43,11 +42,11 @@ func (kv KeyValue) ToMultipartFormData() (data map[string][]byte) {
 //
 // ToUrlValues convert the KeyValue to the standard url.Values.
 //
-func (kv KeyValue) ToUrlValues() url.Values {
+func (kv KeyValue) ToUrlValues() (vals url.Values) {
+	vals = url.Values{}
 	if kv == nil || len(kv) == 0 {
-		return nil
+		return vals
 	}
-	vals := url.Values{}
 	for k, v := range kv {
 		vals.Set(k, v)
 	}
