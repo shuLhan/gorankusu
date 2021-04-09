@@ -623,7 +623,9 @@ func (trunks *Trunks) workerAttackQueue() {
 		var err error
 		trunks.Env.AttackRunning = rr
 
-		rr.HttpTarget.PreAttack(rr)
+		if rr.HttpTarget.PreAttack != nil {
+			rr.HttpTarget.PreAttack(rr)
+		}
 
 		isCancelled := false
 		attacker := vegeta.NewAttacker(
@@ -663,7 +665,7 @@ func (trunks *Trunks) workerAttackQueue() {
 				trunks.cancelq <- true
 			}
 		} else {
-			err := rr.result.finish()
+			err = rr.result.finish()
 			if err != nil {
 				mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
 			}
@@ -677,6 +679,7 @@ func (trunks *Trunks) workerAttackQueue() {
 			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 		}
 
+		rr.result = nil
 		trunks.Env.AttackRunning = nil
 	}
 }
