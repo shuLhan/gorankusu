@@ -29,13 +29,11 @@ func (rr *RunRequest) String() string {
 // target.
 //
 func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, origHttpTarget *HttpTarget) {
-	if rr.Target.Opts.Duration > 0 &&
-		rr.Target.Opts.Duration <= env.MaxAttackDuration {
+	if rr.Target.Opts.Duration > 0 && rr.Target.Opts.Duration <= env.MaxAttackDuration {
 		origTarget.Opts.Duration = rr.Target.Opts.Duration
 	}
 
-	if rr.Target.Opts.RatePerSecond > 0 &&
-		rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
+	if rr.Target.Opts.RatePerSecond > 0 && rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
 		origTarget.Opts.RatePerSecond = rr.Target.Opts.RatePerSecond
 		origTarget.Opts.ratePerSecond = vegeta.Rate{
 			Freq: rr.Target.Opts.RatePerSecond,
@@ -43,8 +41,7 @@ func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, orig
 		}
 	}
 
-	if rr.Target.Opts.Timeout > 0 &&
-		rr.Target.Opts.Timeout <= DefaultAttackTimeout {
+	if rr.Target.Opts.Timeout > 0 && rr.Target.Opts.Timeout <= DefaultAttackTimeout {
 		origTarget.Opts.Timeout = rr.Target.Opts.Timeout
 	}
 
@@ -63,13 +60,11 @@ func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, orig
 func (rr *RunRequest) mergeWebSocketTarget(env *Environment,
 	origTarget *Target, origWebSocketTarget *WebSocketTarget,
 ) {
-	if rr.Target.Opts.Duration > 0 &&
-		rr.Target.Opts.Duration <= env.MaxAttackDuration {
+	if rr.Target.Opts.Duration > 0 && rr.Target.Opts.Duration <= env.MaxAttackDuration {
 		origTarget.Opts.Duration = rr.Target.Opts.Duration
 	}
 
-	if rr.Target.Opts.RatePerSecond > 0 &&
-		rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
+	if rr.Target.Opts.RatePerSecond > 0 && rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
 		origTarget.Opts.RatePerSecond = rr.Target.Opts.RatePerSecond
 		origTarget.Opts.ratePerSecond = vegeta.Rate{
 			Freq: rr.Target.Opts.RatePerSecond,
@@ -77,8 +72,7 @@ func (rr *RunRequest) mergeWebSocketTarget(env *Environment,
 		}
 	}
 
-	if rr.Target.Opts.Timeout > 0 &&
-		rr.Target.Opts.Timeout <= DefaultAttackTimeout {
+	if rr.Target.Opts.Timeout > 0 && rr.Target.Opts.Timeout <= DefaultAttackTimeout {
 		origTarget.Opts.Timeout = rr.Target.Opts.Timeout
 	}
 
