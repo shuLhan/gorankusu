@@ -406,7 +406,7 @@ func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, er
 
 	var res *RunResponse
 
-	if req.HttpTarget.Run == nil {
+	if origHttpTarget.Run == nil {
 		req.Target.BaseUrl = origTarget.BaseUrl
 		req.Target.Name = origTarget.Name
 		res, err = trunks.runHttpTarget(req)
