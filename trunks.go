@@ -299,7 +299,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 
 	trunks.attackq <- req
 
-	msg := fmt.Sprintf("Attacking %s/%s with %d RPS for %s seconds",
+	msg := fmt.Sprintf("Attacking %s%s with %d RPS for %s seconds",
 		req.Target.BaseUrl, req.HttpTarget.Path,
 		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
 
