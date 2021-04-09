@@ -451,7 +451,16 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 
 	req.mergeWebSocketTarget(trunks.Env, origTarget, origWsTarget)
 
-	return req.WebSocketTarget.Run(req)
+	res, err := req.WebSocketTarget.Run(req)
+	if err != nil {
+		return nil, errInternal(err)
+	}
+
+	epres := libhttp.EndpointResponse{}
+	epres.Code = http.StatusOK
+	epres.Data = res
+
+	return json.Marshal(&epres)
 }
 
 func (trunks *Trunks) apiTargets(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
