@@ -241,10 +241,15 @@ function renderHttpTargets(target) {
 		}
 
 		w += `
-				<h4>Run output</h4>
+				<h4>
+					Run output
+					<button onclick="clearHttpOutput('${http.ID}')">
+						Clear
+					</button>
+				</h4>
 				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
-				<pre id="${http.ID}_body" class="response mono"></pre>
+				<pre id="${http.ID}_response_body" class="response mono"></pre>
 
 				<h4>Attack results</h4>
 				<div id="${http.ID}_results" class="results"></div>
@@ -309,7 +314,12 @@ function renderWebSocketTargets(target) {
 		}
 
 		w += `
-				<h4>Run response</h4>
+				<h4>
+					Run output
+					<button onclick="clearWebsocketOutput('${wst.ID}')">
+						Clear
+					</button>
+				</h4>
 				<pre id="${wst.ID}_response" class="response mono"></pre>
 			</div>
 		`
@@ -328,6 +338,16 @@ function renderWebSocketTargets(target) {
 			renderHttpTargetParams(target, wst)
 		}
 	}
+}
+
+function clearHttpOutput(httpId) {
+	document.getElementById(httpId +'_request').innerHTML = '';
+	document.getElementById(httpId +'_response').innerHTML = '';
+	document.getElementById(httpId +'_response_body').innerHTML = '';
+}
+
+function clearWebsocketOutput(wstId) {
+	document.getElementById(wstId +'_response').innerHTML = '';
 }
 
 function renderHttpTargetHeaders(target, http) {
@@ -474,7 +494,7 @@ async function run(targetID, httpTargetID) {
 	)
 
 	let body = atob(res.data.ResponseBody)
-	let elBody = document.getElementById(httpTargetID + "_body")
+	let elBody = document.getElementById(httpTargetID + "_response_body")
 
 	if (res.data.ResponseType === _contentTypeJson) {
 		elBody.innerHTML = JSON.stringify(JSON.parse(body), null, 2)
