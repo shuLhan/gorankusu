@@ -18,6 +18,7 @@ let _requestTypes = {
 	3: "multipart/form-data",
 	4: "application/json",
 }
+let _contentTypeJson = "application/json"
 
 async function main() {
 	await environmentGet()
@@ -243,6 +244,7 @@ function renderHttpTargets(target) {
 				<h4>Run output</h4>
 				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
+				<pre id="${http.ID}_body" class="response mono"></pre>
 
 				<h4>Attack results</h4>
 				<div id="${http.ID}_results" class="results"></div>
@@ -470,6 +472,15 @@ async function run(targetID, httpTargetID) {
 	document.getElementById(httpTargetID + "_response").innerHTML = atob(
 		res.data.DumpResponse,
 	)
+
+	let body = atob(res.data.ResponseBody)
+	let elBody = document.getElementById(httpTargetID + "_body")
+
+	if (res.data.ResponseType === _contentTypeJson) {
+		elBody.innerHTML = JSON.stringify(JSON.parse(body), null, 2)
+	} else {
+		elBody.body
+	}
 }
 
 async function runWebSocket(targetID, wstID) {

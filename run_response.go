@@ -6,8 +6,11 @@ package trunks
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
+
+	libhttp "github.com/shuLhan/share/lib/http"
 )
 
 //
@@ -17,6 +20,8 @@ import (
 type RunResponse struct {
 	DumpRequest  []byte
 	DumpResponse []byte
+	ResponseType string
+	ResponseBody []byte
 }
 
 //
@@ -36,9 +41,19 @@ func (rres *RunResponse) SetHttpRequest(req *http.Request) (err error) {
 // field.
 //
 func (rres *RunResponse) SetHttpResponse(res *http.Response) (err error) {
+	logp := "SetHttpResponse"
+
 	rres.DumpResponse, err = httputil.DumpResponse(res, true)
 	if err != nil {
-		return fmt.Errorf("SetHttpResponse: %w", err)
+		return fmt.Errorf("%s: %w", logp, err)
 	}
+
+	rres.ResponseType = res.Header.Get(libhttp.HeaderContentType)
+
+	rres.ResponseBody, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
 	return nil
 }
