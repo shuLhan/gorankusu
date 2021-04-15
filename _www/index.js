@@ -223,13 +223,23 @@ function renderHttpTargets(target) {
 				</h3>
 
 				<div id="${http.ID}.request" class="request"></div>
+		`
 
+		if (Object.keys(http.Headers).length > 0) {
+			w += `
 				<h4>Headers</h4>
 				<div id="${http.ID}_headers" class="headers"></div>
+			`
+		}
 
+		if (Object.keys(http.Params).length > 0) {
+			w += `
 				<h4>Parameters</h4>
 				<div id="${http.ID}_params" class="params"></div>
+			`
+		}
 
+		w += `
 				<h4>Run output</h4>
 				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
@@ -281,12 +291,22 @@ function renderWebSocketTargets(target) {
 						</button>
 					</span>
 				</h3>
+		`
 
+		if (wst.Headers && Object.keys(wst.Headers).length > 0) {
+			w += `
 				<div id="${wst.ID}_headers" class="headers"></div>
+			`
+		}
 
+		if (wst.Params && Object.keys(wst.Params).length > 0) {
+			w += `
 				<h4>Parameters</h4>
 				<div id="${wst.ID}_params" class="params"></div>
+			`
+		}
 
+		w += `
 				<h4>Run response</h4>
 				<pre id="${wst.ID}_response" class="response mono"></pre>
 			</div>
@@ -622,23 +642,19 @@ function getWebSocketTargetByID(target, id) {
 	return null
 }
 
-function onChangeTargetDuration(tid, val)
-{
+function onChangeTargetDuration(tid, val) {
 	_targets[tid].Opts.Duration = val * 1e9
 }
 
-function onChangeTargetRPS(tid, val)
-{
+function onChangeTargetRPS(tid, val) {
 	_targets[tid].Opts.RatePerSecond = val * 1
 }
 
-function onChangeTargetTimeout(tid, val)
-{
+function onChangeTargetTimeout(tid, val) {
 	_targets[tid].Opts.Timeout = val * 1e9
 }
 
-function onChangeTargetVar(tid, key, val)
-{
+function onChangeTargetVar(tid, key, val) {
 	_targets[tid].Vars[key] = val
 }
 
