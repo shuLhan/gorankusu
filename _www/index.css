@@ -99,7 +99,8 @@ body {
 	margin-top: 2em;
 }
 
-.HttpTarget h3 {
+.HttpTarget h3,
+.WebSocketTarget h3 {
 	border-left: 10px solid gold;
 	margin-left: 0;
 	padding: 0.5em;
