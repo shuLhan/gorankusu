@@ -141,7 +141,6 @@ function renderTarget(targetID, htid, wstid) {
 			<div class="input">
 				<label> Duration </label>:
 				<input
-					id="Duration"
 					value="${target.Opts.Duration / 1e9}"
 					onchange="onChangeTargetDuration('${target.ID}', this.value)"
 				/>
@@ -149,7 +148,6 @@ function renderTarget(targetID, htid, wstid) {
 			<div class="input">
 				<label> Rate per second </label>:
 				<input
-					id="RatePerSecond"
 					value="${target.Opts.RatePerSecond}"
 					onchange="onChangeTargetRPS('${target.ID}', this.value)"
 				/>
@@ -157,7 +155,6 @@ function renderTarget(targetID, htid, wstid) {
 			<div class="input">
 				<label> Timeout (seconds) </label>:
 				<input
-					id="Timeout"
 					value="${target.Opts.Timeout / 1e9}"
 					onchange="onChangeTargetTimeout('${target.ID}', this.value)"
 				/>
@@ -174,7 +171,10 @@ function renderTarget(targetID, htid, wstid) {
 			w += `
 				<div class="input-rows">
 					<label>${k}</label> :
-					<input value="${target.Vars[k]}"/>
+					<input
+						value="${target.Vars[k]}"
+						onchange="onChangeTargetVar('${target.ID}', '${k}', this.value)"
+					/>
 				</div>
 			`
 		}
@@ -635,6 +635,11 @@ function onChangeTargetRPS(tid, val)
 function onChangeTargetTimeout(tid, val)
 {
 	_targets[tid].Opts.Timeout = val * 1e9
+}
+
+function onChangeTargetVar(tid, key, val)
+{
+	_targets[tid].Vars[key] = val
 }
 
 function onChangeHttpHeader(targetID, httpTargetID, key, val) {
