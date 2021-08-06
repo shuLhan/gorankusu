@@ -16,6 +16,12 @@ import (
 )
 
 //
+// HttpConvertParams is a handler that will be called inside the Run handler
+// to convert the Params values to type that will be send as request.
+//
+type HttpConvertParams func(target *HttpTarget) (interface{}, error)
+
+//
 // HttpRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
 //
@@ -45,7 +51,9 @@ type HttpTarget struct {
 	Headers     KeyValue
 	Params      KeyValue
 
-	Run          HttpRunHandler       `json:"-"`
+	Run           HttpRunHandler    `json:"-"`
+	ConvertParams HttpConvertParams `json:"-"`
+
 	Attack       HttpAttackHandler    `json:"-"`
 	PreAttack    HttpPreAttackHandler `json:"-"`
 	AttackLocker sync.Mutex           `json:"-"` // Use this inside the Attack to lock resource.
