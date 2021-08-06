@@ -5,7 +5,165 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<title>Trunks</title>
 		<link rel="icon" type="image/png" href="/favicon.png" />
-		<link rel="stylesheet" href="/index.css" />
+		<style>
+			body {
+				background-color: ivory;
+				margin: 0;
+				padding: 0;
+			}
+
+			#notif,
+			#notif-error {
+				left: 10%;
+				position: absolute;
+				top: 1em;
+				width: 80%;
+			}
+
+			#notif > div {
+				background-color: white;
+				border: 1px solid lightgrey;
+				margin: 1em auto;
+				padding: 1em;
+			}
+
+			#notif-error > div {
+				background-color: salmon;
+				margin: 1em auto;
+				padding: 1em;
+			}
+
+			.nav {
+				border-right: 1px solid lightgrey;
+				height: calc(100% - 2em);
+				overflow: auto;
+				padding: 1em;
+				position: fixed;
+				width: 14em;
+			}
+			.nav .navTarget {
+				cursor: pointer;
+				margin-bottom: 1em;
+			}
+			.nav .navHttpTarget,
+			.nav .navWebSocketTarget {
+				cursor: pointer;
+				margin-bottom: 1em;
+				margin-left: 1em;
+			}
+
+			.nav .footer {
+				bottom: 0;
+				font-size: 9pt;
+				margin-bottom: 1em;
+				position: fixed;
+			}
+			.main {
+				height: calc(100% - 2em);
+				left: 16em;
+				overflow: auto;
+				padding: 1em;
+				position: fixed;
+				width: calc(100% - 18em);
+			}
+			.main .mainState {
+				border: 1px solid lightgrey;
+				padding: 1em;
+			}
+			.input {
+				margin-bottom: 1em;
+			}
+			.input label {
+				display: inline-block;
+				width: 10em;
+			}
+			.input input {
+				border: 1px solid lightgray;
+				display: inline-block;
+				padding: 6px;
+				width: calc(100% - 18em);
+			}
+			.input-rows {
+				margin-bottom: 1em;
+			}
+			.input-rows label {
+				display: inline-block;
+				margin-bottom: 5px;
+				width: auto;
+			}
+			.input-rows input {
+				display: block;
+				width: calc(100% - 2em);
+			}
+
+			.mono {
+				background-color: lightgrey;
+				font-family: monospace;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.HttpTarget {
+				margin-top: 2em;
+			}
+
+			.HttpTarget h3,
+			.WebSocketTarget h3 {
+				border-left: 10px solid gold;
+				margin-left: 0;
+				padding: 0.5em;
+			}
+
+			.results > .resultName {
+				margin-bottom: 1em;
+			}
+
+			@media screen and (max-width: 740px) {
+				.nav {
+					border-bottom: 1px solid lightgrey;
+					border-right: unset;
+					height: unset;
+					padding: 1em;
+					position: unset;
+					width: calc(100% - 2em);
+				}
+
+				.nav .footer {
+					margin: 2em 0 0 0;
+					position: unset;
+				}
+
+				.main {
+					height: unset;
+					left: 0;
+					position: unset;
+					width: calc(100% - 2em);
+				}
+
+				.input label {
+					display: inline-block;
+					width: auto;
+				}
+
+				.input input {
+					display: block;
+					width: calc(100% - 2em);
+				}
+
+				.HttpTargetActions {
+					display: block;
+					margin-top: 10px;
+				}
+
+				.results > .resultName {
+					word-break: break-word;
+				}
+				.results > .resultName .actions {
+					display: block;
+					margin: 0.5em 0px;
+				}
+			}
+		</style>
 		<script src="/index.js"></script>
 	</head>
 	<body onload="main()">
