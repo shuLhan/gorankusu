@@ -86,10 +86,7 @@ async function environmentGet() {
 	_env = res.data
 
 	if (_env.AttackRunning) {
-		updateStateAttack(
-			_env.AttackRunning.Target,
-			_env.AttackRunning.HttpTarget,
-		)
+		updateStateAttack(_env.AttackRunning.Target, _env.AttackRunning.HttpTarget)
 	}
 }
 
@@ -103,9 +100,7 @@ async function renderEnvironment() {
 			</div>
 			<div class="input">
 				<label for="MaxAttackDuration"> Max. attack duration (seconds) </label>:
-				<input id="MaxAttackDuration" readonly="" value="${
-					_env.MaxAttackDuration / 1e9
-				}"></input>
+				<input id="MaxAttackDuration" readonly="" value="${_env.MaxAttackDuration / 1e9}"></input>
 			</div>
 			<div class="input">
 				<label for="MaxAttackRate"> Max. attack rate </label>:
@@ -217,9 +212,17 @@ function renderHttpTargets(target) {
 						<button onclick="run('${target.ID}', '${http.ID}')">
 							Run
 						</button>
+		`
+
+		if (http.AllowAttack) {
+			w += `
 						<button onclick="attack('${target.ID}', '${http.ID}')">
 							Attack
 						</button>
+			`
+		}
+
+		w += `
 					</span>
 				</h3>
 
@@ -341,13 +344,13 @@ function renderWebSocketTargets(target) {
 }
 
 function clearHttpOutput(httpId) {
-	document.getElementById(httpId +'_request').innerHTML = '';
-	document.getElementById(httpId +'_response').innerHTML = '';
-	document.getElementById(httpId +'_response_body').innerHTML = '';
+	document.getElementById(httpId + "_request").innerHTML = ""
+	document.getElementById(httpId + "_response").innerHTML = ""
+	document.getElementById(httpId + "_response_body").innerHTML = ""
 }
 
 function clearWebsocketOutput(wstId) {
-	document.getElementById(wstId +'_response').innerHTML = '';
+	document.getElementById(wstId + "_response").innerHTML = ""
 }
 
 function renderHttpTargetHeaders(target, http) {
@@ -486,12 +489,8 @@ async function run(targetID, httpTargetID) {
 		return
 	}
 
-	document.getElementById(httpTargetID + "_request").innerHTML = atob(
-		res.data.DumpRequest,
-	)
-	document.getElementById(httpTargetID + "_response").innerHTML = atob(
-		res.data.DumpResponse,
-	)
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest)
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse)
 
 	let body = atob(res.data.ResponseBody)
 	let elBody = document.getElementById(httpTargetID + "_response_body")
