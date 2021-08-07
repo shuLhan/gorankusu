@@ -1,5 +1,5 @@
-let _env = {}
-let _targets = {}
+let _env = {};
+let _targets = {};
 let _requestMethods = {
 	0: "GET",
 	1: "CONNECT",
@@ -10,36 +10,36 @@ let _requestMethods = {
 	6: "POST",
 	7: "PUT",
 	8: "TRACE",
-}
+};
 let _requestTypes = {
 	0: "(none)",
 	1: "(query)",
 	2: "application/x-www-form-urlencoded",
 	3: "multipart/form-data",
 	4: "application/json",
-}
-let _contentTypeJson = "application/json"
+};
+let _contentTypeJson = "application/json";
 
 async function main() {
-	await environmentGet()
+	await environmentGet();
 
-	let fres = await fetch("/_trunks/api/targets")
-	let res = await fres.json()
+	let fres = await fetch("/_trunks/api/targets");
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	let targets = res.data
+	let targets = res.data;
 
-	let w = ""
+	let w = "";
 	for (let target of targets) {
-		_targets[target.ID] = target
+		_targets[target.ID] = target;
 
 		w += `
 			<div class="navTarget">
 				<h3 onclick="renderTarget('${target.ID}', '', '')">${target.Name}</h3>
-		`
+		`;
 
 		if (target.HttpTargets) {
 			for (let ht of target.HttpTargets) {
@@ -50,7 +50,7 @@ async function main() {
 					>
 						${ht.Name}
 					</div>
-				`
+				`;
 			}
 		}
 
@@ -63,30 +63,33 @@ async function main() {
 					>
 						${wst.Name}
 					</div>
-				`
+				`;
 			}
 		}
 
 		w += `
 			</div>
-		`
+		`;
 	}
 
-	document.getElementById("navContent").innerHTML = w
+	document.getElementById("navContent").innerHTML = w;
 }
 
 async function environmentGet() {
-	let fres = await fetch("/_trunks/api/environment")
-	let res = await fres.json()
+	let fres = await fetch("/_trunks/api/environment");
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	_env = res.data
+	_env = res.data;
 
 	if (_env.AttackRunning) {
-		updateStateAttack(_env.AttackRunning.Target, _env.AttackRunning.HttpTarget)
+		updateStateAttack(
+			_env.AttackRunning.Target,
+			_env.AttackRunning.HttpTarget
+		);
 	}
 }
 
@@ -100,7 +103,9 @@ async function renderEnvironment() {
 			</div>
 			<div class="input">
 				<label for="MaxAttackDuration"> Max. attack duration (seconds) </label>:
-				<input id="MaxAttackDuration" readonly="" value="${_env.MaxAttackDuration / 1e9}"></input>
+				<input id="MaxAttackDuration" readonly="" value="${
+					_env.MaxAttackDuration / 1e9
+				}"></input>
 			</div>
 			<div class="input">
 				<label for="MaxAttackRate"> Max. attack rate </label>:
@@ -115,14 +120,14 @@ async function renderEnvironment() {
 				<input id="ResultsSuffix" readonly="" value="${_env.ResultsSuffix}"></input>
 			</div>
 		</div>
-	`
+	`;
 }
 
 function renderTarget(targetID, htid, wstid) {
-	let target = _targets[targetID]
+	let target = _targets[targetID];
 	if (target === null) {
-		console.log(`invalid target ${targetID}`)
-		return
+		console.log(`invalid target ${targetID}`);
+		return;
 	}
 	w = `
 		<h2>${target.Name}</h2>
@@ -156,13 +161,13 @@ function renderTarget(targetID, htid, wstid) {
 				/>
 			</div>
 		</div>
-	`
+	`;
 
 	if (target.Vars && Object.keys(target.Vars).length > 0) {
 		w += `
 			<div class='Vars'>
 				<h3>Variables</h3>
-		`
+		`;
 		for (const k in target.Vars) {
 			w += `
 				<div class="input-rows">
@@ -172,37 +177,37 @@ function renderTarget(targetID, htid, wstid) {
 						onchange="onChangeTargetVar('${target.ID}', '${k}', this.value)"
 					/>
 				</div>
-			`
+			`;
 		}
-		w += "</div>"
+		w += "</div>";
 	}
 
 	w += `
 		<div id="${targetID}.HttpTargets" class="HttpTargets"></div>
 		<div id="${targetID}.WebSocketTargets" class="WebSocketTargets"></div>
-	`
+	`;
 
-	document.getElementById("main-content").innerHTML = w
+	document.getElementById("main-content").innerHTML = w;
 
-	renderHttpTargets(target)
-	renderWebSocketTargets(target)
+	renderHttpTargets(target);
+	renderWebSocketTargets(target);
 
 	if (htid) {
-		document.getElementById(htid).scrollIntoView()
+		document.getElementById(htid).scrollIntoView();
 	} else if (wstid) {
-		document.getElementById(wstid).scrollIntoView()
+		document.getElementById(wstid).scrollIntoView();
 	}
 }
 
 function renderHttpTargets(target) {
-	let w = ""
+	let w = "";
 
 	if (!target.HttpTargets) {
-		return
+		return;
 	}
 
 	for (let x = 0; x < target.HttpTargets.length; x++) {
-		let http = target.HttpTargets[x]
+		let http = target.HttpTargets[x];
 
 		w += `
 			<div id="${http.ID}" class="HttpTarget">
@@ -212,14 +217,14 @@ function renderHttpTargets(target) {
 						<button onclick="run('${target.ID}', '${http.ID}')">
 							Run
 						</button>
-		`
+		`;
 
 		if (http.AllowAttack) {
 			w += `
 						<button onclick="attack('${target.ID}', '${http.ID}')">
 							Attack
 						</button>
-			`
+			`;
 		}
 
 		w += `
@@ -227,20 +232,20 @@ function renderHttpTargets(target) {
 				</h3>
 
 				<div id="${http.ID}.request" class="request"></div>
-		`
+		`;
 
 		if (Object.keys(http.Headers).length > 0) {
 			w += `
 				<h4>Headers</h4>
 				<div id="${http.ID}_headers" class="headers"></div>
-			`
+			`;
 		}
 
 		if (Object.keys(http.Params).length > 0) {
 			w += `
 				<h4>Parameters</h4>
 				<div id="${http.ID}_params" class="params"></div>
-			`
+			`;
 		}
 
 		w += `
@@ -257,39 +262,39 @@ function renderHttpTargets(target) {
 				<h4>Attack results</h4>
 				<div id="${http.ID}_results" class="results"></div>
 			</div>
-		`
+		`;
 	}
 
-	document.getElementById(`${target.ID}.HttpTargets`).innerHTML = w
+	document.getElementById(`${target.ID}.HttpTargets`).innerHTML = w;
 
 	for (let x = 0; x < target.HttpTargets.length; x++) {
-		let http = target.HttpTargets[x]
+		let http = target.HttpTargets[x];
 
-		renderHttpTargetRequest(target, http)
+		renderHttpTargetRequest(target, http);
 
 		if (Object.keys(http.Headers).length > 0) {
-			renderHttpTargetHeaders(target, http)
+			renderHttpTargetHeaders(target, http);
 		}
 
 		if (Object.keys(http.Params).length > 0) {
-			renderHttpTargetParams(target, http)
+			renderHttpTargetParams(target, http);
 		}
 
 		if (http.Results && Object.keys(http.Results).length > 0) {
-			renderHttpAttackResults(target, http)
+			renderHttpAttackResults(target, http);
 		}
 	}
 }
 
 function renderWebSocketTargets(target) {
-	let w = ""
+	let w = "";
 
 	if (!target.WebSocketTargets) {
-		return
+		return;
 	}
 
 	for (let x = 0; x < target.WebSocketTargets.length; x++) {
-		let wst = target.WebSocketTargets[x]
+		let wst = target.WebSocketTargets[x];
 
 		w += `
 			<div id="${wst.ID}" class="WebSocketTarget">
@@ -301,19 +306,19 @@ function renderWebSocketTargets(target) {
 						</button>
 					</span>
 				</h3>
-		`
+		`;
 
 		if (wst.Headers && Object.keys(wst.Headers).length > 0) {
 			w += `
 				<div id="${wst.ID}_headers" class="headers"></div>
-			`
+			`;
 		}
 
 		if (wst.Params && Object.keys(wst.Params).length > 0) {
 			w += `
 				<h4>Parameters</h4>
 				<div id="${wst.ID}_params" class="params"></div>
-			`
+			`;
 		}
 
 		w += `
@@ -325,36 +330,36 @@ function renderWebSocketTargets(target) {
 				</h4>
 				<pre id="${wst.ID}_response" class="response mono"></pre>
 			</div>
-		`
+		`;
 	}
 
-	document.getElementById(`${target.ID}.WebSocketTargets`).innerHTML = w
+	document.getElementById(`${target.ID}.WebSocketTargets`).innerHTML = w;
 
 	for (let x = 0; x < target.WebSocketTargets.length; x++) {
-		let wst = target.WebSocketTargets[x]
+		let wst = target.WebSocketTargets[x];
 
 		if (wst.Headers && Object.keys(wst.Headers).length > 0) {
-			renderHttpTargetHeaders(target, wst)
+			renderHttpTargetHeaders(target, wst);
 		}
 
 		if (wst.Params && Object.keys(wst.Params).length > 0) {
-			renderHttpTargetParams(target, wst)
+			renderHttpTargetParams(target, wst);
 		}
 	}
 }
 
 function clearHttpOutput(httpId) {
-	document.getElementById(httpId + "_request").innerHTML = ""
-	document.getElementById(httpId + "_response").innerHTML = ""
-	document.getElementById(httpId + "_response_body").innerHTML = ""
+	document.getElementById(httpId + "_request").innerHTML = "";
+	document.getElementById(httpId + "_response").innerHTML = "";
+	document.getElementById(httpId + "_response_body").innerHTML = "";
 }
 
 function clearWebsocketOutput(wstId) {
-	document.getElementById(wstId + "_response").innerHTML = ""
+	document.getElementById(wstId + "_response").innerHTML = "";
 }
 
 function renderHttpTargetHeaders(target, http) {
-	let w = ""
+	let w = "";
 	for (const k in http.Headers) {
 		w += `
 			<div class="input-rows">
@@ -364,9 +369,9 @@ function renderHttpTargetHeaders(target, http) {
 					onchange="onChangeHttpHeader('${target.ID}', '${http.ID}', '${k}', this.value)"
 				/>
 			</div>
-		`
+		`;
 	}
-	document.getElementById(`${http.ID}_headers`).innerHTML = w
+	document.getElementById(`${http.ID}_headers`).innerHTML = w;
 }
 
 function renderHttpTargetRequest(target, http) {
@@ -378,14 +383,14 @@ function renderHttpTargetRequest(target, http) {
 					${http.IsCustomizable ? "" : "disabled"}
 					onchange="onChangeRequestMethod(this, '${target.ID}', '${http.ID}')"
 				>
-	`
+	`;
 
 	for (const m in _requestMethods) {
 		w += `
 			<option value="${m}" ${http.Method == m ? "selected" : ""}>
 				${_requestMethods[m]}
 			</option>
-		`
+		`;
 	}
 
 	w += `
@@ -404,26 +409,26 @@ function renderHttpTargetRequest(target, http) {
 				${http.IsCustomizable ? "" : "disabled"}
 				onchange="onChangeRequestType(this, '${target.ID}', '${http.ID}')"
 			>
-	`
+	`;
 
 	for (const ct in _requestTypes) {
 		w += `
 			<option value="${ct}" ${http.RequestType == ct ? "selected" : ""}>
 				${_requestTypes[ct]}
 			</option>
-		`
+		`;
 	}
 
 	w += `
 			</select>
 		</div>
-	`
+	`;
 
-	document.getElementById(`${http.ID}.request`).innerHTML = w
+	document.getElementById(`${http.ID}.request`).innerHTML = w;
 }
 
 function renderHttpTargetParams(target, http) {
-	let w = ""
+	let w = "";
 	for (const k in http.Params) {
 		w += `
 			<div class="input">
@@ -433,15 +438,15 @@ function renderHttpTargetParams(target, http) {
 					onchange="onChangeHttpParam('${target.ID}', '${http.ID}', '${k}', this.value)"
 				/>
 			</div>
-		`
+		`;
 	}
-	document.getElementById(`${http.ID}_params`).innerHTML = w
+	document.getElementById(`${http.ID}_params`).innerHTML = w;
 }
 
 function renderHttpAttackResults(target, http) {
-	let w = ""
+	let w = "";
 	for (let x = 0; x < http.Results.length; x++) {
-		let result = http.Results[x]
+		let result = http.Results[x];
 		w += `
 			<div class="resultName">
 				${result.Name}
@@ -458,22 +463,22 @@ function renderHttpAttackResults(target, http) {
 			</div>
 			<div class="result" id="${result.Name}" style="display: none;">
 			</div>
-		`
+		`;
 	}
-	document.getElementById(`${http.ID}_results`).innerHTML = w
+	document.getElementById(`${http.ID}_results`).innerHTML = w;
 }
 
 async function run(targetID, httpTargetID) {
-	target = _targets[targetID]
+	target = _targets[targetID];
 
-	let req = {}
+	let req = {};
 	req.Target = {
 		ID: target.ID,
 		Opts: target.Opts,
 		Vars: target.Vars,
-	}
+	};
 
-	req.HttpTarget = getHttpTargetByID(target, httpTargetID)
+	req.HttpTarget = getHttpTargetByID(target, httpTargetID);
 
 	let fres = await fetch("/_trunks/api/target/run/http", {
 		method: "POST",
@@ -481,38 +486,42 @@ async function run(targetID, httpTargetID) {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(req),
-	})
+	});
 
-	let res = await fres.json()
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest)
-	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse)
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(
+		res.data.DumpRequest
+	);
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(
+		res.data.DumpResponse
+	);
 
-	let body = atob(res.data.ResponseBody)
-	let elBody = document.getElementById(httpTargetID + "_response_body")
+	let body = atob(res.data.ResponseBody);
+	let elBody = document.getElementById(httpTargetID + "_response_body");
 
 	if (res.data.ResponseType === _contentTypeJson) {
-		elBody.innerHTML = JSON.stringify(JSON.parse(body), null, 2)
+		elBody.innerHTML = JSON.stringify(JSON.parse(body), null, 2);
 	} else {
-		elBody.body
+		elBody.body;
 	}
 }
 
 async function runWebSocket(targetID, wstID) {
-	target = _targets[targetID]
+	target = _targets[targetID];
 
-	let req = {}
+	let req = {};
 	req.Target = {
 		ID: target.ID,
 		Opts: target.Opts,
 		Vars: target.Vars,
-	}
+	};
 
-	req.WebSocketTarget = getWebSocketTargetByID(target, wstID)
+	req.WebSocketTarget = getWebSocketTargetByID(target, wstID);
 
 	let fres = await fetch("/_trunks/api/target/run/websocket", {
 		method: "POST",
@@ -520,21 +529,21 @@ async function runWebSocket(targetID, wstID) {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(req),
-	})
+	});
 
-	let res = await fres.json()
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	let elResponse = document.getElementById(wstID + "_response")
-	elResponse.innerHTML = JSON.stringify(res, null, 2)
+	let elResponse = document.getElementById(wstID + "_response");
+	elResponse.innerHTML = JSON.stringify(res, null, 2);
 }
 
 async function attack(targetID, httpTargetID) {
-	let target = _targets[targetID]
-	let httpTarget = getHttpTargetByID(target, httpTargetID)
+	let target = _targets[targetID];
+	let httpTarget = getHttpTargetByID(target, httpTargetID);
 
 	let req = {
 		Target: {
@@ -547,7 +556,7 @@ async function attack(targetID, httpTargetID) {
 			Headers: httpTarget.Headers,
 			Params: httpTarget.Params,
 		},
-	}
+	};
 
 	let fres = await fetch("/_trunks/api/target/attack", {
 		method: "POST",
@@ -555,91 +564,91 @@ async function attack(targetID, httpTargetID) {
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(req),
-	})
+	});
 
-	let res = await fres.json()
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	updateStateAttack(target, httpTarget)
+	updateStateAttack(target, httpTarget);
 
-	notif(res.message)
+	notif(res.message);
 }
 
 async function attackCancel() {
 	let fres = await fetch("/_trunks/api/target/attack", {
 		method: "DELETE",
-	})
+	});
 
-	let res = await fres.json()
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	updateStateAttack(null, null)
+	updateStateAttack(null, null);
 
-	notif(res.message)
+	notif(res.message);
 }
 
 async function attackResultDelete(name) {
-	let msg = `Are you sure you want to delete the result: ${name}?`
-	let yes = window.confirm(msg)
+	let msg = `Are you sure you want to delete the result: ${name}?`;
+	let yes = window.confirm(msg);
 	if (!yes) {
-		return
+		return;
 	}
 
-	let url = "/_trunks/api/target/attack/result?name=" + name
+	let url = "/_trunks/api/target/attack/result?name=" + name;
 	let fres = await fetch(url, {
 		method: "DELETE",
-	})
-	let res = await fres.json()
+	});
+	let res = await fres.json();
 	if (res.code != 200) {
-		console.log("attackResultDelete: ", res)
-		notifError(res.message)
-		return
+		console.log("attackResultDelete: ", res);
+		notifError(res.message);
+		return;
 	}
 
-	let ids = name.split(".")
-	let target = _targets[ids[0]]
+	let ids = name.split(".");
+	let target = _targets[ids[0]];
 	if (!target) {
-		return
+		return;
 	}
-	let httpTarget = getHttpTargetByID(target, ids[1])
+	let httpTarget = getHttpTargetByID(target, ids[1]);
 	if (!httpTarget) {
-		return
+		return;
 	}
 	for (let x = 0; x < httpTarget.Results.length; x++) {
-		let result = httpTarget.Results[x]
+		let result = httpTarget.Results[x];
 		if (result.Name == name) {
-			httpTarget.Results.splice(x, 1)
-			renderHttpAttackResults(target, httpTarget)
-			notif(`Result file "${name}" has been deleted.`)
-			return
+			httpTarget.Results.splice(x, 1);
+			renderHttpAttackResults(target, httpTarget);
+			notif(`Result file "${name}" has been deleted.`);
+			return;
 		}
 	}
 }
 
 async function attackResultGet(button, name) {
-	let el = document.getElementById(name)
+	let el = document.getElementById(name);
 
 	if (el.style.display === "block") {
-		el.style.display = "none"
-		button.innerHTML = "Show"
-		return
+		el.style.display = "none";
+		button.innerHTML = "Show";
+		return;
 	}
 
-	let url = "/_trunks/api/target/attack/result?name=" + name
-	let fres = await fetch(url)
-	let res = await fres.json()
+	let url = "/_trunks/api/target/attack/result?name=" + name;
+	let fres = await fetch(url);
+	let res = await fres.json();
 	if (res.code != 200) {
-		notifError(res.message)
-		return
+		notifError(res.message);
+		return;
 	}
 
-	let result = res.data
+	let result = res.data;
 
 	el.innerHTML = `
 		<pre class="mono">
@@ -648,100 +657,100 @@ ${atob(result.TextReport)}
 		<pre class="mono">
 ${atob(result.HistReport)}
 		</pre>
-	`
+	`;
 
-	el.style.display = "block"
-	button.innerHTML = "Hide"
+	el.style.display = "block";
+	button.innerHTML = "Hide";
 }
 
 function getHttpTargetByID(target, id) {
 	for (let x = 0; x < target.HttpTargets.length; x++) {
 		if (id == target.HttpTargets[x].ID) {
-			return target.HttpTargets[x]
+			return target.HttpTargets[x];
 		}
 	}
-	return null
+	return null;
 }
 
 function getWebSocketTargetByID(target, id) {
 	for (let x = 0; x < target.WebSocketTargets.length; x++) {
 		if (id == target.WebSocketTargets[x].ID) {
-			return target.WebSocketTargets[x]
+			return target.WebSocketTargets[x];
 		}
 	}
-	return null
+	return null;
 }
 
 function onChangeTargetDuration(tid, val) {
-	_targets[tid].Opts.Duration = val * 1e9
+	_targets[tid].Opts.Duration = val * 1e9;
 }
 
 function onChangeTargetRPS(tid, val) {
-	_targets[tid].Opts.RatePerSecond = val * 1
+	_targets[tid].Opts.RatePerSecond = val * 1;
 }
 
 function onChangeTargetTimeout(tid, val) {
-	_targets[tid].Opts.Timeout = val * 1e9
+	_targets[tid].Opts.Timeout = val * 1e9;
 }
 
 function onChangeTargetVar(tid, key, val) {
-	_targets[tid].Vars[key] = val
+	_targets[tid].Vars[key] = val;
 }
 
 function onChangeHttpHeader(targetID, httpTargetID, key, val) {
-	let target = _targets[targetID]
-	let httpTarget = getHttpTargetByID(target, httpTargetID)
-	httpTarget.Headers[key] = val
+	let target = _targets[targetID];
+	let httpTarget = getHttpTargetByID(target, httpTargetID);
+	httpTarget.Headers[key] = val;
 }
 
 function onChangeHttpParam(targetID, httpTargetID, key, val) {
-	let target = _targets[targetID]
-	let httpTarget = getHttpTargetByID(target, httpTargetID)
-	httpTarget.Params[key] = val
+	let target = _targets[targetID];
+	let httpTarget = getHttpTargetByID(target, httpTargetID);
+	httpTarget.Params[key] = val;
 }
 
 function onChangeRequestMethod(el, tid, htid) {
-	let target = _targets[tid]
-	let httpTarget = getHttpTargetByID(target, htid)
-	httpTarget.Method = parseInt(el.value, 10)
+	let target = _targets[tid];
+	let httpTarget = getHttpTargetByID(target, htid);
+	httpTarget.Method = parseInt(el.value, 10);
 }
 
 function onChangeRequestPath(el, tid, htid) {
-	let target = _targets[tid]
-	let httpTarget = getHttpTargetByID(target, htid)
-	httpTarget.Path = el.value
+	let target = _targets[tid];
+	let httpTarget = getHttpTargetByID(target, htid);
+	httpTarget.Path = el.value;
 }
 
 function onChangeRequestType(el, tid, htid) {
-	let target = _targets[tid]
-	let httpTarget = getHttpTargetByID(target, htid)
-	httpTarget.RequestType = parseInt(el.value, 10)
+	let target = _targets[tid];
+	let httpTarget = getHttpTargetByID(target, htid);
+	httpTarget.RequestType = parseInt(el.value, 10);
 }
 
 function notif(msg) {
-	let root = document.getElementById("notif")
-	let item = document.createElement("div")
-	item.innerHTML = msg
-	root.appendChild(item)
+	let root = document.getElementById("notif");
+	let item = document.createElement("div");
+	item.innerHTML = msg;
+	root.appendChild(item);
 
 	setTimeout(function () {
-		root.removeChild(item)
-	}, 5000)
+		root.removeChild(item);
+	}, 5000);
 }
 
 function notifError(msg) {
-	let root = document.getElementById("notif-error")
-	let item = document.createElement("div")
-	item.innerHTML = msg
-	root.appendChild(item)
+	let root = document.getElementById("notif-error");
+	let item = document.createElement("div");
+	item.innerHTML = msg;
+	root.appendChild(item);
 
 	setTimeout(function () {
-		root.removeChild(item)
-	}, 5000)
+		root.removeChild(item);
+	}, 5000);
 }
 
 function updateStateAttack(target, httpTarget) {
-	let el = document.getElementById("stateAttack")
+	let el = document.getElementById("stateAttack");
 	if (httpTarget) {
 		el.innerHTML = `
 			${target.Name} / ${httpTarget.Name}
@@ -749,8 +758,8 @@ function updateStateAttack(target, httpTarget) {
 			<button onclick="attackCancel('${target.ID}', '${httpTarget.ID}')">
 			Cancel
 			</button>
-		`
+		`;
 	} else {
-		el.innerHTML = "-"
+		el.innerHTML = "-";
 	}
 }
