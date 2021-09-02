@@ -258,9 +258,17 @@ function renderHttpTargets(target) {
 				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
 				<pre id="${http.ID}_response_body" class="response mono"></pre>
+		`
 
+
+		if (http.AllowAttack) {
+			w += `
 				<h4>Attack results</h4>
 				<div id="${http.ID}_results" class="results"></div>
+			`
+		}
+
+		w += `
 			</div>
 		`;
 	}
