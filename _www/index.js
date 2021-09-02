@@ -45,6 +45,7 @@ async function main() {
 			for (let ht of target.HttpTargets) {
 				w += `
 					<div
+						id="/http/${target.ID}/${ht.ID}"
 						class="navHttpTarget"
 						onclick="renderTarget('${target.ID}', '${ht.ID}', '')"
 					>
@@ -58,6 +59,7 @@ async function main() {
 			for (let wst of target.WebSocketTargets) {
 				w += `
 					<div
+						id="/ws/${target.ID}/${wst.ID}"
 						class="navWebSocketTarget"
 						onclick="renderTarget('${target.ID}', '', '${wst.ID}')"
 					>
@@ -73,6 +75,23 @@ async function main() {
 	}
 
 	document.getElementById("navContent").innerHTML = w;
+
+	windowOnHashChange();
+	window.onhashchange = windowOnHashChange;
+}
+
+function windowOnHashChange() {
+	// Parse the location hash.
+	let path = window.location.hash.substring(1);
+	let paths = path.split("/");
+	if (paths.length != 4) {
+		return;
+	}
+	if (paths[1] == "http") {
+		renderTarget(paths[2], paths[3], "");
+	} else {
+		renderTarget(paths[2], "", paths[3]);
+	}
 }
 
 async function environmentGet() {
@@ -86,10 +105,7 @@ async function environmentGet() {
 	_env = res.data;
 
 	if (_env.AttackRunning) {
-		updateStateAttack(
-			_env.AttackRunning.Target,
-			_env.AttackRunning.HttpTarget
-		);
+		updateStateAttack(_env.AttackRunning.Target, _env.AttackRunning.HttpTarget);
 	}
 }
 
@@ -103,9 +119,7 @@ async function renderEnvironment() {
 			</div>
 			<div class="input">
 				<label for="MaxAttackDuration"> Max. attack duration (seconds) </label>:
-				<input id="MaxAttackDuration" readonly="" value="${
-					_env.MaxAttackDuration / 1e9
-				}"></input>
+				<input id="MaxAttackDuration" readonly="" value="${_env.MaxAttackDuration / 1e9}"></input>
 			</div>
 			<div class="input">
 				<label for="MaxAttackRate"> Max. attack rate </label>:
@@ -125,7 +139,7 @@ async function renderEnvironment() {
 
 function renderTarget(targetID, htid, wstid) {
 	let target = _targets[targetID];
-	if (target === null) {
+	if (!target) {
 		console.log(`invalid target ${targetID}`);
 		return;
 	}
@@ -193,8 +207,10 @@ function renderTarget(targetID, htid, wstid) {
 	renderWebSocketTargets(target);
 
 	if (htid) {
+		window.location.hash = "#/http/" + targetID + "/" + htid;
 		document.getElementById(htid).scrollIntoView();
 	} else if (wstid) {
+		window.location.hash = "#/ws/" + targetID + "/" + wstid;
 		document.getElementById(wstid).scrollIntoView();
 	}
 }
@@ -258,14 +274,13 @@ function renderHttpTargets(target) {
 				<pre id="${http.ID}_request" class="response mono"></pre>
 				<pre id="${http.ID}_response" class="response mono"></pre>
 				<pre id="${http.ID}_response_body" class="response mono"></pre>
-		`
-
+		`;
 
 		if (http.AllowAttack) {
 			w += `
 				<h4>Attack results</h4>
 				<div id="${http.ID}_results" class="results"></div>
-			`
+			`;
 		}
 
 		w += `
@@ -502,12 +517,8 @@ async function run(targetID, httpTargetID) {
 		return;
 	}
 
-	document.getElementById(httpTargetID + "_request").innerHTML = atob(
-		res.data.DumpRequest
-	);
-	document.getElementById(httpTargetID + "_response").innerHTML = atob(
-		res.data.DumpResponse
-	);
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest);
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse);
 
 	let body = atob(res.data.ResponseBody);
 	let elBody = document.getElementById(httpTargetID + "_response_body");
