@@ -2,38 +2,29 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta
+			name="viewport"
+			content="width=device-width,initial-scale=1"
+		/>
 		<title>Trunks</title>
-		<link rel="icon" type="image/png" href="/favicon.png" />
 		<style>
 			body {
 				background-color: ivory;
 				margin: 0;
 				padding: 0;
 			}
-
-			#notif,
-			#notif-error {
-				left: 10%;
-				position: absolute;
-				top: 1em;
-				width: 80%;
+			input:disabled,
+			select:disabled {
+				background-color: gainsboro;
+				color: darkslategray;
+			}
+			input,
+			select,
+			button {
+				font-size: 16px;
 			}
 
-			#notif > div {
-				background-color: white;
-				border: 1px solid lightgrey;
-				margin: 1em auto;
-				padding: 1em;
-			}
-
-			#notif-error > div {
-				background-color: salmon;
-				margin: 1em auto;
-				padding: 1em;
-			}
-
-			.nav {
+			.trunks_nav {
 				border-right: 1px solid lightgrey;
 				height: calc(100% - 5em);
 				overflow: auto;
@@ -41,18 +32,17 @@
 				position: fixed;
 				width: 14em;
 			}
-			.nav .navTarget {
+			.trunks_nav .nav_target {
 				cursor: pointer;
 				margin-bottom: 1em;
 			}
-			.nav .navHttpTarget,
-			.nav .navWebSocketTarget {
+			.trunks_nav .nav_http_target,
+			.trunks_nav .nav_ws_target {
 				cursor: pointer;
 				margin-bottom: 1em;
 				margin-left: 1em;
 			}
-
-			.nav .footer {
+			.trunks_nav .trunks_footer {
 				bottom: 0;
 				font-size: 9pt;
 				padding: 1em;
@@ -60,7 +50,8 @@
 				width: 16em;
 				background-color: ivory;
 			}
-			.main {
+
+			.trunks_main {
 				height: calc(100% - 2em);
 				left: 16em;
 				overflow: auto;
@@ -68,61 +59,54 @@
 				position: fixed;
 				width: calc(100% - 18em);
 			}
-			.main .mainState {
+			.trunks_main .trunks_attack_running {
 				border: 1px solid lightgrey;
 				padding: 1em;
 			}
-			.input {
-				margin-bottom: 1em;
-			}
-			.input label {
-				display: inline-block;
-				width: 10em;
-			}
-			.input input {
+
+			.trunks_input {
 				border: 1px solid lightgray;
 				display: inline-block;
+				margin-left: 10px;
 				padding: 6px;
 				width: calc(100% - 18em);
 			}
-			.input-rows {
-				margin-bottom: 1em;
-			}
-			.input-rows label {
+			.trunks_input_label {
 				display: inline-block;
-				margin-bottom: 5px;
-				width: auto;
-			}
-			.input-rows input {
-				display: block;
-				width: calc(100% - 2em);
+				text-align: right;
+				width: 10em;
 			}
 
-			.mono {
-				background-color: lightgrey;
+			.http_target button,
+			.ws_target button {
+				margin-left: 10px;
+			}
+
+			.http_target_out_mono,
+			.ws_target_out_mono {
+				background-color: gainsboro;
 				font-family: monospace;
 				padding: 1em;
 				overflow: auto;
 			}
-
-			.HttpTarget {
+			.http_target {
 				margin-top: 2em;
 			}
 
-			.HttpTarget h3,
-			.WebSocketTarget h3 {
+			.http_target h3,
+			.ws_target h3 {
 				background-color: beige;
 				border-left: 10px solid gold;
 				margin-left: 0;
 				padding: 0.5em;
 			}
 
-			.results > .resultName {
+			.http_target_attack_result {
 				margin-bottom: 1em;
 			}
 
 			@media screen and (max-width: 740px) {
-				.nav {
+				.trunks_nav {
 					border-bottom: 1px solid lightgrey;
 					border-right: unset;
 					height: unset;
@@ -130,72 +114,43 @@
 					position: unset;
 					width: calc(100% - 2em);
 				}
-
-				.nav .footer {
+				.trunks_nav .trunks_footer {
 					margin: 2em 0 0 0;
 					position: unset;
 				}
 
-				.main {
+				.trunks_main {
 					height: unset;
 					left: 0;
 					position: unset;
 					width: calc(100% - 2em);
 				}
 
-				.input label {
-					display: inline-block;
+				.trunks_input {
+					display: block;
+					width: calc(100% - 2em);
+					margin-bottom: 10px;
+				}
+				.trunks_input_label {
+					display: block;
+					text-align: left;
 					width: auto;
 				}
 
-				.input input {
-					display: block;
-					width: calc(100% - 2em);
-				}
-
-				.HttpTargetActions {
+				.http_target_actions {
 					display: block;
 					margin-top: 10px;
 				}
-
-				.results > .resultName {
+				.http_target_attack_result {
 					word-break: break-word;
 				}
-				.results > .resultName .actions {
+				.http_target_attack_result_actions {
 					display: block;
 					margin: 0.5em 0px;
 				}
 			}
 		</style>
-		<script src="/index.js"></script>
+		<script type="module" src="/index.js"></script>
 	</head>
-	<body onload="main()">
-		<div class="nav">
-			<h1>Trunks</h1>
-
-			<div class="navTarget">
-				<h3 onclick="renderEnvironment()">Environment</h3>
-			</div>
-
-			<div id="navContent"></div>
-
-			<div class="footer">
-				Powered by
-				<a href="https://sr.ht/~shulhan/trunks" target="_blank"
-					>Trunks</a
-				>
-			</div>
-		</div>
-
-		<div class="main">
-			<div class="mainState">
-				Attack running:
-				<span id="stateAttack"> - </span>
-			</div>
-			<div id="main-content"></div>
-		</div>
-
-		<div id="notif"></div>
-		<div id="notif-error"></div>
-	</body>
+	<body></body>
 </html>

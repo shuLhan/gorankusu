@@ -2,13 +2,13 @@
 ## Use of this source code is governed by a BSD-style
 ## license that can be found in the LICENSE file.
 
-.PHONY: all run
+.PHONY: all run embed
 
-all: memfs_www_generate.go
+all: embed
 	go test -v -race ./...
 
 run:
 	DEBUG=3 go run ./cmd/trunks-example
 
-memfs_www_generate.go: _www/*
+embed:
 	go run ./internal/generate-memfs

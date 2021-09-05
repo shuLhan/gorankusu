@@ -17,6 +17,18 @@ func main() {
 
 	opts := &memfs.Options{
 		Root: "_www",
+		Excludes: []string{
+			`.*\.ts`,
+			`/wui/.*/example.js$`,
+			`/wui/.*/index.html$`,
+			`/wui/LICENSE$`,
+			`/wui/Makefile$`,
+			`/wui/README.adoc$`,
+			`/wui/index\.html$`,
+			`/wui/tsconfig\.json$`,
+			`\.git`,
+			`\.wui\.local`,
+		},
 	}
 
 	mfs, err := memfs.New(opts)

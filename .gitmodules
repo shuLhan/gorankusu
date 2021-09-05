@@ -1,0 +1,3 @@
+[submodule "_www/wui"]
+	path = _www/wui
+	url = git@git.sr.ht:~shulhan/wui

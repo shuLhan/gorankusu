@@ -52,6 +52,10 @@ The "DateTime" is in the following layout,
 The "ResultsSuffix" is the one that defined in Environment.
 
 
+## Credits
+
+The Trunks icon and image is provided by https://www.spriters-resource.com/.
+
 ## License
 
 Copyright 2021, Shulhan <ms@kilabit.info>.
