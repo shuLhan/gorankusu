@@ -48,6 +48,11 @@ func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, orig
 	origTarget.Vars = rr.Target.Vars
 	rr.Target = origTarget
 
+	if origHttpTarget.IsCustomizable {
+		origHttpTarget.Method = rr.HttpTarget.Method
+		origHttpTarget.Path = rr.HttpTarget.Path
+		origHttpTarget.RequestType = rr.HttpTarget.RequestType
+	}
 	origHttpTarget.Headers = rr.HttpTarget.Headers
 	origHttpTarget.Params = rr.HttpTarget.Params
 	rr.HttpTarget = origHttpTarget
