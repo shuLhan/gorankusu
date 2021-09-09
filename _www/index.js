@@ -84,13 +84,19 @@ function windowOnHashChange() {
 	// Parse the location hash.
 	let path = window.location.hash.substring(1);
 	let paths = path.split("/");
-	if (paths.length != 4) {
-		return;
-	}
-	if (paths[1] == "http") {
-		renderTarget(paths[2], paths[3], "");
-	} else {
-		renderTarget(paths[2], "", paths[3]);
+
+	switch (paths.length) {
+		case 2:
+		case 3:
+			renderTarget(paths[1], "", "");
+			break;
+
+		case 4:
+			if (paths[2] == "http") {
+				renderTarget(paths[1], paths[3], "");
+			} else {
+				renderTarget(paths[1], "", paths[3]);
+			}
 	}
 }
 
@@ -105,7 +111,10 @@ async function environmentGet() {
 	_env = res.data;
 
 	if (_env.AttackRunning) {
-		updateStateAttack(_env.AttackRunning.Target, _env.AttackRunning.HttpTarget);
+		updateStateAttack(
+			_env.AttackRunning.Target,
+			_env.AttackRunning.HttpTarget,
+		);
 	}
 }
 
@@ -119,7 +128,9 @@ async function renderEnvironment() {
 			</div>
 			<div class="input">
 				<label for="MaxAttackDuration"> Max. attack duration (seconds) </label>:
-				<input id="MaxAttackDuration" readonly="" value="${_env.MaxAttackDuration / 1e9}"></input>
+				<input id="MaxAttackDuration" readonly="" value="${
+					_env.MaxAttackDuration / 1e9
+				}"></input>
 			</div>
 			<div class="input">
 				<label for="MaxAttackRate"> Max. attack rate </label>:
@@ -144,7 +155,7 @@ function renderTarget(targetID, htid, wstid) {
 		return;
 	}
 	w = `
-		<h2>${target.Name}</h2>
+		<h2 id="${target.ID}">${target.Name}</h2>
 
 		<div class="input">
 			<label> Base URL </label>:
@@ -207,11 +218,14 @@ function renderTarget(targetID, htid, wstid) {
 	renderWebSocketTargets(target);
 
 	if (htid) {
-		window.location.hash = "#/http/" + targetID + "/" + htid;
+		window.location.hash = "#/" + targetID + "/http/" + htid;
 		document.getElementById(htid).scrollIntoView();
 	} else if (wstid) {
-		window.location.hash = "#/ws/" + targetID + "/" + wstid;
+		window.location.hash = "#/" + targetID + "/ws/" + wstid;
 		document.getElementById(wstid).scrollIntoView();
+	} else {
+		window.location.hash = "#/" + targetID;
+		document.getElementById(targetID).scrollIntoView();
 	}
 }
 
@@ -356,7 +370,8 @@ function renderWebSocketTargets(target) {
 		`;
 	}
 
-	document.getElementById(`${target.ID}.WebSocketTargets`).innerHTML = w;
+	document.getElementById(`${target.ID}.WebSocketTargets`).innerHTML =
+		w;
 
 	for (let x = 0; x < target.WebSocketTargets.length; x++) {
 		let wst = target.WebSocketTargets[x];
@@ -517,8 +532,12 @@ async function run(targetID, httpTargetID) {
 		return;
 	}
 
-	document.getElementById(httpTargetID + "_request").innerHTML = atob(res.data.DumpRequest);
-	document.getElementById(httpTargetID + "_response").innerHTML = atob(res.data.DumpResponse);
+	document.getElementById(httpTargetID + "_request").innerHTML = atob(
+		res.data.DumpRequest,
+	);
+	document.getElementById(httpTargetID + "_response").innerHTML = atob(
+		res.data.DumpResponse,
+	);
 
 	let body = atob(res.data.ResponseBody);
 	let elBody = document.getElementById(httpTargetID + "_response_body");
