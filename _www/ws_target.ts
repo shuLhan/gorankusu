@@ -1,3 +1,5 @@
+import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
+import { GenerateFormInput } from "./functions.js"
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
@@ -5,7 +7,6 @@ import {
 	TrunksInterface,
 	WebSocketTargetInterface,
 } from "./interface.js"
-import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
 
 const CLASS_WS_TARGET = "ws_target"
 const CLASS_WS_TARGET_ACTIONS = "ws_target_actions"
@@ -86,17 +87,8 @@ export class WebSocketTarget {
 		wrapper.appendChild(title)
 
 		for (let key in this.opts.Headers) {
-			let opts: WuiInputStringOpts = {
-				label: key,
-				value: this.opts.Headers[key],
-				class_input: CLASS_INPUT,
-				class_label: CLASS_INPUT_LABEL,
-				onChangeHandler: (new_value: string) => {
-					this.opts.Headers[key] = new_value
-				},
-			}
-			let wui_input_header = new WuiInputString(opts)
-			wrapper.appendChild(wui_input_header.el)
+			let fi = this.opts.Headers[key]
+			GenerateFormInput(wrapper, fi)
 		}
 
 		parent.appendChild(wrapper)
@@ -118,17 +110,8 @@ export class WebSocketTarget {
 		wrapper.appendChild(title)
 
 		for (let key in this.opts.Params) {
-			let opts: WuiInputStringOpts = {
-				label: key,
-				value: this.opts.Params[key],
-				class_input: CLASS_INPUT,
-				class_label: CLASS_INPUT_LABEL,
-				onChangeHandler: (new_value: string) => {
-					this.opts.Params[key] = new_value
-				},
-			}
-			let wui_input_param = new WuiInputString(opts)
-			wrapper.appendChild(wui_input_param.el)
+			let fi = this.opts.Params[key]
+			GenerateFormInput(wrapper, fi)
 		}
 
 		parent.appendChild(wrapper)

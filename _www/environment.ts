@@ -44,6 +44,7 @@ export class Environment {
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.ListenAddress = v
 			},
@@ -60,6 +61,7 @@ export class Environment {
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
 				this.opts.MaxAttackDuration = v
 			},
@@ -76,6 +78,7 @@ export class Environment {
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
 				this.opts.MaxAttackRate = v
 			},
@@ -91,6 +94,7 @@ export class Environment {
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.ResultsDir = v
 			},
@@ -104,6 +108,7 @@ export class Environment {
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.ResultsSuffix = v
 			},

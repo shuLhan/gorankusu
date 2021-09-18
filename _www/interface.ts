@@ -4,6 +4,9 @@ export const CLASS_NAV_TARGET = "nav_target"
 
 export const HASH_ENVIRONMENT = "environment"
 
+export const FormInputKindNumber = "number"
+export const FormInputKindString = "string"
+
 export interface AttackOptionsInterface {
 	Duration: number
 	RatePerSecond: number
@@ -19,6 +22,15 @@ export interface EnvironmentInterface {
 	AttackRunning: RunRequestInterface | null
 }
 
+export interface FormInput {
+	label: string
+	hint: string
+	kind: string
+	value: string
+	max?: number
+	min?: number
+}
+
 export interface HttpResponseInterface {
 	code: number
 	message: string
@@ -32,15 +44,15 @@ export interface HttpTargetInterface {
 	Method: number
 	Path: string
 	RequestType: number
-	Headers: KeyValue
-	Params: KeyValue
+	Headers: KeyFormInput
+	Params: KeyFormInput
 	Results: ResultInterface[]
 	AllowAttack: boolean
 	IsCustomizable: boolean
 }
 
-export interface KeyValue {
-	[key: string]: string
+export interface KeyFormInput {
+	[key: string]: FormInput
 }
 
 export interface MapIdTarget {
@@ -76,7 +88,7 @@ export interface TargetInterface {
 	Hint?: string
 	BaseUrl: string
 	Opts: AttackOptionsInterface
-	Vars: KeyValue
+	Vars: KeyFormInput
 	HttpTargets: HttpTargetInterface[]
 	WebSocketTargets: WebSocketTargetInterface[]
 }
@@ -115,6 +127,6 @@ export interface WebSocketTargetInterface {
 	ID: string
 	Name: string
 	Hint?: string
-	Headers: KeyValue
-	Params: KeyValue
+	Headers: KeyFormInput
+	Params: KeyFormInput
 }

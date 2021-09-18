@@ -49,8 +49,8 @@ type HttpTarget struct {
 	Method      libhttp.RequestMethod
 	Path        string
 	RequestType libhttp.RequestType
-	Headers     KeyValue
-	Params      KeyValue
+	Headers     KeyFormInput
+	Params      KeyFormInput
 
 	Run           HttpRunHandler    `json:"-"`
 	ConvertParams HttpConvertParams `json:"-"`
@@ -81,10 +81,10 @@ func (ht *HttpTarget) init() (err error) {
 		ht.ID = generateID(ht.Name)
 	}
 	if ht.Headers == nil {
-		ht.Headers = KeyValue{}
+		ht.Headers = KeyFormInput{}
 	}
 	if ht.Params == nil {
-		ht.Params = KeyValue{}
+		ht.Params = KeyFormInput{}
 	}
 	if len(ht.Path) == 0 {
 		ht.Path = "/"

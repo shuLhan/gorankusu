@@ -7,7 +7,7 @@ import {
 	CLASS_NAV_TARGET,
 	AttackOptionsInterface,
 	HttpTargetInterface,
-	KeyValue,
+	KeyFormInput,
 	TargetInterface,
 	TrunksInterface,
 	WebSocketTargetInterface,
@@ -121,6 +121,7 @@ export class Target {
 			value: this.opts.BaseUrl,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.BaseUrl = v
 			},
@@ -145,6 +146,7 @@ export class Target {
 			min: 1,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
 				this.opts.Opts.Duration = v * 1e9
 			},
@@ -158,6 +160,7 @@ export class Target {
 			min: 1,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
 				this.opts.Opts.RatePerSecond = v
 			},
@@ -171,6 +174,7 @@ export class Target {
 			min: 5,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
+			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
 				this.opts.Opts.Timeout = v * 1e9
 			},
@@ -194,11 +198,11 @@ export class Target {
 		for (const key in this.opts.Vars) {
 			let opts: WuiInputStringOpts = {
 				label: key,
-				value: this.opts.Vars[key],
+				value: this.opts.Vars[key].value,
 				class_input: CLASS_INPUT,
 				class_label: CLASS_INPUT_LABEL,
 				onChangeHandler: (v: string) => {
-					this.opts.Vars[key] = v
+					this.opts.Vars[key].value = v
 				},
 			}
 		}

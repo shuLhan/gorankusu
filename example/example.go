@@ -138,8 +138,12 @@ func (ex *Example) registerTargets() (err error) {
 			Duration:      300 * time.Second,
 			RatePerSecond: 1,
 		},
-		Vars: map[string]string{
-			"A": "1",
+		Vars: trunks.KeyFormInput{
+			"A": trunks.FormInput{
+				Label: "A",
+				Kind:  trunks.FormInputKindNumber,
+				Value: "1",
+			},
 		},
 		HttpTargets: []*trunks.HttpTarget{{
 			Name:        "HTTP Get",
@@ -147,11 +151,21 @@ func (ex *Example) registerTargets() (err error) {
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeQuery,
-			Headers: trunks.KeyValue{
-				"X-Get": "1",
+			Headers: trunks.KeyFormInput{
+				"X-Get": trunks.FormInput{
+					Label: "X-Get",
+					Hint:  "Custom HTTP header to be send.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1.1",
+				},
 			},
-			Params: trunks.KeyValue{
-				"Param1": "1",
+			Params: trunks.KeyFormInput{
+				"Param1": trunks.FormInput{
+					Label: "Param1",
+					Hint:  "Parameter with number.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1",
+				},
 			},
 			Run:         ex.runExampleGet,
 			AllowAttack: true,
@@ -163,12 +177,27 @@ func (ex *Example) registerTargets() (err error) {
 			Method:      libhttp.RequestMethodPost,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
-			Headers: trunks.KeyValue{
-				"X-PostForm": "1",
+			Headers: trunks.KeyFormInput{
+				"X-PostForm": trunks.FormInput{
+					Label: "X-PostForm",
+					Hint:  "Custom HTTP header to be send.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1",
+				},
 			},
-			Params: trunks.KeyValue{
-				"Param1": "1",
-				"Param2": "a string",
+			Params: trunks.KeyFormInput{
+				"Param1": trunks.FormInput{
+					Label: "Param1",
+					Hint:  "Parameter with number.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1",
+				},
+				"Param2": trunks.FormInput{
+					Label: "Param2",
+					Hint:  "Parameter with string.",
+					Kind:  trunks.FormInputKindString,
+					Value: "a string",
+				},
 			},
 			Run:         ex.runExamplePostForm,
 			AllowAttack: true,
@@ -180,11 +209,21 @@ func (ex *Example) registerTargets() (err error) {
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
-			Headers: trunks.KeyValue{
-				"X-FreeForm": "1",
+			Headers: trunks.KeyFormInput{
+				"X-FreeForm": trunks.FormInput{
+					Label: "X-FreeForm",
+					Hint:  "Custom HTTP header to be send.",
+					Kind:  trunks.FormInputKindString,
+					Value: "1",
+				},
 			},
-			Params: trunks.KeyValue{
-				"Param1": "123",
+			Params: trunks.KeyFormInput{
+				"Param1": trunks.FormInput{
+					Label: "X-FreeForm",
+					Hint:  "Parameter with number.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "123",
+				},
 			},
 			IsCustomizable: true,
 		}},
@@ -200,14 +239,23 @@ func (ex *Example) registerTargets() (err error) {
 		Hint:    "This section provide an example of WebSocket endpoints that can be tested.",
 		BaseUrl: fmt.Sprintf("ws://%s", websocketAddress),
 		Opts:    &trunks.AttackOptions{},
-		Vars: trunks.KeyValue{
-			"WebSocketVar": "hello",
+		Vars: trunks.KeyFormInput{
+			"WebSocketVar": trunks.FormInput{
+				Label: "WebSocketVar",
+				Kind:  trunks.FormInputKindString,
+				Value: "hello",
+			},
 		},
 		WebSocketTargets: []*trunks.WebSocketTarget{{
 			Name: "Similar to HTTP GET",
 			Hint: "Test WebSocket endpoint with parameters.",
-			Params: trunks.KeyValue{
-				"Param1": "123",
+			Params: trunks.KeyFormInput{
+				"Param1": trunks.FormInput{
+					Label: "Param1",
+					Hint:  "Parameter with kind is number.",
+					Kind:  "number",
+					Value: "123",
+				},
 			},
 			Run: ex.runWebSocketGet,
 		}},

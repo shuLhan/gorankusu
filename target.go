@@ -24,7 +24,7 @@ type Target struct {
 	BaseUrl string
 
 	Opts             *AttackOptions
-	Vars             KeyValue
+	Vars             KeyFormInput
 	HttpTargets      []*HttpTarget
 	WebSocketTargets []*WebSocketTarget
 
@@ -49,7 +49,7 @@ func (target *Target) init() (err error) {
 	target.Opts.init()
 
 	if target.Vars == nil {
-		target.Vars = KeyValue{}
+		target.Vars = KeyFormInput{}
 	}
 
 	for _, ht := range target.HttpTargets {
