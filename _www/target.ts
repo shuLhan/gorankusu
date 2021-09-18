@@ -114,10 +114,10 @@ export class Target {
 
 		let opts_base_url: WuiInputStringOpts = {
 			label: "Base URL",
+			hint: "The base URL where the HTTP request will be send or the target of attack.",
 			value: this.opts.BaseUrl,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
-			is_disabled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.BaseUrl = v
 			},
@@ -134,6 +134,7 @@ export class Target {
 
 		let opts_duration: WuiInputNumberOpts = {
 			label: "Duration",
+			hint: "The duration of attack, in seconds.",
 			value: this.opts.Opts.Duration / 1e9,
 			min: 1,
 			class_input: CLASS_INPUT,
@@ -146,6 +147,7 @@ export class Target {
 
 		let opts_rate: WuiInputNumberOpts = {
 			label: "Rate per second",
+			hint: "The number of request send per second when attacking target.",
 			value: this.opts.Opts.RatePerSecond,
 			min: 1,
 			class_input: CLASS_INPUT,
@@ -158,6 +160,7 @@ export class Target {
 
 		let opts_timeout: WuiInputNumberOpts = {
 			label: "Timeout (seconds)",
+			hint: "Timeout for each request, in seconds.",
 			value: this.opts.Opts.Timeout / 1e9,
 			min: 5,
 			class_input: CLASS_INPUT,

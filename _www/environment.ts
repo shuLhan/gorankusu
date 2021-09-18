@@ -39,6 +39,7 @@ export class Environment {
 
 		let opts_listen_address: WuiInputStringOpts = {
 			label: "Listen address",
+			hint: "The address and port where Trunks is running.",
 			value: this.opts.ListenAddress,
 			is_disabled: true,
 			class_input: CLASS_INPUT,
@@ -53,6 +54,7 @@ export class Environment {
 
 		let opts_max_attack_dur: WuiInputNumberOpts = {
 			label: "Max. attack duration (seconds)",
+			hint: "Maximum attack duration for all targets, in seconds.",
 			value: this.opts.MaxAttackDuration,
 			min: 1,
 			is_disabled: true,
@@ -68,6 +70,7 @@ export class Environment {
 
 		let opts_max_attack_rate: WuiInputNumberOpts = {
 			label: "Max. attack rate",
+			hint: "Maximum attack rate for all targets.",
 			value: this.opts.MaxAttackRate,
 			min: 1,
 			is_disabled: true,
@@ -83,6 +86,7 @@ export class Environment {
 
 		let opts_results_dir: WuiInputStringOpts = {
 			label: "Results directory",
+			hint: "The directory where the attack result will be saved.",
 			value: this.opts.ResultsDir,
 			is_disabled: true,
 			class_input: CLASS_INPUT,
@@ -95,6 +99,7 @@ export class Environment {
 
 		let opts_results_suffix: WuiInputStringOpts = {
 			label: "Results suffix",
+			hint: "Optional suffix for the file name of attack result.",
 			value: this.opts.ResultsSuffix,
 			is_disabled: true,
 			class_input: CLASS_INPUT,
