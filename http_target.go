@@ -40,6 +40,7 @@ type HttpPreAttackHandler func(rr *RunRequest)
 type HttpTarget struct {
 	// Name of target, required.
 	Name string
+	Hint string // Description about what this HTTP target is doing.
 
 	// ID of target, optional.
 	// If its empty, it will generated using value from Name.

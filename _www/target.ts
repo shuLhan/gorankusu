@@ -112,6 +112,9 @@ export class Target {
 		let hdr_target = document.createElement("h2")
 		hdr_target.innerText = this.opts.Name
 
+		let el_hint = document.createElement("p")
+		el_hint.innerHTML = this.opts.Hint || ""
+
 		let opts_base_url: WuiInputStringOpts = {
 			label: "Base URL",
 			hint: "The base URL where the HTTP request will be send or the target of attack.",
@@ -125,6 +128,9 @@ export class Target {
 		let com_input_base_url = new WuiInputString(opts_base_url)
 
 		this.el_content.appendChild(hdr_target)
+		if (this.opts.Hint) {
+			this.el_content.appendChild(el_hint)
+		}
 		this.el_content.appendChild(com_input_base_url.el)
 	}
 

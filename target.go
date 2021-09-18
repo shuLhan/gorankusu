@@ -16,6 +16,7 @@ import (
 type Target struct {
 	ID   string
 	Name string
+	Hint string
 
 	// BaseUrl contains the target address that serve the service to
 	// be tested.

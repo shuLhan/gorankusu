@@ -34,6 +34,7 @@ export class WebSocketTarget {
 		this.el.appendChild(el_title)
 
 		this.generateActions(el_title)
+		this.generateHint(this.el)
 		this.generateInput(this.el)
 		this.generateOutput(this.el)
 	}
@@ -49,6 +50,15 @@ export class WebSocketTarget {
 		el_actions.appendChild(this.el_button_run)
 
 		parent.appendChild(el_actions)
+	}
+
+	private generateHint(parent: HTMLElement) {
+		if (!this.opts.Hint) {
+			return
+		}
+		let el_hint = document.createElement("p")
+		el_hint.innerHTML = this.opts.Hint
+		parent.appendChild(el_hint)
 	}
 
 	private generateInput(parent: HTMLElement) {

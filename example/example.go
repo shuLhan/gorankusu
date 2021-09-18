@@ -132,6 +132,7 @@ func (ex *Example) registerWebSocketEndpoints() (err error) {
 func (ex *Example) registerTargets() (err error) {
 	targetHttp := &trunks.Target{
 		Name:    "Example HTTP",
+		Hint:    "This section provide an example of HTTP endpoints that can be tested and attacked.",
 		BaseUrl: fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
 		Opts: &trunks.AttackOptions{
 			Duration:      300 * time.Second,
@@ -142,6 +143,7 @@ func (ex *Example) registerTargets() (err error) {
 		},
 		HttpTargets: []*trunks.HttpTarget{{
 			Name:        "HTTP Get",
+			Hint:        fmt.Sprintf("Test or attack endpoint %q using HTTP GET.", pathExample),
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeQuery,
@@ -157,6 +159,7 @@ func (ex *Example) registerTargets() (err error) {
 			PreAttack:   ex.preattackExampleGet,
 		}, {
 			Name:        "HTTP Post Form",
+			Hint:        fmt.Sprintf("Test or attack endpoint %q using HTTP POST.", pathExample),
 			Method:      libhttp.RequestMethodPost,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
@@ -173,6 +176,7 @@ func (ex *Example) registerTargets() (err error) {
 			Attack:      ex.attackExamplePostForm,
 		}, {
 			Name:        "HTTP free form",
+			Hint:        fmt.Sprintf("Test endpoint %q using custom HTTP method and/or content type.", pathExample),
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
@@ -193,6 +197,7 @@ func (ex *Example) registerTargets() (err error) {
 
 	targetWebSocket := &trunks.Target{
 		Name:    "Example WebSocket",
+		Hint:    "This section provide an example of WebSocket endpoints that can be tested.",
 		BaseUrl: fmt.Sprintf("ws://%s", websocketAddress),
 		Opts:    &trunks.AttackOptions{},
 		Vars: trunks.KeyValue{
@@ -200,6 +205,7 @@ func (ex *Example) registerTargets() (err error) {
 		},
 		WebSocketTargets: []*trunks.WebSocketTarget{{
 			Name: "Similar to HTTP GET",
+			Hint: "Test WebSocket endpoint with parameters.",
 			Params: trunks.KeyValue{
 				"Param1": "123",
 			},

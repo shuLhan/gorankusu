@@ -27,6 +27,7 @@ export interface HttpResponseInterface {
 
 export interface HttpTargetInterface {
 	Name: string
+	Hint?: string
 	ID: string
 	Method: number
 	Path: string
@@ -72,6 +73,7 @@ export interface RunResponseInterface {
 export interface TargetInterface {
 	ID: string
 	Name: string
+	Hint?: string
 	BaseUrl: string
 	Opts: AttackOptionsInterface
 	Vars: KeyValue
@@ -110,8 +112,9 @@ export interface TrunksInterface {
 }
 
 export interface WebSocketTargetInterface {
-	Name: string
 	ID: string
+	Name: string
+	Hint?: string
 	Headers: KeyValue
 	Params: KeyValue
 }

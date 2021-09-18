@@ -14,7 +14,8 @@ import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
 const CLASS_HTTP_TARGET = "http_target"
 const CLASS_HTTP_TARGET_ACTIONS = "http_target_actions"
 const CLASS_HTTP_TARGET_ATTACK_RESULT = "http_target_attack_result"
-const CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS = "http_target_attack_result_actions"
+const CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS =
+	"http_target_attack_result_actions"
 const CLASS_HTTP_TARGET_INPUT = "http_target_input"
 const CLASS_HTTP_TARGET_INPUT_HEADER = "http_target_input_header"
 const CLASS_HTTP_TARGET_INPUT_PARAMS = "http_target_input_header"
@@ -48,6 +49,7 @@ export class HttpTarget {
 		this.el.appendChild(el_title)
 
 		this.generateActions(el_title)
+		this.generateHint(this.el)
 		this.generateInput(this.el)
 		this.generateOutput(this.el)
 		this.generateOutputAttack(this.el)
@@ -72,6 +74,15 @@ export class HttpTarget {
 		}
 
 		parent.appendChild(el_actions)
+	}
+
+	private generateHint(parent: HTMLElement) {
+		if (!this.opts.Hint) {
+			return
+		}
+		let el_hint = document.createElement("p")
+		el_hint.innerHTML = this.opts.Hint
+		parent.appendChild(el_hint)
 	}
 
 	private generateInput(parent: HTMLElement) {
@@ -321,7 +332,9 @@ export class HttpTarget {
 			el.innerText = result.Name
 
 			let actions = document.createElement("span")
-			actions.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS)
+			actions.classList.add(
+				CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS,
+			)
 
 			let btn_attack_show = document.createElement("button")
 			btn_attack_show.innerText = "Show"
