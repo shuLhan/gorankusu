@@ -78,6 +78,8 @@ export interface RunRequestInterface {
 export interface RunResponseInterface {
 	DumpRequest: string
 	DumpResponse: string
+	ResponseStatus: string
+	ResponseStatusCode: number
 	ResponseType: string
 	ResponseBody: string
 }
@@ -115,12 +117,12 @@ export interface TrunksInterface {
 	RunHttp(
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
-	): Promise<HttpResponseInterface>
+	): Promise<RunResponseInterface | null>
 
 	RunWebSocket(
 		target: TargetInterface,
 		WebSocketTargetInterface: WebSocketTargetInterface,
-	): Promise<HttpResponseInterface>
+	): Promise<HttpResponseInterface | null>
 }
 
 export interface WebSocketTargetInterface {

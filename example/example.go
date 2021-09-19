@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	liberrors "github.com/shuLhan/share/lib/errors"
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/mlog"
 	"github.com/shuLhan/share/lib/websocket"
@@ -21,7 +22,8 @@ import (
 )
 
 const (
-	pathExample = "/example"
+	pathExample      = "/example"
+	pathExampleError = "/example/error"
 )
 
 const (
@@ -32,6 +34,7 @@ type Example struct {
 	trunks   *trunks.Trunks
 	wsServer *websocket.Server
 
+	targetExampleErrorGet vegeta.Target
 	targetExampleGet      vegeta.Target
 	targetExamplePostForm vegeta.Target
 }
@@ -110,6 +113,17 @@ func (ex *Example) registerEndpoints() (err error) {
 	}
 
 	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodGet,
+		Path:         pathExampleError,
+		RequestType:  libhttp.RequestTypeQuery,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         ex.pathExampleErrorGet,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
@@ -171,6 +185,32 @@ func (ex *Example) registerTargets() (err error) {
 			AllowAttack: true,
 			Attack:      ex.attackExampleGet,
 			PreAttack:   ex.preattackExampleGet,
+		}, {
+			Name:        "HTTP Error Get",
+			Hint:        fmt.Sprintf("Test error on endpoint %q using HTTP GET.", pathExampleError),
+			Method:      libhttp.RequestMethodGet,
+			Path:        pathExampleError,
+			RequestType: libhttp.RequestTypeQuery,
+			Headers: trunks.KeyFormInput{
+				"X-Get": trunks.FormInput{
+					Label: "X-Get",
+					Hint:  "Custom HTTP header to be send.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1.1",
+				},
+			},
+			Params: trunks.KeyFormInput{
+				"Param1": trunks.FormInput{
+					Label: "Param1",
+					Hint:  "Parameter with number.",
+					Kind:  trunks.FormInputKindNumber,
+					Value: "1",
+				},
+			},
+			Run:         ex.runExampleGet,
+			AllowAttack: true,
+			Attack:      ex.attackExampleErrorGet,
+			PreAttack:   ex.preattackExampleErrorGet,
 		}, {
 			Name:        "HTTP Post Form",
 			Hint:        fmt.Sprintf("Test or attack endpoint %q using HTTP POST.", pathExample),
@@ -278,6 +318,10 @@ func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) 
 	return json.Marshal(&res)
 }
 
+func (ex *Example) pathExampleErrorGet(epr *libhttp.EndpointRequest) ([]byte, error) {
+	return nil, liberrors.Internal(fmt.Errorf("server error"))
+}
+
 func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
@@ -326,6 +370,21 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 	return res, nil
 }
 
+func (ex *Example) preattackExampleErrorGet(rr *trunks.RunRequest) {
+	ex.targetExampleErrorGet = vegeta.Target{
+		Method: rr.HttpTarget.Method.String(),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
+		Header: rr.HttpTarget.Headers.ToHttpHeader(),
+	}
+
+	q := rr.HttpTarget.Params.ToUrlValues().Encode()
+	if len(q) > 0 {
+		ex.targetExampleErrorGet.URL += "?" + q
+	}
+
+	fmt.Printf("preattackExampleErrorGet: %+v\n", ex.targetExampleErrorGet)
+}
+
 func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 	ex.targetExampleGet = vegeta.Target{
 		Method: rr.HttpTarget.Method.String(),
@@ -339,6 +398,15 @@ func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 	}
 
 	fmt.Printf("preattackExampleGet: %+v\n", ex.targetExampleGet)
+}
+
+func (ex *Example) attackExampleErrorGet(rr *trunks.RunRequest) vegeta.Targeter {
+	return func(tgt *vegeta.Target) error {
+		rr.HttpTarget.AttackLocker.Lock()
+		*tgt = ex.targetExampleErrorGet
+		rr.HttpTarget.AttackLocker.Unlock()
+		return nil
+	}
 }
 
 func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {

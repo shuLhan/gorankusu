@@ -144,16 +144,15 @@ export class WebSocketTarget {
 	}
 
 	private async onClickRun() {
-		let res_json = await this.trunks.RunWebSocket(
+		let res = await this.trunks.RunWebSocket(
 			this.target,
 			this.opts,
 		)
-		if (res_json.code != 200) {
+		if (!res) {
 			return
 		}
-
 		this.el_out_response.innerText = JSON.stringify(
-			JSON.parse(atob(res_json.data)),
+			JSON.parse(atob(res.data)),
 			null,
 			2,
 		)

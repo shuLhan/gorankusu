@@ -1,6 +1,4 @@
-import { wui_notif } from "./vars.js"
 import { Environment } from "./environment.js"
-import { Target } from "./target.js"
 import {
 	CLASS_NAV_TARGET,
 	HASH_ENVIRONMENT,
@@ -10,9 +8,12 @@ import {
 	MapIdTarget,
 	MapNumberString,
 	RunRequestInterface,
+	RunResponseInterface,
 	TargetInterface,
 	WebSocketTargetInterface,
 } from "./interface.js"
+import { Target } from "./target.js"
+import { wui_notif } from "./vars.js"
 
 const API_ENVIRONMENT = "/_trunks/api/environment"
 const API_TARGETS = "/_trunks/api/targets"
@@ -321,7 +322,7 @@ export class Trunks {
 	async RunHttp(
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
-	): Promise<HttpResponseInterface> {
+	): Promise<RunResponseInterface | null> {
 		let req: RunRequestInterface = {
 			Target: {
 				ID: target.ID,
@@ -336,7 +337,7 @@ export class Trunks {
 			WebSocketTarget: null,
 		}
 
-		let fres = await fetch(API_TARGET_RUN_HTTP, {
+		let http_res = await fetch(API_TARGET_RUN_HTTP, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -344,9 +345,22 @@ export class Trunks {
 			body: JSON.stringify(req),
 		})
 
-		let res = await fres.json()
-		if (res.code != 200) {
-			wui_notif.Error(res.message)
+		let json_res = await http_res.json()
+		if (json_res.code != 200) {
+			wui_notif.Error(json_res.message)
+			return null
+		}
+
+		let res = json_res.data as RunResponseInterface
+
+		if (res.ResponseStatusCode != 200) {
+			wui_notif.Error(
+				`${http_target.Name}: ${res.ResponseStatus}`,
+			)
+		} else {
+			wui_notif.Info(
+				`${http_target.Name}: ${res.ResponseStatus}`,
+			)
 		}
 
 		return res
@@ -355,7 +369,7 @@ export class Trunks {
 	async RunWebSocket(
 		target: TargetInterface,
 		ws_target: WebSocketTargetInterface,
-	): Promise<HttpResponseInterface> {
+	): Promise<HttpResponseInterface | null> {
 		let req: RunRequestInterface = {
 			Target: {
 				ID: target.ID,
@@ -378,12 +392,13 @@ export class Trunks {
 			body: JSON.stringify(req),
 		})
 
-		let res = await fres.json()
-		if (res.code != 200) {
-			wui_notif.Error(res.message)
+		let json_res = await fres.json()
+		if (json_res.code != 200) {
+			wui_notif.Error(json_res.message)
+			return null
 		}
-
-		return res
+		wui_notif.Info(`${ws_target.Name}: success.`)
+		return json_res
 	}
 
 	SetContent(path: string, el: HTMLElement): void {

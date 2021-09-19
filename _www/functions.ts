@@ -44,3 +44,27 @@ export function GenerateFormInput(parent: HTMLElement, fi: FormInput) {
 			break
 	}
 }
+
+export function HttpMethodToString(m: number): string {
+	switch (m) {
+		case 0:
+			return "GET"
+		case 1:
+			return "CONNECT"
+		case 2:
+			return "DELETE"
+		case 3:
+			return "HEAD"
+		case 4:
+			return "OPTIONS"
+		case 5:
+			return "PATCH"
+		case 6:
+			return "POST"
+		case 7:
+			return "PUT"
+		case 8:
+			return "TRACE"
+	}
+	return "???"
+}

@@ -11,7 +11,6 @@ import {
 	HttpTargetInterface,
 	KeyFormInput,
 	ResultInterface,
-	RunResponseInterface,
 	TargetInterface,
 	TrunksInterface,
 } from "./interface.js"
@@ -19,7 +18,8 @@ import {
 const CLASS_HTTP_TARGET = "http_target"
 const CLASS_HTTP_TARGET_ACTIONS = "http_target_actions"
 const CLASS_HTTP_TARGET_ATTACK_RESULT = "http_target_attack_result"
-const CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS = "http_target_attack_result_actions"
+const CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS =
+	"http_target_attack_result_actions"
 const CLASS_HTTP_TARGET_INPUT = "http_target_input"
 const CLASS_HTTP_TARGET_INPUT_HEADER = "http_target_input_header"
 const CLASS_HTTP_TARGET_INPUT_PARAMS = "http_target_input_header"
@@ -40,7 +40,11 @@ export class HttpTarget {
 	el_out_attack: HTMLElement = document.createElement("div")
 	el_out_attack_results: HTMLElement = document.createElement("div")
 
-	constructor(public trunks: TrunksInterface, public target: TargetInterface, public opts: HttpTargetInterface) {
+	constructor(
+		public trunks: TrunksInterface,
+		public target: TargetInterface,
+		public opts: HttpTargetInterface,
+	) {
 		this.el.id = opts.ID
 		this.el.classList.add(CLASS_HTTP_TARGET)
 
@@ -262,7 +266,9 @@ export class HttpTarget {
 
 		this.el_out_request.classList.add(CLASS_HTTP_TARGET_OUT_MONO)
 		this.el_out_response.classList.add(CLASS_HTTP_TARGET_OUT_MONO)
-		this.el_out_response_body.classList.add(CLASS_HTTP_TARGET_OUT_MONO)
+		this.el_out_response_body.classList.add(
+			CLASS_HTTP_TARGET_OUT_MONO,
+		)
 
 		wrapper.appendChild(title)
 		wrapper.appendChild(this.el_out_request)
@@ -292,28 +298,43 @@ export class HttpTarget {
 	private generateAttackResults(parent: HTMLElement) {
 		parent.innerText = ""
 
+		if (!this.opts.Results) {
+			return
+		}
+
 		for (let result of this.opts.Results) {
 			let wrapper = document.createElement("div")
 			wrapper.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT)
 
 			let el_report_text = document.createElement("pre")
 			el_report_text.style.display = "none"
-			el_report_text.classList.add(CLASS_HTTP_TARGET_OUT_MONO)
+			el_report_text.classList.add(
+				CLASS_HTTP_TARGET_OUT_MONO,
+			)
 
 			let el_report_hist = document.createElement("pre")
 			el_report_hist.style.display = "none"
-			el_report_hist.classList.add(CLASS_HTTP_TARGET_OUT_MONO)
+			el_report_hist.classList.add(
+				CLASS_HTTP_TARGET_OUT_MONO,
+			)
 
 			let el = document.createElement("div")
 			el.innerText = result.Name
 
 			let actions = document.createElement("span")
-			actions.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS)
+			actions.classList.add(
+				CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS,
+			)
 
 			let btn_attack_show = document.createElement("button")
 			btn_attack_show.innerText = "Show"
 			btn_attack_show.onclick = () => {
-				this.onClickAttackShow(result.Name, btn_attack_show, el_report_text, el_report_hist)
+				this.onClickAttackShow(
+					result.Name,
+					btn_attack_show,
+					el_report_text,
+					el_report_hist,
+				)
 			}
 
 			let btn_attack_del = document.createElement("button")
@@ -347,7 +368,9 @@ export class HttpTarget {
 			let r = this.opts.Results[x]
 			if (r.Name == result.Name) {
 				this.opts.Results.splice(x, 1)
-				this.generateAttackResults(this.el_out_attack_results)
+				this.generateAttackResults(
+					this.el_out_attack_results,
+				)
 				return
 			}
 		}
@@ -389,17 +412,19 @@ export class HttpTarget {
 	}
 
 	private async onClickRun() {
-		let res_json = await this.trunks.RunHttp(this.target, this.opts)
-		if (res_json.code != 200) {
+		let res = await this.trunks.RunHttp(this.target, this.opts)
+		if (!res) {
 			return
 		}
-
-		let res = res_json.data as RunResponseInterface
 		this.el_out_request.innerText = atob(res.DumpRequest)
 		this.el_out_response.innerText = atob(res.DumpResponse)
 		let body = atob(res.ResponseBody)
 		if (res.ResponseType === CONTENT_TYPE_JSON) {
-			this.el_out_response_body.innerText = JSON.stringify(JSON.parse(body), null, 2)
+			this.el_out_response_body.innerText = JSON.stringify(
+				JSON.parse(body),
+				null,
+				2,
+			)
 		} else {
 			this.el_out_response_body.innerText = body
 		}

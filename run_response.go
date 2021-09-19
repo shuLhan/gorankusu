@@ -18,10 +18,12 @@ import (
 // WebSocket target.
 //
 type RunResponse struct {
-	DumpRequest  []byte
-	DumpResponse []byte
-	ResponseType string
-	ResponseBody []byte
+	DumpRequest        []byte
+	DumpResponse       []byte
+	ResponseStatus     string
+	ResponseStatusCode int
+	ResponseType       string
+	ResponseBody       []byte
 }
 
 //
@@ -42,6 +44,9 @@ func (rres *RunResponse) SetHttpRequest(req *http.Request) (err error) {
 //
 func (rres *RunResponse) SetHttpResponse(res *http.Response) (err error) {
 	logp := "SetHttpResponse"
+
+	rres.ResponseStatus = res.Status
+	rres.ResponseStatusCode = res.StatusCode
 
 	rres.DumpResponse, err = httputil.DumpResponse(res, true)
 	if err != nil {
