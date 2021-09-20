@@ -2,7 +2,7 @@
 ## Use of this source code is governed by a BSD-style
 ## license that can be found in the LICENSE file.
 
-.PHONY: all run embed
+.PHONY: all run embed tsc
 
 all: embed
 	go test -v -race ./...
@@ -10,5 +10,8 @@ all: embed
 run:
 	DEBUG=3 go run ./cmd/trunks-example
 
-embed:
+embed: tsc
 	go run ./internal/generate-memfs
+
+tsc:
+	tsc -p _www/tsconfig.json
