@@ -27,7 +27,7 @@ export function GenerateFormInput(parent: HTMLElement, fi: FormInput) {
 			parent.appendChild(wui_input_number.el)
 			break
 
-		case FormInputKindString:
+		default:
 			let wui_input_string_opts: WuiInputStringOpts = {
 				label: fi.label,
 				hint: fi.hint,
