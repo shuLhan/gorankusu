@@ -15,7 +15,7 @@ const (
 // (number, string, and so on), and the Value field contains default value for
 // input.
 //
-// The Max and Min fields is optional, can be set if the Kind is
+// The Max and Min fields is optional, it only affect if the Kind is
 // FormInputKindNumber.
 //
 type FormInput struct {

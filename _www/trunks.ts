@@ -173,6 +173,7 @@ export class Trunks {
 			return
 		}
 
+		let el: HTMLElement | null
 		let target = this.targets[paths[1]]
 		switch (paths.length) {
 			case 2:
@@ -182,6 +183,10 @@ export class Trunks {
 				}
 				this.el_content.innerHTML = ""
 				this.el_content.appendChild(target.el_content)
+				el = document.getElementById(paths[1])
+				if (el) {
+					el.scrollIntoView()
+				}
 				break
 
 			case 4:
@@ -196,7 +201,7 @@ export class Trunks {
 						target.el_content,
 					)
 				}
-				let el = document.getElementById(paths[3])
+				el = document.getElementById(paths[3])
 				if (el) {
 					el.scrollIntoView()
 				}

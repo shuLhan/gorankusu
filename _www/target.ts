@@ -1,6 +1,7 @@
 import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js"
 import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
 
+import { GenerateFormInput } from "./functions.js"
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
@@ -111,6 +112,7 @@ export class Target {
 	private generateContentBaseURL() {
 		let hdr_target = document.createElement("h2")
 		hdr_target.innerText = this.opts.Name
+		hdr_target.id = this.opts.ID
 
 		let el_hint = document.createElement("p")
 		el_hint.innerHTML = this.opts.Hint || ""
@@ -195,16 +197,11 @@ export class Target {
 		let hdr = document.createElement("h3")
 		hdr.innerText = "Variables"
 
+		this.el_content.appendChild(hdr)
+
 		for (const key in this.opts.Vars) {
-			let opts: WuiInputStringOpts = {
-				label: key,
-				value: this.opts.Vars[key].value,
-				class_input: CLASS_INPUT,
-				class_label: CLASS_INPUT_LABEL,
-				onChangeHandler: (v: string) => {
-					this.opts.Vars[key].value = v
-				},
-			}
+			let fi = this.opts.Vars[key]
+			GenerateFormInput(this.el_content, fi)
 		}
 	}
 
