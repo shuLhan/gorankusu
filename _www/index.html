@@ -30,42 +30,44 @@
 
 			.trunks_nav {
 				border-right: 1px solid lightgrey;
-				height: calc(100% - 5em);
+				height: calc(100% - 48px);
 				overflow: auto;
-				padding: 1em;
+				padding: 8px;
 				position: fixed;
-				width: 14em;
+				width: 240px;
 			}
 			.trunks_nav .nav_target {
 				cursor: pointer;
-				margin-bottom: 1em;
+				margin-bottom: 8px;
 			}
 			.trunks_nav .nav_http_target,
 			.trunks_nav .nav_ws_target {
 				cursor: pointer;
-				margin-bottom: 1em;
-				margin-left: 1em;
+				margin-bottom: 8px;
+				margin-left: 8px;
 			}
 			.trunks_nav .trunks_footer {
+				background-color: ivory;
 				bottom: 0;
 				font-size: 9pt;
-				padding: 1em;
+				left: 0;
+				padding: 8px;
 				position: fixed;
-				width: 16em;
-				background-color: ivory;
+				text-align: center;
+				width: calc(240px - 16px);
 			}
 
 			.trunks_main {
-				height: calc(100% - 2em);
-				left: 16em;
+				height: calc(100% - 32px);
+				left: 256px;
 				overflow: auto;
-				padding: 1em;
+				padding: 16px;
 				position: fixed;
-				width: calc(100% - 18em);
+				width: calc(100% - 290px);
 			}
 			.trunks_main .trunks_attack_running {
 				border: 1px solid lightgrey;
-				padding: 1em;
+				padding: 8px;
 			}
 
 			.trunks_input {
@@ -95,23 +97,23 @@
 			.ws_target_out_mono {
 				background-color: gainsboro;
 				font-family: monospace;
-				padding: 1em;
+				padding: 16px;
 				overflow: auto;
 			}
 			.http_target {
-				margin-top: 2em;
+				margin-top: 16px;
 			}
 
 			.http_target h3,
 			.ws_target h3 {
 				background-color: beige;
 				border-left: 10px solid gold;
-				margin: 1em -16px;
-				padding: 0.5em;
+				margin: 8px -14px;
+				padding: 12px;
 			}
 
 			.http_target_attack_result {
-				margin-bottom: 1em;
+				margin-bottom: 8px;
 			}
 
 			@media screen and (max-width: 740px) {
@@ -119,20 +121,23 @@
 					border-bottom: 1px solid lightgrey;
 					border-right: unset;
 					height: unset;
-					padding: 1em;
+					overflow: unset;
+					padding: 8px;
 					position: unset;
-					width: calc(100% - 2em);
+					width: calc(100% - 20px);
 				}
 				.trunks_nav .trunks_footer {
-					margin: 2em 0 0 0;
+					margin: 16px 0 0 0;
 					position: unset;
+					width: calc(100% - 20px);
 				}
 
 				.trunks_main {
 					height: unset;
-					left: 0;
+					overflow: unset;
 					position: unset;
-					width: calc(100% - 2em);
+					padding: 8px;
+					width: calc(100% - 20px);
 				}
 
 				.trunks_input {
@@ -159,7 +164,13 @@
 				}
 				.http_target_attack_result_actions {
 					display: block;
-					margin: 0.5em 0px;
+					margin: 4px 0px;
+				}
+
+				.http_target h3,
+				.ws_target h3 {
+					margin: 8px 0px 0px -8px;
+					padding: 12px;
 				}
 			}
 		</style>
