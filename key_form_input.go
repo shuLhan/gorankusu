@@ -3,6 +3,8 @@ package trunks
 import (
 	"net/http"
 	"net/url"
+
+	"github.com/shuLhan/share/lib/math/big"
 )
 
 //
@@ -23,6 +25,22 @@ func (kfi KeyFormInput) ToHttpHeader() (headers http.Header) {
 		headers.Set(k, fi.Value)
 	}
 	return headers
+}
+
+//
+// ToJsonObject convert the KeyFormInput into JSON object.
+//
+func (kfi KeyFormInput) ToJsonObject() (data map[string]interface{}) {
+	data = make(map[string]interface{}, len(kfi))
+	for k, fi := range kfi {
+		switch fi.Kind {
+		case FormInputKindNumber:
+			data[k], _ = big.NewRat(fi.Value).Float64()
+		default:
+			data[k] = fi.Value
+		}
+	}
+	return data
 }
 
 //

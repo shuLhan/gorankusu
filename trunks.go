@@ -530,7 +530,7 @@ func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error
 	)
 
 	if rr.HttpTarget.RequestType == libhttp.RequestTypeJSON {
-		params = rr.HttpTarget.Params
+		params = rr.HttpTarget.Params.ToJsonObject()
 	} else {
 		params = rr.HttpTarget.Params.ToUrlValues()
 	}
