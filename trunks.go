@@ -512,9 +512,12 @@ func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error
 		params  interface{}
 	)
 
-	if rr.HttpTarget.RequestType == libhttp.RequestTypeJSON {
+	switch rr.HttpTarget.RequestType {
+	case libhttp.RequestTypeJSON:
 		params = rr.HttpTarget.Params.ToJsonObject()
-	} else {
+	case libhttp.RequestTypeMultipartForm:
+		params = rr.HttpTarget.Params.ToMultipartFormData()
+	default:
 		params = rr.HttpTarget.Params.ToUrlValues()
 	}
 
