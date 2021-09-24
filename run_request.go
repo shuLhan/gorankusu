@@ -12,79 +12,93 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
+//
+// RunRequest define the request to run HTTP or WebSocket target.
+//
 type RunRequest struct {
-	Locker          sync.Mutex
-	Target          *Target
-	HttpTarget      *HttpTarget
-	WebSocketTarget *WebSocketTarget
+	Locker          sync.Mutex `json:"-"`
+	Target          Target
+	HttpTarget      HttpTarget
+	WebSocketTarget WebSocketTarget
 	result          *AttackResult
+}
+
+//
+// generateRunRequest merge the run request with original target and HTTP
+// target into new RunRequest.
+//
+func generateRunRequest(
+	env *Environment,
+	req *RunRequest,
+	origTarget *Target,
+	origHttpTarget *HttpTarget,
+) (outrr *RunRequest) {
+	if req.Target.Opts.Duration > 0 && req.Target.Opts.Duration <= env.MaxAttackDuration {
+		origTarget.Opts.Duration = req.Target.Opts.Duration
+	}
+	if req.Target.Opts.RatePerSecond > 0 && req.Target.Opts.RatePerSecond <= env.MaxAttackRate {
+		origTarget.Opts.RatePerSecond = req.Target.Opts.RatePerSecond
+		origTarget.Opts.ratePerSecond = vegeta.Rate{
+			Freq: req.Target.Opts.RatePerSecond,
+			Per:  time.Second,
+		}
+	}
+	if req.Target.Opts.Timeout > 0 && req.Target.Opts.Timeout <= DefaultAttackTimeout {
+		origTarget.Opts.Timeout = req.Target.Opts.Timeout
+	}
+	if origHttpTarget.IsCustomizable {
+		origHttpTarget.Method = req.HttpTarget.Method
+		origHttpTarget.Path = req.HttpTarget.Path
+		origHttpTarget.RequestType = req.HttpTarget.RequestType
+	}
+
+	outrr = &RunRequest{
+		Target:     *origTarget,
+		HttpTarget: *origHttpTarget,
+	}
+
+	outrr.Target.Vars = req.Target.Vars
+	outrr.HttpTarget.Headers = req.HttpTarget.Headers
+	outrr.HttpTarget.Params = req.HttpTarget.Params
+
+	return outrr
+}
+
+//
+// generateWebSocketTarget merge the run request with original target and
+// WebSocket target into new RunRequest
+//
+func generateWebSocketTarget(
+	env *Environment,
+	req *RunRequest,
+	origTarget *Target,
+	origWebSocketTarget *WebSocketTarget,
+) (outrr *RunRequest) {
+	if req.Target.Opts.Duration > 0 && req.Target.Opts.Duration <= env.MaxAttackDuration {
+		origTarget.Opts.Duration = req.Target.Opts.Duration
+	}
+	if req.Target.Opts.RatePerSecond > 0 && req.Target.Opts.RatePerSecond <= env.MaxAttackRate {
+		origTarget.Opts.RatePerSecond = req.Target.Opts.RatePerSecond
+		origTarget.Opts.ratePerSecond = vegeta.Rate{
+			Freq: req.Target.Opts.RatePerSecond,
+			Per:  time.Second,
+		}
+	}
+	if req.Target.Opts.Timeout > 0 && req.Target.Opts.Timeout <= DefaultAttackTimeout {
+		origTarget.Opts.Timeout = req.Target.Opts.Timeout
+	}
+
+	outrr = &RunRequest{
+		Target:          *origTarget,
+		WebSocketTarget: *origWebSocketTarget,
+	}
+	outrr.Target.Vars = req.Target.Vars
+	outrr.WebSocketTarget.Headers = req.WebSocketTarget.Headers
+	outrr.WebSocketTarget.Params = req.WebSocketTarget.Params
+
+	return outrr
 }
 
 func (rr *RunRequest) String() string {
 	return fmt.Sprintf("Target:%v HttpTarget:%v\n", rr.Target, rr.HttpTarget)
-}
-
-//
-// mergeHttpTarget merge the request parameter into original target and HTTP
-// target.
-//
-func (rr *RunRequest) mergeHttpTarget(env *Environment, origTarget *Target, origHttpTarget *HttpTarget) {
-	if rr.Target.Opts.Duration > 0 && rr.Target.Opts.Duration <= env.MaxAttackDuration {
-		origTarget.Opts.Duration = rr.Target.Opts.Duration
-	}
-
-	if rr.Target.Opts.RatePerSecond > 0 && rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
-		origTarget.Opts.RatePerSecond = rr.Target.Opts.RatePerSecond
-		origTarget.Opts.ratePerSecond = vegeta.Rate{
-			Freq: rr.Target.Opts.RatePerSecond,
-			Per:  time.Second,
-		}
-	}
-
-	if rr.Target.Opts.Timeout > 0 && rr.Target.Opts.Timeout <= DefaultAttackTimeout {
-		origTarget.Opts.Timeout = rr.Target.Opts.Timeout
-	}
-
-	origTarget.Vars = rr.Target.Vars
-	rr.Target = origTarget
-
-	if origHttpTarget.IsCustomizable {
-		origHttpTarget.Method = rr.HttpTarget.Method
-		origHttpTarget.Path = rr.HttpTarget.Path
-		origHttpTarget.RequestType = rr.HttpTarget.RequestType
-	}
-	origHttpTarget.Headers = rr.HttpTarget.Headers
-	origHttpTarget.Params = rr.HttpTarget.Params
-	rr.HttpTarget = origHttpTarget
-}
-
-//
-// mergeWebSocketTarget merge the request parameter into original target and
-// WebSocket target.
-//
-func (rr *RunRequest) mergeWebSocketTarget(env *Environment,
-	origTarget *Target, origWebSocketTarget *WebSocketTarget,
-) {
-	if rr.Target.Opts.Duration > 0 && rr.Target.Opts.Duration <= env.MaxAttackDuration {
-		origTarget.Opts.Duration = rr.Target.Opts.Duration
-	}
-
-	if rr.Target.Opts.RatePerSecond > 0 && rr.Target.Opts.RatePerSecond <= env.MaxAttackRate {
-		origTarget.Opts.RatePerSecond = rr.Target.Opts.RatePerSecond
-		origTarget.Opts.ratePerSecond = vegeta.Rate{
-			Freq: rr.Target.Opts.RatePerSecond,
-			Per:  time.Second,
-		}
-	}
-
-	if rr.Target.Opts.Timeout > 0 && rr.Target.Opts.Timeout <= DefaultAttackTimeout {
-		origTarget.Opts.Timeout = rr.Target.Opts.Timeout
-	}
-
-	origTarget.Vars = rr.Target.Vars
-	rr.Target = origTarget
-
-	origWebSocketTarget.Headers = rr.WebSocketTarget.Headers
-	origWebSocketTarget.Params = rr.WebSocketTarget.Params
-	rr.WebSocketTarget = origWebSocketTarget
 }

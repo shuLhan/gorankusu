@@ -272,9 +272,6 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 	if err != nil {
 		return nil, errInternal(err)
 	}
-	if req.Target == nil {
-		return nil, errInvalidTarget("")
-	}
 
 	origTarget := trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
@@ -290,7 +287,7 @@ func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []b
 		return nil, errAttackNotAllowed()
 	}
 
-	req.mergeHttpTarget(trunks.Env, origTarget, origHttpTarget)
+	req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
 
 	req.result, err = newAttackResult(trunks.Env, req)
 	if err != nil {
@@ -386,17 +383,10 @@ func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, er
 	if err != nil {
 		return nil, errInternal(err)
 	}
-	if req.Target == nil {
-		return nil, errInvalidTarget("")
-	}
 
 	origTarget := trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
-	}
-
-	if req.HttpTarget == nil {
-		return nil, errInvalidHttpTarget("")
 	}
 
 	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
@@ -411,7 +401,7 @@ func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, er
 		req.Target.Name = origTarget.Name
 		res, err = trunks.runHttpTarget(req)
 	} else {
-		req.mergeHttpTarget(trunks.Env, origTarget, origHttpTarget)
+		req := generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
 		res, err = req.HttpTarget.Run(req)
 	}
 	if err != nil {
@@ -431,17 +421,10 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 	if err != nil {
 		return nil, errInternal(err)
 	}
-	if req.Target == nil {
-		return nil, errInvalidTarget("")
-	}
 
 	origTarget := trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
-	}
-
-	if req.WebSocketTarget == nil {
-		return nil, errInvalidWebSocketTarget("")
 	}
 
 	origWsTarget := origTarget.getWebSocketTargetByID(req.WebSocketTarget.ID)
@@ -449,7 +432,7 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 		return nil, errInvalidWebSocketTarget(req.WebSocketTarget.ID)
 	}
 
-	req.mergeWebSocketTarget(trunks.Env, origTarget, origWsTarget)
+	req = generateWebSocketTarget(trunks.Env, req, origTarget, origWsTarget)
 
 	res, err := req.WebSocketTarget.Run(req)
 	if err != nil {

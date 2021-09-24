@@ -259,7 +259,7 @@ func (ex *Example) registerTargets() (err error) {
 			},
 			Params: trunks.KeyFormInput{
 				"Param1": trunks.FormInput{
-					Label: "X-FreeForm",
+					Label: "Param1",
 					Hint:  "Parameter with number.",
 					Kind:  trunks.FormInputKindNumber,
 					Value: "123",
