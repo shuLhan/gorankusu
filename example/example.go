@@ -8,7 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -29,6 +31,15 @@ const (
 const (
 	websocketAddress = "127.0.0.1:28240"
 )
+
+type requestResponse struct {
+	Method        string
+	Url           string
+	Headers       http.Header
+	Form          url.Values
+	MultipartForm *multipart.Form
+	Body          string
+}
 
 type Example struct {
 	trunks   *trunks.Trunks
@@ -128,7 +139,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
 		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         ex.pathExamplePostForm,
+		Call:         ex.pathExamplePost,
 	})
 
 	return err
@@ -310,10 +321,19 @@ func (ex *Example) registerTargets() (err error) {
 }
 
 func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) {
+	data := &requestResponse{
+		Method:        epr.HttpRequest.Method,
+		Url:           epr.HttpRequest.URL.String(),
+		Headers:       epr.HttpRequest.Header,
+		Form:          epr.HttpRequest.Form,
+		MultipartForm: epr.HttpRequest.MultipartForm,
+		Body:          string(epr.RequestBody),
+	}
+
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
 	res.Message = pathExample
-	res.Data = epr.HttpRequest.Form
+	res.Data = data
 
 	return json.Marshal(&res)
 }
@@ -322,11 +342,22 @@ func (ex *Example) pathExampleErrorGet(epr *libhttp.EndpointRequest) ([]byte, er
 	return nil, liberrors.Internal(fmt.Errorf("server error"))
 }
 
-func (ex *Example) pathExamplePostForm(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) ([]byte, error) {
+	epr.HttpRequest.ParseMultipartForm(0)
+
+	data := &requestResponse{
+		Method:        epr.HttpRequest.Method,
+		Url:           epr.HttpRequest.URL.String(),
+		Headers:       epr.HttpRequest.Header,
+		Form:          epr.HttpRequest.Form,
+		MultipartForm: epr.HttpRequest.MultipartForm,
+		Body:          string(epr.RequestBody),
+	}
+
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
 	res.Message = pathExample
-	res.Data = epr.HttpRequest.Form
+	res.Data = data
 
 	return json.Marshal(&res)
 }
