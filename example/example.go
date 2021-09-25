@@ -112,7 +112,7 @@ func (ex *Example) Stop() {
 // registerEndpoints register HTTP endpoints for testing.
 //
 func (ex *Example) registerEndpoints() (err error) {
-	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -123,7 +123,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExampleError,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -134,7 +134,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,

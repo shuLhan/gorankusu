@@ -37,16 +37,6 @@ const (
 	envDevelopment = "TRUNKS_DEV"
 )
 
-// List of HTTP APIs provided by Trunks HTTP server.
-const (
-	apiEnvironment        = "/_trunks/api/environment"
-	apiTargetAttack       = "/_trunks/api/target/attack"
-	apiTargetAttackResult = "/_trunks/api/target/attack/result"
-	apiTargetRunHttp      = "/_trunks/api/target/run/http"
-	apiTargetRunWebSocket = "/_trunks/api/target/run/websocket"
-	apiTargets            = "/_trunks/api/targets"
-)
-
 // List of HTTP parameters.
 const (
 	paramNameName = "name"
@@ -57,11 +47,10 @@ const (
 // load testing the registered HTTP endpoints.
 //
 type Trunks struct {
-	*libhttp.Server
+	Env   *Environment
+	Httpd *libhttp.Server
 
-	Env     *Environment
 	targets []*Target
-
 	attackq chan *RunRequest
 	cancelq chan bool
 }
@@ -70,11 +59,14 @@ type Trunks struct {
 // New create and initialize new Trunks service.
 //
 func New(env *Environment) (trunks *Trunks, err error) {
-	isDevelopment := len(os.Getenv(envDevelopment)) > 0
+	var (
+		logp          = "trunks.New"
+		isDevelopment = len(os.Getenv(envDevelopment)) > 0
+	)
 
 	err = env.init()
 	if err != nil {
-		return nil, fmt.Errorf("New: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	trunks = &Trunks{
@@ -83,26 +75,9 @@ func New(env *Environment) (trunks *Trunks, err error) {
 		cancelq: make(chan bool, 1),
 	}
 
-	httpdOpts := &libhttp.ServerOptions{
-		Options: memfs.Options{
-			Root: "_www",
-			Includes: []string{
-				`.*\.(js|png|html|ico)$`,
-			},
-			Development: isDevelopment,
-		},
-		Memfs:   memfsWWW,
-		Address: env.ListenAddress,
-	}
-
-	trunks.Server, err = libhttp.NewServer(httpdOpts)
+	err = trunks.initHttpServer(isDevelopment)
 	if err != nil {
-		return nil, fmt.Errorf("New: %w", err)
-	}
-
-	err = trunks.registerHttpApis()
-	if err != nil {
-		return nil, fmt.Errorf("New: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	if isDevelopment {
@@ -140,7 +115,7 @@ func (trunks *Trunks) Start() (err error) {
 	go trunks.workerAttackQueue()
 
 	mlog.Outf("trunks: starting HTTP server at %s\n", trunks.Env.ListenAddress)
-	return trunks.Server.Start()
+	return trunks.Httpd.Start()
 }
 
 //
@@ -149,7 +124,7 @@ func (trunks *Trunks) Start() (err error) {
 func (trunks *Trunks) Stop() {
 	mlog.Outf("=== Stopping the Trunks service ...\n")
 
-	err := trunks.Server.Stop(0)
+	err := trunks.Httpd.Stop(0)
 	if err != nil {
 		mlog.Errf("!!! Stop: %s\n", err)
 	}
@@ -167,306 +142,6 @@ func (trunks *Trunks) isLoadTesting() (b bool) {
 	}
 	trunks.Env.mtx.Unlock()
 	return b
-}
-
-//
-// registerHttpApis register HTTP APIs to communicate with the Trunks server.
-//
-func (trunks *Trunks) registerHttpApis() (err error) {
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodGet,
-		Path:         apiEnvironment,
-		RequestType:  libhttp.RequestTypeJSON,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiEnvironmentGet,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodPost,
-		Path:         apiTargetAttack,
-		RequestType:  libhttp.RequestTypeJSON,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttack,
-	})
-	if err != nil {
-		return err
-	}
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodDelete,
-		Path:         apiTargetAttack,
-		RequestType:  libhttp.RequestTypeNone,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttackCancel,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodGet,
-		Path:         apiTargetAttackResult,
-		RequestType:  libhttp.RequestTypeQuery,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttackResultGet,
-	})
-	if err != nil {
-		return err
-	}
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodDelete,
-		Path:         apiTargetAttackResult,
-		RequestType:  libhttp.RequestTypeJSON,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetAttackResultDelete,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodPost,
-		Path:         apiTargetRunHttp,
-		RequestType:  libhttp.RequestTypeJSON,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetRunHttp,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodPost,
-		Path:         apiTargetRunWebSocket,
-		RequestType:  libhttp.RequestTypeJSON,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargetRunWebSocket,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = trunks.Server.RegisterEndpoint(&libhttp.Endpoint{
-		Method:       libhttp.RequestMethodGet,
-		Path:         apiTargets,
-		RequestType:  libhttp.RequestTypeNone,
-		ResponseType: libhttp.ResponseTypeJSON,
-		Call:         trunks.apiTargets,
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-//
-// apiEnvironmentGet get the Trunks environment including its state.
-//
-func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	res := libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
-	res.Data = trunks.Env
-	return json.Marshal(&res)
-}
-
-//
-// apiTargetAttack run the load testing on HTTP endpoint with target and
-// options defined in request.
-//
-func (trunks *Trunks) apiTargetAttack(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	if trunks.Env.isAttackRunning() {
-		return nil, errAttackConflict(trunks.Env.getRunningAttack())
-	}
-
-	logp := "apiTargetAttack"
-	req := &RunRequest{}
-
-	err = json.Unmarshal(epr.RequestBody, req)
-	if err != nil {
-		return nil, errInternal(err)
-	}
-
-	origTarget := trunks.getTargetByID(req.Target.ID)
-	if origTarget == nil {
-		return nil, errInvalidTarget(req.Target.ID)
-	}
-
-	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
-	if origTarget == nil {
-		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
-	}
-
-	if !origHttpTarget.AllowAttack {
-		return nil, errAttackNotAllowed()
-	}
-
-	req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
-
-	req.result, err = newAttackResult(trunks.Env, req)
-	if err != nil {
-		return nil, err
-	}
-
-	trunks.attackq <- req
-
-	msg := fmt.Sprintf("Attacking %s%s with %d RPS for %s seconds",
-		req.Target.BaseUrl, req.HttpTarget.Path,
-		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
-
-	mlog.Outf("%s: %s\n", logp, msg)
-
-	res := libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
-	res.Name = "OK_ATTACK"
-	res.Message = msg
-
-	return json.Marshal(res)
-}
-
-func (trunks *Trunks) apiTargetAttackCancel(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	res := &libhttp.EndpointResponse{}
-
-	rr := trunks.Env.getRunningAttack()
-	if rr == nil {
-		res.Code = http.StatusNotFound
-		res.Message = "No attack is currently running."
-		res.Name = "ERR_ATTACK_CANCEL_NOT_FOUND"
-		return nil, res
-	}
-
-	trunks.cancelq <- true
-
-	res.Code = http.StatusOK
-	res.Name = "OK_ATTACK_CANCEL"
-	res.Message = fmt.Sprintf(`Attack on target "%s / %s" has been canceled`,
-		rr.Target.Name, rr.HttpTarget.Name)
-	res.Data = rr
-
-	return json.Marshal(res)
-}
-
-func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	name := epr.HttpRequest.Form.Get(paramNameName)
-	if len(name) == 0 {
-		return nil, errInvalidParameter(paramNameName, name)
-	}
-
-	_, _, result, err := trunks.getAttackResultByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	err = result.load()
-	if err != nil {
-		return nil, err
-	}
-
-	res := libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
-	res.Name = "OK_TARGET_ATTACK_RESULT_GET"
-	res.Data = result
-
-	return json.Marshal(&res)
-}
-
-func (trunks *Trunks) apiTargetAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	name := epr.HttpRequest.Form.Get(paramNameName)
-	if len(name) == 0 {
-		return nil, errInvalidParameter(paramNameName, name)
-	}
-
-	_, ht, result, err := trunks.getAttackResultByName(name)
-	if err != nil {
-		return nil, err
-	}
-
-	ht.deleteResult(result)
-
-	res := libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
-	res.Name = "OK_TARGET_ATTACK_RESULT_GET"
-	res.Data = result
-
-	return json.Marshal(&res)
-}
-
-func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, error) {
-	req := &RunRequest{}
-	err := json.Unmarshal(epr.RequestBody, req)
-	if err != nil {
-		return nil, errInternal(err)
-	}
-
-	origTarget := trunks.getTargetByID(req.Target.ID)
-	if origTarget == nil {
-		return nil, errInvalidTarget(req.Target.ID)
-	}
-
-	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
-	if origHttpTarget == nil {
-		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
-	}
-
-	var res *RunResponse
-
-	if origHttpTarget.Run == nil {
-		req.Target.BaseUrl = origTarget.BaseUrl
-		req.Target.Name = origTarget.Name
-		res, err = trunks.runHttpTarget(req)
-	} else {
-		req := generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
-		res, err = req.HttpTarget.Run(req)
-	}
-	if err != nil {
-		return nil, errInternal(err)
-	}
-
-	epres := libhttp.EndpointResponse{}
-	epres.Code = http.StatusOK
-	epres.Data = res
-
-	return json.Marshal(&epres)
-}
-
-func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byte, error) {
-	req := &RunRequest{}
-	err := json.Unmarshal(epr.RequestBody, req)
-	if err != nil {
-		return nil, errInternal(err)
-	}
-
-	origTarget := trunks.getTargetByID(req.Target.ID)
-	if origTarget == nil {
-		return nil, errInvalidTarget(req.Target.ID)
-	}
-
-	origWsTarget := origTarget.getWebSocketTargetByID(req.WebSocketTarget.ID)
-	if origWsTarget == nil {
-		return nil, errInvalidWebSocketTarget(req.WebSocketTarget.ID)
-	}
-
-	req = generateWebSocketTarget(trunks.Env, req, origTarget, origWsTarget)
-
-	res, err := req.WebSocketTarget.Run(req)
-	if err != nil {
-		return nil, errInternal(err)
-	}
-
-	epres := libhttp.EndpointResponse{}
-	epres.Code = http.StatusOK
-	epres.Data = res
-
-	return json.Marshal(&epres)
-}
-
-func (trunks *Trunks) apiTargets(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	res := libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
-	res.Data = trunks.targets
-	return json.Marshal(&res)
 }
 
 func (trunks *Trunks) getTargetByID(id string) *Target {
