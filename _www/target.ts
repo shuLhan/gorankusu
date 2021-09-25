@@ -1,7 +1,7 @@
 import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js"
 import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
 
-import { GenerateFormInput } from "./functions.js"
+import { GenerateFormInput, LoadTargetVar } from "./functions.js"
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
@@ -201,7 +201,8 @@ export class Target {
 
 		for (const key in this.opts.Vars) {
 			let fi = this.opts.Vars[key]
-			GenerateFormInput(this.el_content, fi)
+			let val = LoadTargetVar(this.opts, key)
+			GenerateFormInput(this.el_content, fi, val)
 		}
 	}
 

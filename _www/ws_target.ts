@@ -1,5 +1,9 @@
 import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
-import { GenerateFormInput } from "./functions.js"
+import {
+	GenerateFormInput,
+	LoadWsTargetHeader,
+	LoadWsTargetParam,
+} from "./functions.js"
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
@@ -88,7 +92,12 @@ export class WebSocketTarget {
 
 		for (let key in this.opts.Headers) {
 			let fi = this.opts.Headers[key]
-			GenerateFormInput(wrapper, fi)
+			let val = LoadWsTargetHeader(
+				this.target,
+				this.opts,
+				key,
+			)
+			GenerateFormInput(wrapper, fi, val)
 		}
 
 		parent.appendChild(wrapper)
@@ -111,7 +120,12 @@ export class WebSocketTarget {
 
 		for (let key in this.opts.Params) {
 			let fi = this.opts.Params[key]
-			GenerateFormInput(wrapper, fi)
+			let val = LoadWsTargetParam(
+				this.target,
+				this.opts,
+				key,
+			)
+			GenerateFormInput(wrapper, fi, val)
 		}
 
 		parent.appendChild(wrapper)

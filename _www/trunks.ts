@@ -1,4 +1,5 @@
 import { Environment } from "./environment.js"
+import { Save } from "./functions.js"
 import {
 	CLASS_NAV_TARGET,
 	HASH_ENVIRONMENT,
@@ -328,6 +329,8 @@ export class Trunks {
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
 	): Promise<RunResponseInterface | null> {
+		Save(target, http_target, null)
+
 		let req: RunRequestInterface = {
 			Target: {
 				ID: target.ID,
@@ -375,6 +378,8 @@ export class Trunks {
 		target: TargetInterface,
 		ws_target: WebSocketTargetInterface,
 	): Promise<HttpResponseInterface | null> {
+		Save(target, null, ws_target)
+
 		let req: RunRequestInterface = {
 			Target: {
 				ID: target.ID,
