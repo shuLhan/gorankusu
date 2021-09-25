@@ -13,13 +13,15 @@ import (
 	"strings"
 	"time"
 
+	"git.sr.ht/~shulhan/ciigo"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
-	"github.com/shuLhan/share/lib/debug"
 	liberrors "github.com/shuLhan/share/lib/errors"
 	libhttp "github.com/shuLhan/share/lib/http"
+	"github.com/shuLhan/share/lib/io"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
+	"github.com/shuLhan/share/lib/os/exec"
 )
 
 const (
@@ -29,6 +31,10 @@ const (
 	DefaultListenAddress       = "127.0.0.1:8217"
 	DefaultMaxAttackDuration   = 30 * time.Second
 	DefaultMaxAttackRate       = 3000
+
+	// Setting this environment variable will enable trunks development
+	// mode.
+	envDevelopment = "TRUNKS_DEV"
 )
 
 // List of HTTP APIs provided by Trunks HTTP server.
@@ -64,6 +70,8 @@ type Trunks struct {
 // New create and initialize new Trunks service.
 //
 func New(env *Environment) (trunks *Trunks, err error) {
+	isDevelopment := len(os.Getenv(envDevelopment)) > 0
+
 	err = env.init()
 	if err != nil {
 		return nil, fmt.Errorf("New: %w", err)
@@ -77,8 +85,11 @@ func New(env *Environment) (trunks *Trunks, err error) {
 
 	httpdOpts := &libhttp.ServerOptions{
 		Options: memfs.Options{
-			Root:        "_www",
-			Development: debug.Value >= 2,
+			Root: "_www",
+			Includes: []string{
+				`.*\.(js|png|html|ico)$`,
+			},
+			Development: isDevelopment,
 		},
 		Memfs:   memfsWWW,
 		Address: env.ListenAddress,
@@ -92,6 +103,11 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	err = trunks.registerHttpApis()
 	if err != nil {
 		return nil, fmt.Errorf("New: %w", err)
+	}
+
+	if isDevelopment {
+		go watchDocs()
+		go watchWww()
 	}
 
 	return trunks, nil
@@ -676,5 +692,62 @@ func (trunks *Trunks) workerAttackQueue() {
 
 		rr.result = nil
 		trunks.Env.AttackRunning = nil
+	}
+}
+
+//
+// watchDocs a goroutine that watch any changes to .adoc files inside
+// "_www/docs" directory and convert them into HTML files.
+//
+func watchDocs() {
+	logp := "watchDocs"
+	opts := &ciigo.ConvertOptions{
+		Root: "_www/docs",
+	}
+	err := ciigo.Watch(opts)
+	if err != nil {
+		mlog.Errf("%s: %s", logp, err)
+	}
+}
+
+//
+// watchWww a goroutine that watch any changes to TypeScript, HTML, and
+// tsconfig files inside the _www, and when there is an update it will execute
+// "tsc -p" to recompile and "go run ./internal/generate-memfs" to embed them
+// into Go source.
+//
+func watchWww() {
+	logp := "watchWww"
+	commands := []string{
+		"tsc -p _www/tsconfig.json",
+		"go run ./internal/generate-memfs",
+	}
+
+	dirWatcher := &io.DirWatcher{
+		Options: memfs.Options{
+			Root: "_www",
+			Includes: []string{
+				`\.*.ts$`,
+				`_www/index.html$`,
+				`_www/tsconfig.json$`,
+			},
+			Excludes: []string{
+				`\.*.d.ts$`,
+			},
+		},
+		Callback: func(ns *io.NodeState) {
+			for _, cmd := range commands {
+				mlog.Outf("%s: %s\n", logp, cmd)
+				err := exec.Run(cmd, nil, nil)
+				if err != nil {
+					mlog.Errf("%s: %s", logp, err)
+					return
+				}
+			}
+		},
+	}
+	err := dirWatcher.Start()
+	if err != nil {
+		mlog.Errf("%s: %s", logp, err)
 	}
 }

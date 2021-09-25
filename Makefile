@@ -8,7 +8,7 @@ all: embed
 	go test -v -race ./...
 
 run:
-	DEBUG=3 go run ./cmd/trunks-example
+	go run ./cmd/trunks-example
 
 embed: tsc
 	go run ./internal/generate-memfs

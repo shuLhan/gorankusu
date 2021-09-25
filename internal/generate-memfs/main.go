@@ -18,6 +18,7 @@ func main() {
 	opts := &memfs.Options{
 		Root: "_www",
 		Excludes: []string{
+			`.*\.adoc`,
 			`.*\.ts`,
 			`/wui/.*/example.js$`,
 			`/wui/.*/index.html$`,

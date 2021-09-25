@@ -12,8 +12,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"git.sr.ht/~shulhan/trunks/example"
 	"github.com/shuLhan/share/lib/mlog"
+
+	"git.sr.ht/~shulhan/trunks/example"
 )
 
 func main() {
