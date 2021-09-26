@@ -522,11 +522,12 @@ func watchDocs() {
 // into Go source.
 //
 func watchWww() {
-	logp := "watchWww"
-	commands := []string{
-		"tsc -p _www/tsconfig.json",
-		"go run ./internal/generate-memfs",
-	}
+	var (
+		logp    = "watchWww"
+		changeq = make(chan struct{}, 64)
+	)
+
+	go recompile(changeq)
 
 	dirWatcher := &io.DirWatcher{
 		Options: memfs.Options{
@@ -545,19 +546,51 @@ func watchWww() {
 		},
 		Callback: func(ns *io.NodeState) {
 			mlog.Outf("--- %s: %s: %d\n", logp, ns.Node.SysPath, ns.State)
-
-			for _, cmd := range commands {
-				mlog.Outf("%s: %s\n", logp, cmd)
-				err := exec.Run(cmd, nil, nil)
-				if err != nil {
-					mlog.Errf("%s: %s", logp, err)
-					return
-				}
-			}
+			changeq <- struct{}{}
 		},
 	}
 	err := dirWatcher.Start()
 	if err != nil {
 		mlog.Errf("%s: %s", logp, err)
+	}
+}
+
+func recompile(changeq chan struct{}) {
+	var (
+		logp         = "recompile"
+		count        int
+		changeTicker = time.NewTicker(3 * time.Second)
+		commands     = []string{
+			"tsc -p _www/tsconfig.json",
+			"go run ./internal/generate-memfs",
+		}
+		draining bool
+	)
+	for range changeTicker.C {
+		draining = true
+		for draining {
+			select {
+			case <-changeq:
+				count++
+			default:
+				if count == 0 {
+					// No changes.
+					draining = false
+				} else {
+					// All changes has been drained, execute all
+					// commands.
+					for _, cmd := range commands {
+						mlog.Outf("%s: %s\n", logp, cmd)
+						err := exec.Run(cmd, nil, nil)
+						if err != nil {
+							mlog.Errf("%s: %s", logp, err)
+							return
+						}
+					}
+					count = 0
+					draining = false
+				}
+			}
+		}
 	}
 }
