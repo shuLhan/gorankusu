@@ -14,10 +14,15 @@ import (
 // Environment contains global configuration for load testing.
 //
 type Environment struct {
-	// ListenAddress is the address and port where Trunks HTTP service
+	// ListenAddress is the address and port where Trunks HTTP web
 	// will run.
 	// If its emtpy, it will set to DefaultListenAddress.
 	ListenAddress string `ini:"trunks::listen_address"`
+
+	// WebSocketListenAddress is the address where Trunks WebSocket API
+	// will run.
+	// If its empty, it will set to DefaultWebSocketListenAddress.
+	WebSocketListenAddress string
 
 	// MaxAttackDuration define the maximum duration for an attack to be
 	// run on each target.
@@ -53,6 +58,9 @@ type Environment struct {
 func (env *Environment) init() (err error) {
 	if len(env.ListenAddress) == 0 {
 		env.ListenAddress = DefaultListenAddress
+	}
+	if len(env.WebSocketListenAddress) == 0 {
+		env.WebSocketListenAddress = DefaultWebSocketListenAddress
 	}
 	if env.MaxAttackRate == 0 {
 		env.MaxAttackRate = DefaultMaxAttackRate

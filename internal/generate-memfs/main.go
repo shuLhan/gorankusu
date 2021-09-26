@@ -19,16 +19,18 @@ func main() {
 		Root: "_www",
 		Excludes: []string{
 			`.*\.adoc`,
+			`.*\.git`,
 			`.*\.ts`,
 			`/wui/.*/example.js$`,
 			`/wui/.*/index.html$`,
 			`/wui/LICENSE$`,
 			`/wui/Makefile$`,
+			`/wui/NOTES$`,
 			`/wui/README.adoc$`,
 			`/wui/index\.html$`,
 			`/wui/tsconfig\.json$`,
-			`\.git`,
-			`\.wui\.local`,
+			`/wui\.bak`,
+			`/wui\.local`,
 		},
 	}
 

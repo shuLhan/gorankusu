@@ -1,3 +1,9 @@
+import {
+	WuiWebSocketClient,
+	WuiWebSocketOptions,
+	WuiWebSocketRequest,
+} from "./wui/websocket_client.js"
+
 import { Environment } from "./environment.js"
 import { Save } from "./functions.js"
 import {
@@ -16,9 +22,9 @@ import {
 import { Target } from "./target.js"
 import { wui_notif } from "./vars.js"
 
+const API_ATTACK_HTTP = "/_trunks/api/attack/http"
 const API_ENVIRONMENT = "/_trunks/api/environment"
 const API_TARGETS = "/_trunks/api/targets"
-const API_TARGET_ATTACK = "/_trunks/api/target/attack"
 const API_TARGET_ATTACK_RESULT = "/_trunks/api/target/attack/result"
 const API_TARGET_RUN_HTTP = "/_trunks/api/target/run/http"
 const API_TARGET_RUN_WEBSOCKET = "/_trunks/api/target/run/websocket"
@@ -27,6 +33,8 @@ const CLASS_ATTACK_RUNNING = "trunks_attack_running"
 const CLASS_FOOTER = "trunks_footer"
 const CLASS_MAIN = "trunks_main"
 const CLASS_NAV = "trunks_nav"
+
+const WSC_RECONNECT_INTERVAL = 5000
 
 interface MapIDTarget {
 	[key: string]: Target
@@ -38,9 +46,11 @@ export class Trunks {
 	el_attack_cancel!: HTMLButtonElement
 	el_content!: HTMLElement
 	el_nav_content!: HTMLElement
+	el_ws_conn_status!: HTMLElement
 
 	env: EnvironmentInterface = {
 		ListenAddress: "",
+		WebSocketListenAddress: "",
 		MaxAttackDuration: 0,
 		MaxAttackRate: 0,
 		ResultsDir: "",
@@ -48,11 +58,33 @@ export class Trunks {
 		AttackRunning: null,
 	}
 
+	wsc_opts: WuiWebSocketOptions
+	wsc: WuiWebSocketClient | null = null
+
 	com_env!: Environment
 	targets: MapIDTarget = {}
 
 	constructor() {
 		this.el = document.createElement("div")
+
+		this.wsc_opts = {
+			address: "",
+			insecure: true,
+			auto_reconnect: true,
+			auto_reconnect_interval: WSC_RECONNECT_INTERVAL,
+			onBroadcast: () => {
+				this.wsOnBroadcast()
+			},
+			onConnected: () => {
+				this.wsOnConnected()
+			},
+			onDisconnected: () => {
+				this.wsOnDisconnected()
+			},
+			onError: () => {
+				this.wsOnError()
+			},
+		}
 
 		this.com_env = new Environment(this, this.env)
 		this.generateNav()
@@ -65,21 +97,23 @@ export class Trunks {
 		let el_nav = document.createElement("div")
 		el_nav.classList.add(CLASS_NAV)
 
-		el_nav.appendChild(this.com_env.el_nav)
+		this.el_ws_conn_status = document.createElement("div")
 
 		this.el_nav_content = document.createElement("div")
-		el_nav.appendChild(this.el_nav_content)
 
 		let el_nav_footer = document.createElement("div")
 		el_nav_footer.classList.add(CLASS_FOOTER)
 		el_nav_footer.innerHTML = `
-			Powered by
-			<a href="https://sr.ht/~shulhan/trunks" target="_blank">
-				Trunks
-			</a>
+			<div>
+				Powered by
+				<a href="https://sr.ht/~shulhan/trunks" target="_blank">Trunks</a>
+			</div>
 		`
-		el_nav.appendChild(el_nav_footer)
 
+		el_nav.appendChild(this.el_ws_conn_status)
+		el_nav.appendChild(this.com_env.el_nav)
+		el_nav.appendChild(this.el_nav_content)
+		el_nav.appendChild(el_nav_footer)
 		this.el.appendChild(el_nav)
 	}
 
@@ -108,6 +142,9 @@ export class Trunks {
 		window.onhashchange = () => {
 			this.windowOnHashChange()
 		}
+
+		this.wsc_opts.address = this.env.WebSocketListenAddress
+		this.wsc = new WuiWebSocketClient(this.wsc_opts)
 	}
 
 	async apiEnvironmentGet() {
@@ -145,19 +182,26 @@ export class Trunks {
 	}
 
 	private async onClickAttackCancel() {
-		let http_res = await fetch(API_TARGET_ATTACK, {
-			method: "DELETE",
-		})
+		if (!this.wsc) {
+			console.error("websocket is not connected")
+			return
+		}
 
-		let res = await http_res.json()
-		if (res.code != 200) {
-			wui_notif.Error(res.message)
+		let req: WuiWebSocketRequest = {
+			id: Date.now(),
+			method: "DELETE",
+			target: API_ATTACK_HTTP,
+		}
+
+		let json_res = await this.wsc.Send(req)
+		if (json_res.code != 200) {
+			wui_notif.Error(json_res.message)
 			return
 		}
 
 		this.setAttackRunning(null)
 
-		wui_notif.Info(res.message)
+		wui_notif.Info(json_res.message)
 	}
 
 	private windowOnHashChange() {
@@ -210,6 +254,19 @@ export class Trunks {
 		}
 	}
 
+	private wsOnBroadcast() {
+		// TODO
+	}
+	private wsOnConnected() {
+		this.el_ws_conn_status.innerHTML = "&#128994; Connected"
+	}
+	private wsOnDisconnected() {
+		this.el_ws_conn_status.innerHTML = "&#128308; Disconnected"
+	}
+	private wsOnError() {
+		// TODO
+	}
+
 	setAttackRunning(runRequest: RunRequestInterface | null) {
 		if (!runRequest) {
 			this.el_attack_running.innerHTML = "Attack running: -"
@@ -232,8 +289,13 @@ export class Trunks {
 	async AttackHttp(
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
-	): Promise<HttpResponseInterface> {
-		let req: RunRequestInterface = {
+	): Promise<HttpResponseInterface | null> {
+		if (!this.wsc) {
+			console.error("websocket is not connected")
+			return null
+		}
+
+		let attackReq: RunRequestInterface = {
 			Target: {
 				ID: target.ID,
 				Opts: target.Opts,
@@ -258,20 +320,20 @@ export class Trunks {
 			WebSocketTarget: null,
 		}
 
-		let http_res = await fetch("/_trunks/api/target/attack", {
+		let req: WuiWebSocketRequest = {
+			id: Date.now(),
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(req),
-		})
+			target: API_ATTACK_HTTP,
+			body: btoa(JSON.stringify(attackReq)),
+		}
 
-		let json_res = await http_res.json()
+		let json_res = await this.wsc.Send(req)
 		if (json_res.code != 200) {
 			wui_notif.Error(json_res.message)
-		} else {
-			this.setAttackRunning(req)
+			return null
 		}
+
+		this.setAttackRunning(attackReq)
 
 		return json_res
 	}

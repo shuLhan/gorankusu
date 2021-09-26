@@ -5,11 +5,9 @@
 package trunks
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -22,15 +20,18 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
 	"github.com/shuLhan/share/lib/os/exec"
+	"github.com/shuLhan/share/lib/websocket"
 )
 
 const (
 	DefaultAttackDuration      = 10 * time.Second
 	DefaultAttackRatePerSecond = 500
 	DefaultAttackTimeout       = 30 * time.Second
-	DefaultListenAddress       = "127.0.0.1:8217"
 	DefaultMaxAttackDuration   = 30 * time.Second
 	DefaultMaxAttackRate       = 3000
+
+	DefaultListenAddress          = "127.0.0.1:8217"
+	DefaultWebSocketListenAddress = "127.0.0.1:8218"
 
 	// Setting this environment variable will enable trunks development
 	// mode.
@@ -48,11 +49,13 @@ const (
 //
 type Trunks struct {
 	Env   *Environment
-	Httpd *libhttp.Server
+	Httpd *libhttp.Server   // The HTTP server.
+	Wsd   *websocket.Server // The WebSocket server.
 
 	targets []*Target
 	attackq chan *RunRequest
 	cancelq chan bool
+	errq    chan error
 }
 
 //
@@ -73,9 +76,14 @@ func New(env *Environment) (trunks *Trunks, err error) {
 		Env:     env,
 		attackq: make(chan *RunRequest, 1),
 		cancelq: make(chan bool, 1),
+		errq:    make(chan error, 1),
 	}
 
 	err = trunks.initHttpServer(isDevelopment)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+	err = trunks.initWebSocketServer()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -86,6 +94,67 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	}
 
 	return trunks, nil
+}
+
+//
+// AttackHttp start attacking the HTTP target defined in req.
+//
+func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
+	logp := "AttackHttp"
+
+	if trunks.Env.isAttackRunning() {
+		return errAttackConflict(trunks.Env.getRunningAttack())
+	}
+
+	origTarget := trunks.getTargetByID(req.Target.ID)
+	if origTarget == nil {
+		return errInvalidTarget(req.Target.ID)
+	}
+
+	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+	if origTarget == nil {
+		return errInvalidHttpTarget(req.HttpTarget.ID)
+	}
+	if !origHttpTarget.AllowAttack {
+		return errAttackNotAllowed()
+	}
+
+	req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
+
+	req.result, err = newAttackResult(trunks.Env, req)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	trunks.attackq <- req
+
+	msg := fmt.Sprintf("Attacking %s%s with %d RPS for %s seconds",
+		req.Target.BaseUrl, req.HttpTarget.Path,
+		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
+
+	mlog.Outf("%s: %s\n", logp, msg)
+
+	return nil
+}
+
+//
+// AttackHttpCancel cancel any running attack.
+// It will return an error if no attack is running.
+//
+func (trunks *Trunks) AttackHttpCancel() (rr *RunRequest, err error) {
+	rr = trunks.Env.getRunningAttack()
+	if rr == nil {
+		e := &liberrors.E{
+			Code:    http.StatusNotFound,
+			Message: "No attack is currently running.",
+			Name:    "ERR_ATTACK_CANCEL_NOT_FOUND",
+		}
+		return nil, e
+	}
+
+	trunks.cancelq <- true
+
+	return rr, nil
 }
 
 func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
@@ -104,6 +173,35 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 }
 
 //
+// RunHttp send the HTTP request to the HTTP target defined in RunRequest with
+// optional Headers and Parameters.
+//
+func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
+	origTarget := trunks.getTargetByID(req.Target.ID)
+	if origTarget == nil {
+		return nil, errInvalidTarget(req.Target.ID)
+	}
+
+	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+	if origHttpTarget == nil {
+		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
+	}
+
+	if origHttpTarget.Run == nil {
+		req.Target.BaseUrl = origTarget.BaseUrl
+		req.Target.Name = origTarget.Name
+		res, err = trunks.runHttpTarget(req)
+	} else {
+		req := generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
+		res, err = req.HttpTarget.Run(req)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+//
 // Start the Trunks HTTP server that provide user interface for running and
 // load testing registered Targets.
 //
@@ -115,24 +213,62 @@ func (trunks *Trunks) Start() (err error) {
 	go trunks.workerAttackQueue()
 
 	mlog.Outf("trunks: starting HTTP server at %s\n", trunks.Env.ListenAddress)
-	return trunks.Httpd.Start()
+	go func() {
+		err := trunks.Httpd.Start()
+		if err != nil {
+			trunks.errq <- err
+		}
+	}()
+	go func() {
+		err := trunks.Wsd.Start()
+		if err != nil {
+			trunks.errq <- err
+		}
+	}()
+
+	err = <-trunks.errq
+
+	return err
 }
 
 //
 // Stop the Trunks HTTP server.
 //
 func (trunks *Trunks) Stop() {
+	logp := "trunks.Stop"
 	mlog.Outf("=== Stopping the Trunks service ...\n")
 
 	err := trunks.Httpd.Stop(0)
 	if err != nil {
-		mlog.Errf("!!! Stop: %s\n", err)
+		mlog.Errf("!!! %s: %s", logp, err)
 	}
+
+	trunks.Wsd.Stop()
 
 	if trunks.isLoadTesting() {
 		trunks.cancelq <- true
 		<-trunks.cancelq
 	}
+
+	trunks.errq <- nil
+}
+
+func (trunks *Trunks) addHttpAttackResult(rr *RunRequest) (ok bool) {
+	for _, target := range trunks.targets {
+		if target.ID != rr.Target.ID {
+			continue
+		}
+		for _, httpTarget := range target.HttpTargets {
+			if httpTarget.ID != rr.HttpTarget.ID {
+				continue
+			}
+
+			httpTarget.Results = append(httpTarget.Results, rr.result)
+			httpTarget.sortResults()
+			return true
+		}
+	}
+	return false
 }
 
 func (trunks *Trunks) isLoadTesting() (b bool) {
@@ -295,9 +431,7 @@ func (trunks *Trunks) scanResultsDir() {
 
 	for _, target := range trunks.targets {
 		for _, httpTarget := range target.HttpTargets {
-			sort.Slice(httpTarget.Results, func(x, y int) bool {
-				return httpTarget.Results[x].Name > httpTarget.Results[y].Name
-			})
+			httpTarget.sortResults()
 		}
 	}
 }
@@ -356,11 +490,7 @@ func (trunks *Trunks) workerAttackQueue() {
 				mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
 			}
 
-			rr.HttpTarget.Results = append(rr.HttpTarget.Results, rr.result)
-
-			sort.Slice(rr.HttpTarget.Results, func(x, y int) bool {
-				return rr.HttpTarget.Results[x].Name > rr.HttpTarget.Results[y].Name
-			})
+			trunks.addHttpAttackResult(rr)
 
 			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 		}
@@ -408,9 +538,14 @@ func watchWww() {
 			},
 			Excludes: []string{
 				`\.*.d.ts$`,
+				`\.git`,
+				`\.wui.bak`,
+				`\.wui.local`,
 			},
 		},
 		Callback: func(ns *io.NodeState) {
+			mlog.Outf("--- %s: %s: %d\n", logp, ns.Node.SysPath, ns.State)
+
 			for _, cmd := range commands {
 				mlog.Outf("%s: %s\n", logp, cmd)
 				err := exec.Run(cmd, nil, nil)

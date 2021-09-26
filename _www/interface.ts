@@ -15,6 +15,7 @@ export interface AttackOptionsInterface {
 
 export interface EnvironmentInterface {
 	ListenAddress: string
+	WebSocketListenAddress: string
 	MaxAttackDuration: number
 	MaxAttackRate: number
 	ResultsDir: string
@@ -99,7 +100,7 @@ export interface TrunksInterface {
 	AttackHttp(
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
-	): Promise<HttpResponseInterface>
+	): Promise<HttpResponseInterface | null>
 
 	AttackHttpDelete(name: string): Promise<HttpResponseInterface | null>
 

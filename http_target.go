@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	libhttp "github.com/shuLhan/share/lib/http"
@@ -132,4 +133,10 @@ func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {
 		}
 	}
 	return nil
+}
+
+func (ht *HttpTarget) sortResults() {
+	sort.Slice(ht.Results, func(x, y int) bool {
+		return ht.Results[x].Name > ht.Results[y].Name
+	})
 }

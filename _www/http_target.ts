@@ -362,7 +362,7 @@ export class HttpTarget {
 	}
 
 	private async onClickAttack() {
-		let res = await this.trunks.AttackHttp(this.target, this.opts)
+		await this.trunks.AttackHttp(this.target, this.opts)
 	}
 
 	private async onClickAttackDelete(result: ResultInterface) {
