@@ -22,7 +22,7 @@ const (
 
 func (trunks *Trunks) initWebSocketServer() (err error) {
 	opts := &websocket.ServerOptions{
-		Address: trunks.Env.WebSocketListenAddress,
+		Address: trunks.Env.websocketListenAddress,
 	}
 
 	trunks.Wsd = websocket.NewServer(opts)

@@ -30,8 +30,8 @@ const (
 	DefaultMaxAttackDuration   = 30 * time.Second
 	DefaultMaxAttackRate       = 3000
 
-	DefaultListenAddress          = "127.0.0.1:8217"
-	DefaultWebSocketListenAddress = "127.0.0.1:8218"
+	DefaultListenAddress       = "127.0.0.1:8217"
+	DefaultWebSocketListenPort = 8218
 
 	// Setting this environment variable will enable trunks development
 	// mode.
@@ -212,7 +212,7 @@ func (trunks *Trunks) Start() (err error) {
 	mlog.Outf("trunks: starting attack worker...\n")
 	go trunks.workerAttackQueue()
 
-	mlog.Outf("trunks: starting HTTP server at %s\n", trunks.Env.ListenAddress)
+	mlog.Outf("trunks: starting HTTP server at http://%s\n", trunks.Env.ListenAddress)
 	go func() {
 		err := trunks.Httpd.Start()
 		if err != nil {
@@ -220,6 +220,7 @@ func (trunks *Trunks) Start() (err error) {
 		}
 	}()
 	go func() {
+		mlog.Outf("trunks: starting WebSocket server at ws://%s\n", trunks.Env.websocketListenAddress)
 		err := trunks.Wsd.Start()
 		if err != nil {
 			trunks.errq <- err
@@ -584,7 +585,6 @@ func recompile(changeq chan struct{}) {
 						err := exec.Run(cmd, nil, nil)
 						if err != nil {
 							mlog.Errf("%s: %s", logp, err)
-							return
 						}
 					}
 					count = 0

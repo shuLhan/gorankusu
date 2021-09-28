@@ -5,6 +5,8 @@
 package trunks
 
 import (
+	"fmt"
+	"net"
 	"os"
 	"sync"
 	"time"
@@ -19,10 +21,10 @@ type Environment struct {
 	// If its emtpy, it will set to DefaultListenAddress.
 	ListenAddress string `ini:"trunks::listen_address"`
 
-	// WebSocketListenAddress is the address where Trunks WebSocket API
+	// WebSocketListenPort is the port number where Trunks WebSocket API
 	// will run.
-	// If its empty, it will set to DefaultWebSocketListenAddress.
-	WebSocketListenAddress string
+	// If its empty, it will set to DefaultWebSocketListenPort.
+	WebSocketListenPort int
 
 	// MaxAttackDuration define the maximum duration for an attack to be
 	// run on each target.
@@ -51,16 +53,19 @@ type Environment struct {
 
 	// AttackRunning will be set to non-nil if there is a load
 	// testing currently running.
-	AttackRunning *RunRequest
-	mtx           sync.Mutex
+	AttackRunning          *RunRequest
+	mtx                    sync.Mutex
+	websocketListenAddress string
 }
 
 func (env *Environment) init() (err error) {
+	logp := "Environment.init"
+
 	if len(env.ListenAddress) == 0 {
 		env.ListenAddress = DefaultListenAddress
 	}
-	if len(env.WebSocketListenAddress) == 0 {
-		env.WebSocketListenAddress = DefaultWebSocketListenAddress
+	if env.WebSocketListenPort <= 0 {
+		env.WebSocketListenPort = DefaultWebSocketListenPort
 	}
 	if env.MaxAttackRate == 0 {
 		env.MaxAttackRate = DefaultMaxAttackRate
@@ -72,9 +77,15 @@ func (env *Environment) init() (err error) {
 	if len(env.ResultsDir) == 0 {
 		env.ResultsDir, err = os.Getwd()
 		if err != nil {
-			return err
+			return fmt.Errorf("%s: %w", logp, err)
 		}
 	}
+
+	host, _, err := net.SplitHostPort(env.ListenAddress)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	env.websocketListenAddress = fmt.Sprintf("%s:%d", host, env.WebSocketListenPort)
 
 	return nil
 }

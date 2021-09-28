@@ -15,7 +15,7 @@ export interface AttackOptionsInterface {
 
 export interface EnvironmentInterface {
 	ListenAddress: string
-	WebSocketListenAddress: string
+	WebSocketListenPort: number
 	MaxAttackDuration: number
 	MaxAttackRate: number
 	ResultsDir: string

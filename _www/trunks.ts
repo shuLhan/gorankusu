@@ -50,7 +50,7 @@ export class Trunks {
 
 	env: EnvironmentInterface = {
 		ListenAddress: "",
-		WebSocketListenAddress: "",
+		WebSocketListenPort: 8218,
 		MaxAttackDuration: 0,
 		MaxAttackRate: 0,
 		ResultsDir: "",
@@ -151,7 +151,7 @@ export class Trunks {
 			this.windowOnHashChange()
 		}
 
-		this.wsc_opts.address = this.env.WebSocketListenAddress
+		this.wsc_opts.address = window.location.hostname +":"+ this.env.WebSocketListenPort
 		this.wsc = new WuiWebSocketClient(this.wsc_opts)
 	}
 
