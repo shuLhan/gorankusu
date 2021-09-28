@@ -269,8 +269,6 @@ export class Trunks {
 	}
 
 	private wsOnBroadcast(res: WuiWebSocketResponse) {
-		console.log("wsOnBroadcast: ", res.message)
-
 		switch (res.message) {
 			case API_ATTACK_RESULT:
 				let result = JSON.parse(
@@ -335,6 +333,8 @@ export class Trunks {
 			console.error("websocket is not connected")
 			return null
 		}
+
+		Save(target, http_target, null)
 
 		let attackReq: RunRequestInterface = {
 			Target: {

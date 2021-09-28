@@ -1,7 +1,13 @@
 import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js"
 import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
 
-import { GenerateFormInput, LoadTargetVar } from "./functions.js"
+import {
+	GenerateFormInput,
+	LoadTargetOptDuration,
+	LoadTargetOptRatePerSecond,
+	LoadTargetOptTimeout,
+	LoadTargetVar,
+} from "./functions.js"
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
@@ -146,7 +152,7 @@ export class Target {
 		let opts_duration: WuiInputNumberOpts = {
 			label: "Duration",
 			hint: "The duration of attack, in seconds.",
-			value: this.opts.Opts.Duration / 1e9,
+			value: LoadTargetOptDuration(this.opts),
 			min: 1,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
@@ -160,7 +166,7 @@ export class Target {
 		let opts_rate: WuiInputNumberOpts = {
 			label: "Rate per second",
 			hint: "The number of request send per second when attacking target.",
-			value: this.opts.Opts.RatePerSecond,
+			value: LoadTargetOptRatePerSecond(this.opts),
 			min: 1,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
@@ -174,7 +180,7 @@ export class Target {
 		let opts_timeout: WuiInputNumberOpts = {
 			label: "Timeout (seconds)",
 			hint: "Timeout for each request, in seconds.",
-			value: this.opts.Opts.Timeout / 1e9,
+			value: LoadTargetOptTimeout(this.opts),
 			min: 5,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,

@@ -12,11 +12,7 @@ import {
 	WebSocketTargetInterface,
 } from "./interface.js"
 
-export function GenerateFormInput(
-	parent: HTMLElement,
-	fi: FormInput,
-	value: string,
-) {
+export function GenerateFormInput(parent: HTMLElement, fi: FormInput, value: string) {
 	switch (fi.kind) {
 		case FormInputKindNumber:
 			let wui_input_number_opts: WuiInputNumberOpts = {
@@ -36,9 +32,7 @@ export function GenerateFormInput(
 			if (fi.min) {
 				wui_input_number_opts.min = fi.min
 			}
-			let wui_input_number = new WuiInputNumber(
-				wui_input_number_opts,
-			)
+			let wui_input_number = new WuiInputNumber(wui_input_number_opts)
 			parent.appendChild(wui_input_number.el)
 			break
 
@@ -54,9 +48,7 @@ export function GenerateFormInput(
 					fi.value = new_value
 				},
 			}
-			let wui_input_string = new WuiInputString(
-				wui_input_string_opts,
-			)
+			let wui_input_string = new WuiInputString(wui_input_string_opts)
 			parent.appendChild(wui_input_string.el)
 			break
 	}
@@ -90,32 +82,45 @@ export function HttpMethodToString(m: number): string {
 // LoadHttpTargetHeader get HttpTarget header from local storage by key.
 // If no header exist in storage return the one from HttpTarget itself.
 //
-export function LoadHttpTargetHeader(
-	target: TargetInterface,
-	httpTarget: HttpTargetInterface,
-	key: string,
-): string {
+export function LoadHttpTargetHeader(target: TargetInterface, httpTarget: HttpTargetInterface, key: string): string {
 	let storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`
-	return (
-		window.localStorage.getItem(storageKey) ||
-		httpTarget.Headers[key].value
-	)
+	return window.localStorage.getItem(storageKey) || httpTarget.Headers[key].value
 }
 
 //
 // LoadHttpTargetParam get HttpTarget parameter from local storage by key.
 // If no parameter exist in storage return the one from HttpTarget itself.
 //
-export function LoadHttpTargetParam(
-	target: TargetInterface,
-	httpTarget: HttpTargetInterface,
-	key: string,
-): string {
+export function LoadHttpTargetParam(target: TargetInterface, httpTarget: HttpTargetInterface, key: string): string {
 	let storageKey = `${target.ID}.http.${httpTarget.ID}.var.${key}`
-	return (
-		window.localStorage.getItem(storageKey) ||
-		httpTarget.Params[key].value
-	)
+	return window.localStorage.getItem(storageKey) || httpTarget.Params[key].value
+}
+
+export function LoadTargetOptDuration(target: TargetInterface): number {
+	let key = `${target.ID}.opt.Duration`
+	let val = window.localStorage.getItem(key)
+	if (val) {
+		return +val/1e9
+	}
+	return target.Opts.Duration / 1e9
+}
+
+export function LoadTargetOptRatePerSecond(target: TargetInterface): number {
+	let key = `${target.ID}.opt.RatePerSecond`
+	let val = window.localStorage.getItem(key)
+	if (val) {
+		return +val
+	}
+	return target.Opts.RatePerSecond
+}
+
+export function LoadTargetOptTimeout(target: TargetInterface): number {
+	let key = `${target.ID}.opt.Timeout`
+	let val = window.localStorage.getItem(key)
+	if (val) {
+		return +val/1e9
+	}
+	return target.Opts.Timeout / 1e9
 }
 
 //
@@ -130,32 +135,18 @@ export function LoadTargetVar(target: TargetInterface, key: string): string {
 //
 // LoadWsTargetHeader get the WebSocketTarget from local storage by key.
 //
-export function LoadWsTargetHeader(
-	target: TargetInterface,
-	wsTarget: WebSocketTargetInterface,
-	key: string,
-): string {
+export function LoadWsTargetHeader(target: TargetInterface, wsTarget: WebSocketTargetInterface, key: string): string {
 	let storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`
-	return (
-		window.localStorage.getItem(storageKey) ||
-		wsTarget.Headers[key].value
-	)
+	return window.localStorage.getItem(storageKey) || wsTarget.Headers[key].value
 }
 
 //
 // LoadWsTargetParam get the WebSocketTarget parameter from local storage or
 // return the one from wsTarget if its not exist.
 //
-export function LoadWsTargetParam(
-	target: TargetInterface,
-	wsTarget: WebSocketTargetInterface,
-	key: string,
-): string {
+export function LoadWsTargetParam(target: TargetInterface, wsTarget: WebSocketTargetInterface, key: string): string {
 	let storageKey = `${target.ID}.ws.${wsTarget.ID}.var.${key}`
-	return (
-		window.localStorage.getItem(storageKey) ||
-		wsTarget.Params[key].value
-	)
+	return window.localStorage.getItem(storageKey) || wsTarget.Params[key].value
 }
 
 //
@@ -167,6 +158,10 @@ export function Save(
 	httpTarget: HttpTargetInterface | null,
 	wsTarget: WebSocketTargetInterface | null,
 ) {
+	window.localStorage.setItem(`${target.ID}.opt.Duration`, ""+target.Opts.Duration)
+	window.localStorage.setItem(`${target.ID}.opt.RatePerSecond`, ""+target.Opts.RatePerSecond)
+	window.localStorage.setItem(`${target.ID}.opt.Timeout`, ""+target.Opts.Timeout)
+
 	for (const k in target.Vars) {
 		let fi = target.Vars[k]
 		let key = `${target.ID}.var.${k}`
