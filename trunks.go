@@ -36,11 +36,13 @@ const (
 	// Setting this environment variable will enable trunks development
 	// mode.
 	envDevelopment = "TRUNKS_DEV"
-)
 
-// List of HTTP parameters.
-const (
+	// List of HTTP parameters.
 	paramNameName = "name"
+
+	// List of HTTP APIs and/or WebSocket broadcast messages.
+	apiAttackHttp   = "/_trunks/api/attack/http"
+	apiAttackResult = "/_trunks/api/attack/result"
 )
 
 //
@@ -493,6 +495,7 @@ func (trunks *Trunks) workerAttackQueue() {
 
 			trunks.addHttpAttackResult(rr)
 
+			trunks.wsBroadcastAttackFinish(rr.result)
 			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
 		}
 

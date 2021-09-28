@@ -10,11 +10,11 @@ import {
 import {
 	CLASS_INPUT,
 	CLASS_INPUT_LABEL,
+	AttackResult,
 	FormInputKindNumber,
 	FormInputKindString,
 	HttpTargetInterface,
 	KeyFormInput,
-	ResultInterface,
 	TargetInterface,
 	TrunksInterface,
 } from "./interface.js"
@@ -374,7 +374,7 @@ export class HttpTarget {
 		await this.trunks.AttackHttp(this.target, this.opts)
 	}
 
-	private async onClickAttackDelete(result: ResultInterface) {
+	private async onClickAttackDelete(result: AttackResult) {
 		let res = await this.trunks.AttackHttpDelete(result.Name)
 		if (!res) {
 			return
@@ -409,7 +409,7 @@ export class HttpTarget {
 			return
 		}
 
-		let res = res_json.data as ResultInterface
+		let res = res_json.data as AttackResult
 
 		el_report_text.innerText = atob(res.TextReport)
 		el_report_text.style.display = "block"
@@ -443,5 +443,10 @@ export class HttpTarget {
 		} else {
 			this.el_out_response_body.innerText = body
 		}
+	}
+
+	AddAttackResult(result: AttackResult) {
+		this.opts.Results.push(result)
+		this.generateAttackResults(this.el_out_attack_results)
 	}
 }

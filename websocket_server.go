@@ -10,15 +10,42 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
 	"github.com/shuLhan/share/lib/websocket"
 )
 
-const (
-	apiAttackHttp = "/_trunks/api/attack/http"
-)
+func (trunks *Trunks) wsBroadcastAttackFinish(result *AttackResult) {
+	if result == nil {
+		return
+	}
+
+	logp := "wsBroadcastAttackFinish"
+
+	jsonb, err := json.Marshal(result)
+	if err != nil {
+		log.Printf("%s: %s", logp, err)
+		return
+	}
+
+	packet, err := websocket.NewBroadcast(
+		apiAttackResult,
+		base64.StdEncoding.EncodeToString(jsonb),
+	)
+	if err != nil {
+		log.Printf("%s: %s", logp, err)
+		return
+	}
+
+	for _, conn := range trunks.Wsd.Clients.All() {
+		err = websocket.Send(conn, packet)
+		if err != nil {
+			log.Printf("%s: %s", logp, err)
+		}
+	}
+}
 
 func (trunks *Trunks) initWebSocketServer() (err error) {
 	opts := &websocket.ServerOptions{

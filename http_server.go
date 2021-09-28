@@ -22,15 +22,15 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiTargetAttackResultDelete = &libhttp.Endpoint{
+	apiAttackResultDelete = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
-		Path:         "/_trunks/api/target/attack/result",
+		Path:         apiAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
-	apiTargetAttackResultGet = &libhttp.Endpoint{
+	apiAttackResultGet = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         "/_trunks/api/target/attack/result",
+		Path:         apiAttackResult,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
@@ -82,13 +82,13 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiTargetAttackResultDelete.Call = trunks.apiTargetAttackResultDelete
-	err = trunks.Httpd.RegisterEndpoint(apiTargetAttackResultDelete)
+	apiAttackResultDelete.Call = trunks.apiAttackResultDelete
+	err = trunks.Httpd.RegisterEndpoint(apiAttackResultDelete)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
-	apiTargetAttackResultGet.Call = trunks.apiTargetAttackResultGet
-	err = trunks.Httpd.RegisterEndpoint(apiTargetAttackResultGet)
+	apiAttackResultGet.Call = trunks.apiAttackResultGet
+	err = trunks.Httpd.RegisterEndpoint(apiAttackResultGet)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -123,7 +123,7 @@ func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody [
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	name := epr.HttpRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
@@ -144,7 +144,7 @@ func (trunks *Trunks) apiTargetAttackResultDelete(epr *libhttp.EndpointRequest) 
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	name := epr.HttpRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)

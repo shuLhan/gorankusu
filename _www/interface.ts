@@ -13,6 +13,14 @@ export interface AttackOptionsInterface {
 	Timeout: number
 }
 
+export interface AttackResult {
+	TargetID: string
+	HttpTargetID: string
+	Name: string
+	TextReport: string
+	HistReport: string
+}
+
 export interface EnvironmentInterface {
 	ListenAddress: string
 	WebSocketListenPort: number
@@ -47,7 +55,7 @@ export interface HttpTargetInterface {
 	RequestType: number
 	Headers: KeyFormInput
 	Params: KeyFormInput
-	Results: ResultInterface[]
+	Results: AttackResult[]
 	AllowAttack: boolean
 	IsCustomizable: boolean
 }
@@ -64,16 +72,11 @@ export interface MapNumberString {
 	[key: number]: string
 }
 
-export interface ResultInterface {
-	Name: string
-	TextReport: string
-	HistReport: string
-}
-
 export interface RunRequestInterface {
 	Target: TargetInterface
 	HttpTarget: HttpTargetInterface | null
 	WebSocketTarget: WebSocketTargetInterface | null
+	Result?: AttackResult | null
 }
 
 export interface RunResponseInterface {

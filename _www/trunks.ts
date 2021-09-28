@@ -2,6 +2,7 @@ import {
 	WuiWebSocketClient,
 	WuiWebSocketOptions,
 	WuiWebSocketRequest,
+	WuiWebSocketResponse,
 } from "./wui/websocket_client.js"
 
 import { Environment } from "./environment.js"
@@ -9,6 +10,7 @@ import { Save } from "./functions.js"
 import {
 	CLASS_NAV_TARGET,
 	HASH_ENVIRONMENT,
+	AttackResult,
 	EnvironmentInterface,
 	HttpResponseInterface,
 	HttpTargetInterface,
@@ -23,9 +25,10 @@ import { Target } from "./target.js"
 import { wui_notif } from "./vars.js"
 
 const API_ATTACK_HTTP = "/_trunks/api/attack/http"
+const API_ATTACK_RESULT = "/_trunks/api/attack/result"
 const API_ENVIRONMENT = "/_trunks/api/environment"
 const API_TARGETS = "/_trunks/api/targets"
-const API_TARGET_ATTACK_RESULT = "/_trunks/api/target/attack/result"
+
 const API_TARGET_RUN_HTTP = "/_trunks/api/target/run/http"
 const API_TARGET_RUN_WEBSOCKET = "/_trunks/api/target/run/websocket"
 
@@ -72,8 +75,8 @@ export class Trunks {
 			insecure: true,
 			auto_reconnect: true,
 			auto_reconnect_interval: WSC_RECONNECT_INTERVAL,
-			onBroadcast: () => {
-				this.wsOnBroadcast()
+			onBroadcast: (res: WuiWebSocketResponse) => {
+				this.wsOnBroadcast(res)
 			},
 			onConnected: () => {
 				this.wsOnConnected()
@@ -151,7 +154,10 @@ export class Trunks {
 			this.windowOnHashChange()
 		}
 
-		this.wsc_opts.address = window.location.hostname +":"+ this.env.WebSocketListenPort
+		this.wsc_opts.address =
+			window.location.hostname +
+			":" +
+			this.env.WebSocketListenPort
 		this.wsc = new WuiWebSocketClient(this.wsc_opts)
 	}
 
@@ -262,9 +268,31 @@ export class Trunks {
 		}
 	}
 
-	private wsOnBroadcast() {
-		// TODO
+	private wsOnBroadcast(res: WuiWebSocketResponse) {
+		console.log("wsOnBroadcast: ", res.message)
+
+		switch (res.message) {
+			case API_ATTACK_RESULT:
+				let result = JSON.parse(
+					atob(res.body),
+				) as AttackResult
+
+				this.setAttackRunning(null)
+
+				let comTarget = this.targets[result.TargetID]
+				let comHttpTarget =
+					comTarget.http_targets[
+						result.HttpTargetID
+					]
+
+				comHttpTarget.AddAttackResult(result)
+
+				wui_notif.Info(
+					`Attack finished on "${comTarget.opts.Name}/${comHttpTarget.opts.Name}".`,
+				)
+		}
 	}
+
 	private wsOnConnected() {
 		this.el_ws_conn_status.innerHTML = "&#9670; Connected"
 	}
@@ -286,13 +314,17 @@ export class Trunks {
 		}
 		this.el_attack_running.innerHTML = `
 			${runRequest.Target.Name} <br/>
-			> ${runRequest.HttpTarget.Name} <br/>
+			/ ${runRequest.HttpTarget.Name} <br/>
 			<br/>
 		`
 		this.el_attack_cancel.onclick = () => {
 			this.onClickAttackCancel()
 		}
 		this.el_attack_running.appendChild(this.el_attack_cancel)
+
+		wui_notif.Info(
+			`Attacking "${runRequest.Target.Name}/${runRequest.HttpTarget.Name}" ...`,
+		)
 	}
 
 	async AttackHttp(
@@ -356,7 +388,7 @@ export class Trunks {
 			return null
 		}
 
-		let url = API_TARGET_ATTACK_RESULT + "?name=" + name
+		let url = API_ATTACK_RESULT + "?name=" + name
 		let fres = await fetch(url, {
 			method: "DELETE",
 		})
@@ -369,7 +401,7 @@ export class Trunks {
 	}
 
 	async AttackHttpGet(name: string): Promise<HttpResponseInterface> {
-		let url = API_TARGET_ATTACK_RESULT + "?name=" + name
+		let url = API_ATTACK_RESULT + "?name=" + name
 		let fres = await fetch(url)
 		let res = await fres.json()
 		if (res.code != 200) {

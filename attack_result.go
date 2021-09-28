@@ -32,6 +32,7 @@ const (
 type AttackResult struct {
 	mtx sync.Mutex
 
+	TargetID     string // ID of Target.
 	HttpTargetID string // ID of HTTP target which own the result.
 	Name         string // Name of output file without path.
 	TextReport   []byte // TextReport the result reported as text.
@@ -50,7 +51,9 @@ type AttackResult struct {
 func newAttackResult(env *Environment, rr *RunRequest) (
 	ar *AttackResult, err error,
 ) {
+	logp := "newAttackResult"
 	ar = &AttackResult{
+		TargetID:     rr.Target.ID,
 		HttpTargetID: rr.HttpTarget.ID,
 		metrics:      &vegeta.Metrics{},
 		hist:         &vegeta.Histogram{},
@@ -64,14 +67,14 @@ func newAttackResult(env *Environment, rr *RunRequest) (
 
 	err = ar.hist.Buckets.UnmarshalText([]byte(histogramBuckets))
 	if err != nil {
-		return nil, fmt.Errorf("newAttackResult: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	ar.fullpath = filepath.Join(env.ResultsDir, ar.Name)
 
 	ar.fout, err = os.Create(ar.fullpath)
 	if err != nil {
-		return nil, fmt.Errorf("newAttackResult: %w", err)
+		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
 	ar.encoder = vegeta.NewEncoder(ar.fout)
