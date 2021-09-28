@@ -26,7 +26,7 @@ const CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS =
 	"http_target_attack_result_actions"
 const CLASS_HTTP_TARGET_INPUT = "http_target_input"
 const CLASS_HTTP_TARGET_INPUT_HEADER = "http_target_input_header"
-const CLASS_HTTP_TARGET_INPUT_PARAMS = "http_target_input_header"
+const CLASS_HTTP_TARGET_INPUT_PARAMS = "http_target_input_params"
 const CLASS_HTTP_TARGET_OUT_ATTACK = "http_target_out_attack"
 const CLASS_HTTP_TARGET_OUT_MONO = "http_target_out_mono"
 const CLASS_HTTP_TARGET_OUT_RUN = "http_target_out_run"
@@ -38,10 +38,10 @@ export class HttpTarget {
 	el_button_run: HTMLButtonElement = document.createElement("button")
 	el_button_attack: HTMLButtonElement = document.createElement("button")
 	el_request_input: HTMLElement = document.createElement("div")
-	el_out_request: HTMLElement = document.createElement("pre")
-	el_out_response: HTMLElement = document.createElement("pre")
-	el_out_response_body: HTMLElement = document.createElement("pre")
-	el_out_attack: HTMLElement = document.createElement("div")
+	el_out_request: HTMLElement = document.createElement("div")
+	el_out_response: HTMLElement = document.createElement("div")
+	el_out_response_body: HTMLElement = document.createElement("div")
+	el_out_attack: HTMLElement = document.createElement("fieldset")
 	el_out_attack_results: HTMLElement = document.createElement("div")
 
 	constructor(
@@ -216,16 +216,20 @@ export class HttpTarget {
 			return
 		}
 
-		let wrapper = document.createElement("div")
+		let wrapper = document.createElement("fieldset")
 		wrapper.classList.add(CLASS_HTTP_TARGET_INPUT_HEADER)
 
-		let title = document.createElement("h4")
-		title.innerText = "Headers"
-		wrapper.appendChild(title)
+		let legend = document.createElement("legend")
+		legend.innerText = "Headers"
+		wrapper.appendChild(legend)
 
 		for (let key in this.opts.Headers) {
 			let fi = this.opts.Headers[key]
-			let val = LoadHttpTargetHeader(this.target, this.opts, key)
+			let val = LoadHttpTargetHeader(
+				this.target,
+				this.opts,
+				key,
+			)
 			GenerateFormInput(wrapper, fi, val)
 		}
 
@@ -240,16 +244,20 @@ export class HttpTarget {
 			return
 		}
 
-		let wrapper = document.createElement("div")
+		let wrapper = document.createElement("fieldset")
 		wrapper.classList.add(CLASS_HTTP_TARGET_INPUT_PARAMS)
 
-		let title = document.createElement("h4")
+		let title = document.createElement("legend")
 		title.innerText = "Parameters"
 		wrapper.appendChild(title)
 
 		for (let key in this.opts.Params) {
 			let fi = this.opts.Params[key]
-			let val = LoadHttpTargetParam(this.target, this.opts, key)
+			let val = LoadHttpTargetParam(
+				this.target,
+				this.opts,
+				key,
+			)
 			GenerateFormInput(wrapper, fi, val)
 		}
 
@@ -257,10 +265,10 @@ export class HttpTarget {
 	}
 
 	private generateOutput(parent: HTMLElement) {
-		let wrapper = document.createElement("div")
+		let wrapper = document.createElement("fieldset")
 		wrapper.classList.add(CLASS_HTTP_TARGET_OUT_RUN)
 
-		let title = document.createElement("h4")
+		let title = document.createElement("legend")
 		title.innerText = "Run output"
 
 		let btn_clear = document.createElement("button")
@@ -282,6 +290,7 @@ export class HttpTarget {
 		wrapper.appendChild(this.el_out_response_body)
 
 		parent.appendChild(wrapper)
+		this.onClickClearOutput()
 	}
 
 	private generateOutputAttack(parent: HTMLElement) {
@@ -291,7 +300,7 @@ export class HttpTarget {
 
 		this.el_out_attack.classList.add(CLASS_HTTP_TARGET_OUT_ATTACK)
 
-		let title = document.createElement("h4")
+		let title = document.createElement("legend")
 		title.innerText = "Attack results"
 
 		this.generateAttackResults(this.el_out_attack_results)
@@ -312,13 +321,13 @@ export class HttpTarget {
 			let wrapper = document.createElement("div")
 			wrapper.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT)
 
-			let el_report_text = document.createElement("pre")
+			let el_report_text = document.createElement("div")
 			el_report_text.style.display = "none"
 			el_report_text.classList.add(
 				CLASS_HTTP_TARGET_OUT_MONO,
 			)
 
-			let el_report_hist = document.createElement("pre")
+			let el_report_hist = document.createElement("div")
 			el_report_hist.style.display = "none"
 			el_report_hist.classList.add(
 				CLASS_HTTP_TARGET_OUT_MONO,
@@ -412,9 +421,9 @@ export class HttpTarget {
 	}
 
 	private async onClickClearOutput() {
-		this.el_out_request.innerText = ""
-		this.el_out_response.innerText = ""
-		this.el_out_response_body.innerText = ""
+		this.el_out_request.innerText = "Raw request"
+		this.el_out_response.innerText = "Raw response"
+		this.el_out_response_body.innerText = "JSON formatted response body"
 	}
 
 	private async onClickRun() {

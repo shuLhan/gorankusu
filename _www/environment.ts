@@ -56,14 +56,14 @@ export class Environment {
 		let opts_max_attack_dur: WuiInputNumberOpts = {
 			label: "Max. attack duration (seconds)",
 			hint: "Maximum attack duration for all targets, in seconds.",
-			value: this.opts.MaxAttackDuration,
+			value: this.opts.MaxAttackDuration / 1e9,
 			min: 1,
 			is_disabled: true,
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
 			is_hint_toggled: true,
 			onChangeHandler: (v: number) => {
-				this.opts.MaxAttackDuration = v
+				this.opts.MaxAttackDuration = v * 1e9
 			},
 		}
 		this.com_max_attack_dur = new WuiInputNumber(
@@ -129,7 +129,7 @@ export class Environment {
 		this.opts = opts
 
 		this.com_listen_address.Set(opts.ListenAddress)
-		this.com_max_attack_dur.Set(opts.MaxAttackDuration)
+		this.com_max_attack_dur.Set(opts.MaxAttackDuration/1e9)
 		this.com_max_attack_rate.Set(opts.MaxAttackRate)
 		this.com_results_dir.Set(opts.ResultsDir)
 		this.com_results_suffix.Set(opts.ResultsSuffix)

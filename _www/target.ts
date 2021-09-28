@@ -138,8 +138,10 @@ export class Target {
 	}
 
 	private generateContentAttackOptions() {
-		let hdr_attack_opts = document.createElement("h3")
-		hdr_attack_opts.innerText = "Attack options"
+		let wrapper = document.createElement("fieldset")
+
+		let legend = document.createElement("legend")
+		legend.innerText = "Attack options"
 
 		let opts_duration: WuiInputNumberOpts = {
 			label: "Duration",
@@ -183,10 +185,11 @@ export class Target {
 		}
 		let com_input_timeout = new WuiInputNumber(opts_timeout)
 
-		this.el_content.appendChild(hdr_attack_opts)
-		this.el_content.appendChild(com_input_duration.el)
-		this.el_content.appendChild(com_input_rate.el)
-		this.el_content.appendChild(com_input_timeout.el)
+		wrapper.appendChild(legend)
+		wrapper.appendChild(com_input_duration.el)
+		wrapper.appendChild(com_input_rate.el)
+		wrapper.appendChild(com_input_timeout.el)
+		this.el_content.appendChild(wrapper)
 	}
 
 	private generateContentVars() {
@@ -194,16 +197,19 @@ export class Target {
 			return
 		}
 
-		let hdr = document.createElement("h3")
-		hdr.innerText = "Variables"
+		let wrapper = document.createElement("fieldset")
 
-		this.el_content.appendChild(hdr)
+		let legend = document.createElement("legend")
+		legend.innerText = "Variables"
+		wrapper.appendChild(legend)
 
 		for (const key in this.opts.Vars) {
 			let fi = this.opts.Vars[key]
 			let val = LoadTargetVar(this.opts, key)
-			GenerateFormInput(this.el_content, fi, val)
+			GenerateFormInput(wrapper, fi, val)
 		}
+
+		this.el_content.appendChild(wrapper)
 	}
 
 	private generateHttpTargets(trunks: TrunksInterface) {

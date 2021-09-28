@@ -166,6 +166,7 @@ func (ex *Example) registerTargets() (err error) {
 		Vars: trunks.KeyFormInput{
 			"A": trunks.FormInput{
 				Label: "A",
+				Hint:  "This is the global variabel for all HTTP targets below.",
 				Kind:  trunks.FormInputKindNumber,
 				Value: "1",
 			},

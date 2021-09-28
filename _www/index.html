@@ -16,6 +16,10 @@
 				margin: 0;
 				padding: 0;
 			}
+			fieldset {
+				margin-top: 16px;
+				min-width: 0px;
+			}
 			input:disabled,
 			select:disabled {
 				background-color: gainsboro;
@@ -92,6 +96,11 @@
 				margin: 4px 0 0 210px;
 			}
 
+			.http_target,
+			.ws_target {
+				margin-top: 16px;
+			}
+
 			.http_target button,
 			.ws_target button {
 				margin-left: 10px;
@@ -101,8 +110,10 @@
 			.ws_target_out_mono {
 				background-color: gainsboro;
 				font-family: monospace;
-				padding: 16px;
+				margin-top: 8px;
 				overflow: auto;
+				padding: 16px;
+				white-space: pre;
 			}
 			.http_target {
 				margin-top: 16px;

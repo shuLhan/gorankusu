@@ -111,10 +111,10 @@ export class WebSocketTarget {
 			return
 		}
 
-		let wrapper = document.createElement("div")
+		let wrapper = document.createElement("fieldset")
 		wrapper.classList.add(CLASS_WS_TARGET_INPUT_PARAM)
 
-		let title = document.createElement("h4")
+		let title = document.createElement("legend")
 		title.innerText = "Parameters"
 		wrapper.appendChild(title)
 
@@ -132,10 +132,10 @@ export class WebSocketTarget {
 	}
 
 	private generateOutput(parent: HTMLElement) {
-		let wrapper = document.createElement("div")
+		let wrapper = document.createElement("fieldset")
 		wrapper.classList.add(CLASS_WS_TARGET_OUT_RUN)
 
-		let title = document.createElement("h4")
+		let title = document.createElement("legend")
 		title.innerText = "Run output"
 
 		let btn_clear = document.createElement("button")

@@ -99,6 +99,13 @@ export class Trunks {
 
 		this.el_ws_conn_status = document.createElement("div")
 
+		let fs_attack_running = document.createElement("fieldset")
+		let legend = document.createElement("legend")
+		legend.innerText = "Attack running"
+
+		this.el_attack_running = document.createElement("span")
+		this.el_attack_running.classList.add(CLASS_ATTACK_RUNNING)
+
 		this.el_nav_content = document.createElement("div")
 
 		let el_nav_footer = document.createElement("div")
@@ -111,6 +118,11 @@ export class Trunks {
 		`
 
 		el_nav.appendChild(this.el_ws_conn_status)
+
+		fs_attack_running.appendChild(legend)
+		fs_attack_running.appendChild(this.el_attack_running)
+		el_nav.appendChild(fs_attack_running)
+
 		el_nav.appendChild(this.com_env.el_nav)
 		el_nav.appendChild(this.el_nav_content)
 		el_nav.appendChild(el_nav_footer)
@@ -120,10 +132,6 @@ export class Trunks {
 	private generateContent() {
 		let wrapper = document.createElement("div")
 		wrapper.classList.add(CLASS_MAIN)
-
-		this.el_attack_running = document.createElement("div")
-		this.el_attack_running.classList.add(CLASS_ATTACK_RUNNING)
-		wrapper.appendChild(this.el_attack_running)
 
 		this.el_attack_cancel = document.createElement("button")
 		this.el_attack_cancel.innerHTML = "Cancel"
@@ -258,10 +266,10 @@ export class Trunks {
 		// TODO
 	}
 	private wsOnConnected() {
-		this.el_ws_conn_status.innerHTML = "&#128994; Connected"
+		this.el_ws_conn_status.innerHTML = "&#9670; Connected"
 	}
 	private wsOnDisconnected() {
-		this.el_ws_conn_status.innerHTML = "&#128308; Disconnected"
+		this.el_ws_conn_status.innerHTML = "&#9671; Disconnected"
 	}
 	private wsOnError() {
 		// TODO
@@ -269,16 +277,17 @@ export class Trunks {
 
 	setAttackRunning(runRequest: RunRequestInterface | null) {
 		if (!runRequest) {
-			this.el_attack_running.innerHTML = "Attack running: -"
+			this.el_attack_running.innerHTML = "-"
 			return
 		}
 		if (!runRequest.Target || !runRequest.HttpTarget) {
-			this.el_attack_running.innerHTML = "Attack running: -"
+			this.el_attack_running.innerHTML = "-"
 			return
 		}
 		this.el_attack_running.innerHTML = `
-			Attack running: ${runRequest.Target.Name} / ${runRequest.HttpTarget.Name}
-			&nbsp;
+			${runRequest.Target.Name} <br/>
+			> ${runRequest.HttpTarget.Name} <br/>
+			<br/>
 		`
 		this.el_attack_cancel.onclick = () => {
 			this.onClickAttackCancel()
