@@ -39,7 +39,7 @@ func main() {
 		log.Fatalf("%s\n", err)
 	}
 
-	err = mfs.GoGenerate("trunks", "memfsWWW", "memfs_www_generate.go", "")
+	err = mfs.GoEmbed("trunks", "memfsWWW", "memfs_www_embed.go", "")
 	if err != nil {
 		mlog.Fatalf("%s\n", err)
 	}

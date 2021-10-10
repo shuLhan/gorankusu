@@ -11,7 +11,7 @@ run:
 	go run ./cmd/trunks-example
 
 embed: tsc
-	go run ./internal/generate-memfs
+	go run ./internal/memfs-embed
 
 tsc:
 	tsc -p _www/tsconfig.json
