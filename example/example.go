@@ -1,6 +1,10 @@
 //
-// Package example provide an example how to use the Trunks library from setup
-// to creating targets.
+// Package example provide an example how to use the Trunks library from
+// setting it up to creating targets.
+//
+// To run the example, execute
+//
+//	$ go run ./internal/cmd/trunks-example
 //
 package example
 
