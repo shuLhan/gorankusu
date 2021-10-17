@@ -11,15 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"git.sr.ht/~shulhan/ciigo"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
 	liberrors "github.com/shuLhan/share/lib/errors"
 	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/io"
-	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
-	"github.com/shuLhan/share/lib/os/exec"
 	"github.com/shuLhan/share/lib/websocket"
 )
 
@@ -35,7 +31,7 @@ const (
 
 	// Setting this environment variable will enable trunks development
 	// mode.
-	envDevelopment = "TRUNKS_DEV"
+	EnvDevelopment = "TRUNKS_DEV"
 
 	// List of HTTP parameters.
 	paramNameName = "name"
@@ -66,7 +62,7 @@ type Trunks struct {
 func New(env *Environment) (trunks *Trunks, err error) {
 	var (
 		logp          = "trunks.New"
-		isDevelopment = len(os.Getenv(envDevelopment)) > 0
+		isDevelopment = len(os.Getenv(EnvDevelopment)) > 0
 	)
 
 	err = env.init()
@@ -88,11 +84,6 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	err = trunks.initWebSocketServer()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	if isDevelopment {
-		go watchDocs()
-		go watchWww()
 	}
 
 	return trunks, nil
@@ -501,99 +492,5 @@ func (trunks *Trunks) workerAttackQueue() {
 
 		rr.result = nil
 		trunks.Env.AttackRunning = nil
-	}
-}
-
-//
-// watchDocs a goroutine that watch any changes to .adoc files inside
-// "_www/docs" directory and convert them into HTML files.
-//
-func watchDocs() {
-	logp := "watchDocs"
-	opts := &ciigo.ConvertOptions{
-		Root: "_www/docs",
-	}
-	err := ciigo.Watch(opts)
-	if err != nil {
-		mlog.Errf("%s: %s", logp, err)
-	}
-}
-
-//
-// watchWww a goroutine that watch any changes to TypeScript, HTML, and
-// tsconfig files inside the _www, and when there is an update it will execute
-// "tsc -p" to recompile and "go run ./internal/generate-memfs" to embed them
-// into Go source.
-//
-func watchWww() {
-	var (
-		logp    = "watchWww"
-		changeq = make(chan struct{}, 64)
-	)
-
-	go recompile(changeq)
-
-	dirWatcher := &io.DirWatcher{
-		Options: memfs.Options{
-			Root: "_www",
-			Includes: []string{
-				`\.*.ts$`,
-				`_www/index.html$`,
-				`_www/tsconfig.json$`,
-			},
-			Excludes: []string{
-				`\.*.d.ts$`,
-				`\.git`,
-				`\.wui.bak`,
-				`\.wui.local`,
-			},
-		},
-		Callback: func(ns *io.NodeState) {
-			mlog.Outf("--- %s: %s: %d\n", logp, ns.Node.SysPath, ns.State)
-			changeq <- struct{}{}
-		},
-	}
-	err := dirWatcher.Start()
-	if err != nil {
-		mlog.Errf("%s: %s", logp, err)
-	}
-}
-
-func recompile(changeq chan struct{}) {
-	var (
-		logp         = "recompile"
-		count        int
-		changeTicker = time.NewTicker(3 * time.Second)
-		commands     = []string{
-			"tsc -p _www/tsconfig.json",
-			"go run ./internal/generate-memfs",
-		}
-		draining bool
-	)
-	for range changeTicker.C {
-		draining = true
-		for draining {
-			select {
-			case <-changeq:
-				count++
-			default:
-				if count == 0 {
-					// No changes.
-					draining = false
-				} else {
-					// All changes has been drained, execute all
-					// commands.
-					for _, cmd := range commands {
-						mlog.Outf("%s: %s\n", logp, cmd)
-						err := exec.Run(cmd, nil, nil)
-						if err != nil {
-							mlog.Errf("%s: %s", logp, err)
-						}
-					}
-					count = 0
-					draining = false
-				}
-			}
-		}
 	}
 }

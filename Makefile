@@ -4,14 +4,9 @@
 
 .PHONY: all run embed tsc
 
-all: embed
+all:
+	go run ./internal/cmd/trunks-example build
 	go test -v -race ./...
 
 run:
 	go run ./internal/cmd/trunks-example
-
-embed: tsc
-	go run ./internal/memfs-embed
-
-tsc:
-	tsc -p _www/tsconfig.json

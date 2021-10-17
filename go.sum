@@ -1,7 +1,7 @@
 git.sr.ht/~shulhan/asciidoctor-go v0.1.1-0.20211004182124-1c48dfa11a1b h1:LrKeNE5urwiAZcuv1ACKwStbXpxWIaXNKrL4aCsN2EE=
 git.sr.ht/~shulhan/asciidoctor-go v0.1.1-0.20211004182124-1c48dfa11a1b/go.mod h1:fGzLvcEmRkdfo9mg7sp7fQHQHquCUJ4+6nRfWi6I7B0=
-git.sr.ht/~shulhan/ciigo v0.6.1-0.20211010143228-56488e32c04c h1:+XHHQitIznJFH9vQJMfR/+DQfVFED/ls1p81FExlJAg=
-git.sr.ht/~shulhan/ciigo v0.6.1-0.20211010143228-56488e32c04c/go.mod h1:mmvVAFWJ14Y3qrI0MPNrslAf6QKxtEiXpmERaBYk7LY=
+git.sr.ht/~shulhan/ciigo v0.6.1-0.20211017121420-36d729c71dd0 h1:aScDnq5u5DnQ2XGwGXCmcdZzfpyyPFvGZxnkFbWtMCM=
+git.sr.ht/~shulhan/ciigo v0.6.1-0.20211017121420-36d729c71dd0/go.mod h1:mmvVAFWJ14Y3qrI0MPNrslAf6QKxtEiXpmERaBYk7LY=
 github.com/alecthomas/jsonschema v0.0.0-20180308105923-f2c93856175a/go.mod h1:qpebaTNSsyUn5rPSJMsfqEtDw71TTggXM6stUDI16HA=
 github.com/bmizerany/perks v0.0.0-20141205001514-d9a9656a3a4b h1:AP/Y7sqYicnjGDfD5VcY4CIfh1hRXBUavxrvELjTiOE=
 github.com/bmizerany/perks v0.0.0-20141205001514-d9a9656a3a4b/go.mod h1:ac9efd0D1fsDb3EJvhqgXRbFx7bs2wqZ10HQPeU8U/Q=
