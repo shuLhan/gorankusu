@@ -14,7 +14,7 @@ See the
 on how to programmatically use and create service using this module, or,
 
 	* clone this repository,
-	* execute `make run`, and
+	* execute `make dev`, and
 	* open http://127.0.0.1:8217.
 
 

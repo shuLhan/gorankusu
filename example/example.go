@@ -4,7 +4,9 @@
 //
 // To run the example, execute
 //
-//	$ go run ./internal/cmd/trunks-example
+//	$ go run ./internal/cmd/trunks
+//
+// It will run a web user interface at http://127.0.0.1:8217 .
 //
 package example
 
