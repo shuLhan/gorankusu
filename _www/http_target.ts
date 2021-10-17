@@ -423,7 +423,8 @@ export class HttpTarget {
 	private async onClickClearOutput() {
 		this.el_out_request.innerText = "Raw request"
 		this.el_out_response.innerText = "Raw response"
-		this.el_out_response_body.innerText = "JSON formatted response body"
+		this.el_out_response_body.innerText =
+			"JSON formatted response body"
 	}
 
 	private async onClickRun() {

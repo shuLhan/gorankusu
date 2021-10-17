@@ -129,7 +129,7 @@ export class Environment {
 		this.opts = opts
 
 		this.com_listen_address.Set(opts.ListenAddress)
-		this.com_max_attack_dur.Set(opts.MaxAttackDuration/1e9)
+		this.com_max_attack_dur.Set(opts.MaxAttackDuration / 1e9)
 		this.com_max_attack_rate.Set(opts.MaxAttackRate)
 		this.com_results_dir.Set(opts.ResultsDir)
 		this.com_results_suffix.Set(opts.ResultsSuffix)

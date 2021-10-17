@@ -130,6 +130,7 @@ export class Target {
 			class_input: CLASS_INPUT,
 			class_label: CLASS_INPUT_LABEL,
 			is_hint_toggled: true,
+			is_disabled: true,
 			onChangeHandler: (v: string) => {
 				this.opts.BaseUrl = v
 			},
