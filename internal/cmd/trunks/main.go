@@ -126,11 +126,15 @@ func workerBuild(oneTime bool) {
 				`_www/tsconfig.json`,
 			},
 			Excludes: []string{
+				`.*\.adoc$`,
 				`.*\.d\.ts$`,
 				`.*\.git/.*`,
+				`/wui/.*/example.js$`,
+				`/wui/.*/index.html$`,
+				`/wui/index\.html$`,
+				`/wui\.bak`,
+				`/wui\.local`,
 				`docs`,
-				`wui\.bak`,
-				`wui\.local`,
 			},
 		},
 		Callback: func(ns *io.NodeState) {
@@ -155,16 +159,25 @@ func workerBuild(oneTime bool) {
 			} else if strings.HasSuffix(ns.Node.SysPath, ".json") {
 				mlog.Outf("%s: update %s\n", logp, ns.Node.SysPath)
 				tsCount++
-			} else if strings.HasSuffix(ns.Node.SysPath, ".js") {
+			} else if strings.HasSuffix(ns.Node.SysPath, ".js") ||
+				strings.HasSuffix(ns.Node.SysPath, ".html") {
 				embedCount++
-				mlog.Outf("%s: update %s\n", logp, ns.Node.SysPath)
-				err = ns.Node.Update(nil, 0)
+				mlog.Outf("%s: update %s\n", logp, ns.Node.Path)
+				node, err := mfsWww.Get(ns.Node.Path)
 				if err != nil {
-					mlog.Errf("%s: %s", logp, err)
+					mlog.Errf("%s: %q: %s", logp, ns.Node.Path, err)
+					continue
+				}
+				if node != nil {
+					err = node.Update(nil, 0)
+					if err != nil {
+						mlog.Errf("%s: %q: %s", logp, node.Path, err)
+					}
 				}
 			} else {
 				mlog.Outf("%s: unknown file updated %s\n", logp, ns.Node.SysPath)
 			}
+
 		case <-ticker.C:
 			if tsCount > 0 {
 				tsCount = 0
