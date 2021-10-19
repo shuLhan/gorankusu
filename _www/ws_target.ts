@@ -92,12 +92,12 @@ export class WebSocketTarget {
 
 		for (let key in this.opts.Headers) {
 			let fi = this.opts.Headers[key]
-			let val = LoadWsTargetHeader(
+			fi.value = LoadWsTargetHeader(
 				this.target,
 				this.opts,
 				key,
 			)
-			GenerateFormInput(wrapper, fi, val)
+			GenerateFormInput(wrapper, fi)
 		}
 
 		parent.appendChild(wrapper)
@@ -120,12 +120,12 @@ export class WebSocketTarget {
 
 		for (let key in this.opts.Params) {
 			let fi = this.opts.Params[key]
-			let val = LoadWsTargetParam(
+			fi.value = LoadWsTargetParam(
 				this.target,
 				this.opts,
 				key,
 			)
-			GenerateFormInput(wrapper, fi, val)
+			GenerateFormInput(wrapper, fi)
 		}
 
 		parent.appendChild(wrapper)

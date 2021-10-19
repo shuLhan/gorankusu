@@ -212,8 +212,8 @@ export class Target {
 
 		for (const key in this.opts.Vars) {
 			let fi = this.opts.Vars[key]
-			let val = LoadTargetVar(this.opts, key)
-			GenerateFormInput(wrapper, fi, val)
+			fi.value = LoadTargetVar(this.opts, key)
+			GenerateFormInput(wrapper, fi)
 		}
 
 		this.el_content.appendChild(wrapper)

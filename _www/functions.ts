@@ -12,17 +12,13 @@ import {
 	WebSocketTargetInterface,
 } from "./interface.js"
 
-export function GenerateFormInput(
-	parent: HTMLElement,
-	fi: FormInput,
-	value: string,
-) {
+export function GenerateFormInput(parent: HTMLElement, fi: FormInput) {
 	switch (fi.kind) {
 		case FormInputKindNumber:
 			let wui_input_number_opts: WuiInputNumberOpts = {
 				label: fi.label,
 				hint: fi.hint,
-				value: +value,
+				value: +fi.value,
 				class_input: CLASS_INPUT,
 				class_label: CLASS_INPUT_LABEL,
 				is_hint_toggled: true,
@@ -46,7 +42,7 @@ export function GenerateFormInput(
 			let wui_input_string_opts: WuiInputStringOpts = {
 				label: fi.label,
 				hint: fi.hint,
-				value: value,
+				value: fi.value,
 				class_input: CLASS_INPUT,
 				class_label: CLASS_INPUT_LABEL,
 				is_hint_toggled: true,
