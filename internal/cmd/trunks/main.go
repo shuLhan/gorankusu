@@ -99,6 +99,11 @@ func workerBuild(oneTime bool) {
 			`/wui\.bak`,
 			`/wui\.local`,
 		},
+		Embed: memfs.EmbedOptions{
+			PackageName: "trunks",
+			VarName:     "memfsWWW",
+			GoFileName:  "memfs_www_embed.go",
+		},
 	}
 
 	mfsWww, err := memfs.New(mfsOpts)
@@ -221,7 +226,7 @@ func doRunTsc(logp string) (err error) {
 
 func doGoEmbed(logp string, mfs *memfs.MemFS) (err error) {
 	mlog.Outf("%s: generate memfs_www_embed.go\n", logp)
-	err = mfs.GoEmbed("trunks", "memfsWWW", "memfs_www_embed.go", "")
+	err = mfs.GoEmbed()
 	if err != nil {
 		mlog.Errf("%s: %s", logp, err)
 		return err
