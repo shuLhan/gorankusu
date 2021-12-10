@@ -166,7 +166,7 @@ export class WebSocketTarget {
 			return
 		}
 		this.el_out_response.innerText = JSON.stringify(
-			JSON.parse(atob(res.data)),
+			res.data,
 			null,
 			2,
 		)
