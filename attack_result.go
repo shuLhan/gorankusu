@@ -30,19 +30,20 @@ const (
 // AttackResult represent the output from load testing.
 //
 type AttackResult struct {
-	mtx sync.Mutex
+	fout    *os.File
+	encoder vegeta.Encoder
+	metrics *vegeta.Metrics
+	hist    *vegeta.Histogram
 
 	TargetID     string // ID of Target.
 	HttpTargetID string // ID of HTTP target which own the result.
 	Name         string // Name of output file without path.
-	TextReport   []byte // TextReport the result reported as text.
-	HistReport   []byte // HistReport the result reported as histogram text.
+	fullpath     string
 
-	fullpath string
-	fout     *os.File
-	encoder  vegeta.Encoder
-	metrics  *vegeta.Metrics
-	hist     *vegeta.Histogram
+	TextReport []byte // TextReport the result reported as text.
+	HistReport []byte // HistReport the result reported as histogram text.
+
+	mtx sync.Mutex
 }
 
 //

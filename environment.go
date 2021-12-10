@@ -16,30 +16,16 @@ import (
 // Environment contains global configuration for load testing.
 //
 type Environment struct {
+	// AttackRunning will be set to non-nil if there is a load
+	// testing currently running.
+	AttackRunning *RunRequest
+
 	// ListenAddress is the address and port where Trunks HTTP web
 	// will run.
 	// If its emtpy, it will set to DefaultListenAddress.
 	ListenAddress string `ini:"trunks::listen_address"`
 
-	// WebSocketListenPort is the port number where Trunks WebSocket API
-	// will run.
-	// If its empty, it will set to DefaultWebSocketListenPort.
-	WebSocketListenPort int
-
-	// MaxAttackDuration define the maximum duration for an attack to be
-	// run on each target.
-	// The purpose of this option is to prevent client to attack service
-	// and bringing it down.
-	// This field is optional, default to DefaultMaxAttackDuration if its
-	// zero.
-	MaxAttackDuration time.Duration `ini:"trunks::max_attack_duration"`
-
-	// MaxAttackRate define the maximum AttackRate can be set by client.
-	// The purpose of this option is to prevent client to set attack rate
-	// which may bring down the service to be tested.
-	// This field is optional, default to DefaultMaxAttackRate if its
-	// zero.
-	MaxAttackRate int `ini:"trunks::max_attack_rate"`
+	websocketListenAddress string
 
 	// ResultsDir is the path where the output of load testing will be
 	// stored.
@@ -51,11 +37,27 @@ type Environment struct {
 	// uniquely identify results on each run.
 	ResultsSuffix string `ini:"trunks:result:suffix"`
 
-	// AttackRunning will be set to non-nil if there is a load
-	// testing currently running.
-	AttackRunning          *RunRequest
-	mtx                    sync.Mutex
-	websocketListenAddress string
+	// WebSocketListenPort is the port number where Trunks WebSocket API
+	// will run.
+	// If its empty, it will set to DefaultWebSocketListenPort.
+	WebSocketListenPort int
+
+	// MaxAttackRate define the maximum AttackRate can be set by client.
+	// The purpose of this option is to prevent client to set attack rate
+	// which may bring down the service to be tested.
+	// This field is optional, default to DefaultMaxAttackRate if its
+	// zero.
+	MaxAttackRate int `ini:"trunks::max_attack_rate"`
+
+	// MaxAttackDuration define the maximum duration for an attack to be
+	// run on each target.
+	// The purpose of this option is to prevent client to attack service
+	// and bringing it down.
+	// This field is optional, default to DefaultMaxAttackDuration if its
+	// zero.
+	MaxAttackDuration time.Duration `ini:"trunks::max_attack_duration"`
+
+	mtx sync.Mutex
 }
 
 func (env *Environment) init() (err error) {

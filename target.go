@@ -14,22 +14,24 @@ import (
 // Target contains group of HttpTarget that can be tested by Trunks.
 //
 type Target struct {
+	// HttpClient that can be used for running HttpTarget.
+	HttpClient *libhttp.Client `json:"-"`
+
+	Opts *AttackOptions
+	Vars KeyFormInput
+
 	ID   string
 	Name string
-	Hint string
 
 	// BaseUrl contains the target address that serve the service to
 	// be tested.
 	// This field is required.
 	BaseUrl string
 
-	Opts             *AttackOptions
-	Vars             KeyFormInput
+	Hint string
+
 	HttpTargets      []*HttpTarget
 	WebSocketTargets []*WebSocketTarget
-
-	// HttpClient that can be used for running HttpTarget.
-	HttpClient *libhttp.Client `json:"-"`
 }
 
 func (target *Target) init() (err error) {

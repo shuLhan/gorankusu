@@ -18,12 +18,14 @@ import (
 // WebSocket target.
 //
 type RunResponse struct {
-	DumpRequest        []byte
-	DumpResponse       []byte
-	ResponseStatus     string
+	ResponseStatus string
+	ResponseType   string
+
+	DumpRequest  []byte
+	DumpResponse []byte
+	ResponseBody []byte
+
 	ResponseStatusCode int
-	ResponseType       string
-	ResponseBody       []byte
 }
 
 //

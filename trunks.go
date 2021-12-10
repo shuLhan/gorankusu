@@ -47,13 +47,14 @@ const (
 //
 type Trunks struct {
 	Env   *Environment
-	Httpd *libhttp.Server   // The HTTP server.
-	Wsd   *websocket.Server // The WebSocket server.
+	Httpd *libhttp.Server
+	Wsd   *websocket.Server
 
-	targets []*Target
 	attackq chan *RunRequest
 	cancelq chan bool
 	errq    chan error
+
+	targets []*Target
 }
 
 //

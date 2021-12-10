@@ -16,11 +16,13 @@ import (
 // RunRequest define the request to run HTTP or WebSocket target.
 //
 type RunRequest struct {
-	Locker          sync.Mutex `json:"-"`
+	result *AttackResult
+
 	Target          Target
-	HttpTarget      HttpTarget
 	WebSocketTarget WebSocketTarget
-	result          *AttackResult
+	HttpTarget      HttpTarget
+
+	Locker sync.Mutex `json:"-"`
 }
 
 //

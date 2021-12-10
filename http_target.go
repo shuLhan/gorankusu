@@ -39,29 +39,28 @@ type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
 type HttpPreAttackHandler func(rr *RunRequest)
 
 type HttpTarget struct {
-	// Name of target, required.
-	Name string
-	Hint string // Description about what this HTTP target is doing.
+	Params        KeyFormInput
+	ConvertParams HttpConvertParams `json:"-"`
+
+	Headers KeyFormInput
+
+	Run       HttpRunHandler       `json:"-"`
+	PreAttack HttpPreAttackHandler `json:"-"`
+	Attack    HttpAttackHandler    `json:"-"`
 
 	// ID of target, optional.
 	// If its empty, it will generated using value from Name.
 	ID string
 
-	Method      libhttp.RequestMethod
-	Path        string
+	Name string // Name of target, required.
+	Hint string // Description about what this HTTP target is doing.
+	Path string
+
+	Results     []*AttackResult // Results contains list of load testing output.
 	RequestType libhttp.RequestType
-	Headers     KeyFormInput
-	Params      KeyFormInput
+	Method      libhttp.RequestMethod
 
-	Run           HttpRunHandler    `json:"-"`
-	ConvertParams HttpConvertParams `json:"-"`
-
-	Attack       HttpAttackHandler    `json:"-"`
-	PreAttack    HttpPreAttackHandler `json:"-"`
-	AttackLocker sync.Mutex           `json:"-"` // Use this inside the Attack to lock resource.
-
-	// Results contains list of load testing output.
-	Results []*AttackResult
+	AttackLocker sync.Mutex `json:"-"` // Use this inside the Attack to lock resource.
 
 	// AllowAttack if its true the "Attack" button will be showed on user
 	// interface and client will be allowed to run load testing on this
