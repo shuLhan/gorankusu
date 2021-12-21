@@ -8,6 +8,7 @@ import {
 import { Environment } from "./environment.js"
 import { Save } from "./functions.js"
 import {
+	CLASS_NAV_LINK,
 	CLASS_NAV_TARGET,
 	HASH_ENVIRONMENT,
 	AttackResult,
@@ -27,6 +28,7 @@ import { wui_notif } from "./vars.js"
 const API_ATTACK_HTTP = "/_trunks/api/attack/http"
 const API_ATTACK_RESULT = "/_trunks/api/attack/result"
 const API_ENVIRONMENT = "/_trunks/api/environment"
+const API_NAVLINKS = "/_trunks/api/navlinks"
 const API_TARGETS = "/_trunks/api/targets"
 
 const API_TARGET_RUN_HTTP = "/_trunks/api/target/run/http"
@@ -49,6 +51,7 @@ export class Trunks {
 	el_attack_cancel!: HTMLButtonElement
 	el_content!: HTMLElement
 	el_nav_content!: HTMLElement
+	el_nav_links!: HTMLElement
 	el_ws_conn_status!: HTMLElement
 
 	env: EnvironmentInterface = {
@@ -110,6 +113,7 @@ export class Trunks {
 		this.el_attack_running.classList.add(CLASS_ATTACK_RUNNING)
 
 		this.el_nav_content = document.createElement("div")
+		this.el_nav_links = document.createElement("div")
 
 		let el_nav_footer = document.createElement("div")
 		el_nav_footer.classList.add(CLASS_FOOTER)
@@ -128,6 +132,8 @@ export class Trunks {
 
 		el_nav.appendChild(this.com_env.el_nav)
 		el_nav.appendChild(this.el_nav_content)
+		el_nav.appendChild(document.createElement("hr"))
+		el_nav.appendChild(this.el_nav_links)
 		el_nav.appendChild(el_nav_footer)
 		this.el.appendChild(el_nav)
 	}
@@ -148,6 +154,7 @@ export class Trunks {
 	async Init() {
 		await this.apiEnvironmentGet()
 		await this.initTargets()
+		await this.initNavLinks()
 
 		this.windowOnHashChange()
 		window.onhashchange = () => {
@@ -173,6 +180,33 @@ export class Trunks {
 
 		this.setAttackRunning(this.env.AttackRunning)
 		this.com_env.Set(this.env)
+	}
+
+	async initNavLinks() {
+		let http_res = await fetch(API_NAVLINKS)
+		let res = await http_res.json()
+		if (res.code != 200) {
+			wui_notif.Error(res.message)
+			return
+		}
+
+		let hdr = document.createElement("h3")
+		hdr.textContent = "Links"
+		this.el_nav_links.appendChild(hdr)
+
+		let navLinks = res.data
+		for (let nav of navLinks) {
+			let com_nav = document.createElement("a")
+			com_nav.href = nav.Href
+			com_nav.textContent = nav.Text
+			com_nav.target = "_blank"
+
+			let div = document.createElement("div")
+			div.classList.add(CLASS_NAV_LINK)
+			div.appendChild(com_nav)
+			this.el_nav_links.appendChild(div)
+		}
+
 	}
 
 	async initTargets() {

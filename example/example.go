@@ -95,6 +95,11 @@ func New() (ex *Example, err error) {
 		return nil, fmt.Errorf("example: New: %w", err)
 	}
 
+	err = ex.registerNavLinks()
+	if err != nil {
+		return nil, fmt.Errorf("example: New: %w", err)
+	}
+
 	return ex, nil
 }
 
@@ -322,6 +327,20 @@ func (ex *Example) registerTargets() (err error) {
 	err = ex.trunks.RegisterTarget(targetWebSocket)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (ex *Example) registerNavLinks() (err error) {
+	logp := "registerNavLinks"
+
+	err = ex.trunks.RegisterNavLink(&trunks.NavLink{
+		Text: "Trunks",
+		Href: "https://git.sr.ht/~shulhan/trunks",
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
 	}
 
 	return nil

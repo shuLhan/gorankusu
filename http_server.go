@@ -35,6 +35,13 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
+	apiNavLinks = &libhttp.Endpoint{
+		Method:       libhttp.RequestMethodGet,
+		Path:         "/_trunks/api/navlinks",
+		RequestType:  libhttp.RequestTypeNone,
+		ResponseType: libhttp.ResponseTypeJSON,
+	}
+
 	apiTargetRunHttp = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         "/_trunks/api/target/run/http",
@@ -59,14 +66,23 @@ var (
 func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 	logp := "initHttpServer"
 
-	httpdOpts := &libhttp.ServerOptions{
-		Options: memfs.Options{
+	if memfsWWW == nil {
+		mfsOptions := memfs.Options{
 			Root: "_www",
 			Includes: []string{
 				`.*\.(js|html|ico|png)$`,
 			},
-			Development: isDevelopment,
-		},
+			Development: true,
+		}
+		memfsWWW, err = memfs.New(&mfsOptions)
+		if err != nil {
+			return fmt.Errorf("%s: %w", logp, err)
+		}
+	} else {
+		memfsWWW.Opts.Development = isDevelopment
+	}
+
+	httpdOpts := &libhttp.ServerOptions{
 		Memfs:   memfsWWW,
 		Address: trunks.Env.ListenAddress,
 	}
@@ -89,6 +105,12 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 	}
 	apiAttackResultGet.Call = trunks.apiAttackResultGet
 	err = trunks.Httpd.RegisterEndpoint(apiAttackResultGet)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	apiNavLinks.Call = trunks.apiNavLinks
+	err = trunks.Httpd.RegisterEndpoint(apiNavLinks)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -165,6 +187,13 @@ func (trunks *Trunks) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody 
 	res.Name = "OK_TARGET_ATTACK_RESULT_GET"
 	res.Data = result
 
+	return json.Marshal(&res)
+}
+
+func (trunks *Trunks) apiNavLinks(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	res := libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Data = trunks.navLinks
 	return json.Marshal(&res)
 }
 

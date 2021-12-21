@@ -54,7 +54,8 @@ type Trunks struct {
 	cancelq chan bool
 	errq    chan error
 
-	targets []*Target
+	targets  []*Target
+	navLinks []*NavLink
 }
 
 //
@@ -149,6 +150,24 @@ func (trunks *Trunks) AttackHttpCancel() (rr *RunRequest, err error) {
 	trunks.cancelq <- true
 
 	return rr, nil
+}
+
+//
+// RegisterNavLink register custom navigation link.
+//
+func (trunks *Trunks) RegisterNavLink(nav *NavLink) (err error) {
+	if nav == nil {
+		return
+	}
+
+	err = nav.init()
+	if err != nil {
+		return fmt.Errorf("RegisterNavLink: %w", err)
+	}
+
+	trunks.navLinks = append(trunks.navLinks, nav)
+
+	return nil
 }
 
 func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
