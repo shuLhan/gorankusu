@@ -336,7 +336,16 @@ func (ex *Example) registerNavLinks() (err error) {
 	logp := "registerNavLinks"
 
 	err = ex.trunks.RegisterNavLink(&trunks.NavLink{
-		Text: "Trunks",
+		Text:         "Link in IFrame",
+		Href:         "https://git.sr.ht/~shulhan/trunks",
+		OpenInIFrame: true,
+	})
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	err = ex.trunks.RegisterNavLink(&trunks.NavLink{
+		Text: "Link in new window",
 		Href: "https://git.sr.ht/~shulhan/trunks",
 	})
 	if err != nil {

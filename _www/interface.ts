@@ -4,6 +4,7 @@ export const CLASS_NAV_LINK = "nav_link"
 export const CLASS_NAV_TARGET = "nav_target"
 
 export const HASH_ENVIRONMENT = "environment"
+export const HASH_LINKS = "links"
 
 export const FormInputKindNumber = "number"
 export const FormInputKindString = "string"
@@ -73,6 +74,13 @@ export interface MapNumberString {
 	[key: number]: string
 }
 
+export interface NavLinkInterface {
+	ID: string
+	Text: string
+	Href: string
+	OpenInIFrame: boolean
+}
+
 export interface RunRequestInterface {
 	Target: TargetInterface
 	HttpTarget: HttpTargetInterface | null
@@ -114,10 +122,11 @@ export interface TrunksInterface {
 		target: TargetInterface,
 		http_target: HttpTargetInterface | null,
 		ws_target: WebSocketTargetInterface | null,
+		nav_link: NavLinkInterface | null,
 		el: HTMLElement,
 	): void
 
-	SetContent(path: string, el: HTMLElement): void
+	SetContent(path: string, el: HTMLElement | null): void
 
 	RunHttp(
 		target: TargetInterface,

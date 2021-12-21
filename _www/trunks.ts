@@ -17,11 +17,13 @@ import {
 	HttpTargetInterface,
 	MapIdTarget,
 	MapNumberString,
+	NavLinkInterface,
 	RunRequestInterface,
 	RunResponseInterface,
 	TargetInterface,
 	WebSocketTargetInterface,
 } from "./interface.js"
+import { NavLinks } from "./nav_links.js"
 import { Target } from "./target.js"
 import { wui_notif } from "./vars.js"
 
@@ -43,6 +45,10 @@ const WSC_RECONNECT_INTERVAL = 5000
 
 interface MapIDTarget {
 	[key: string]: Target
+}
+
+interface MapIDNavLink {
+	[key: string]: NavLinkInterface
 }
 
 export class Trunks {
@@ -68,7 +74,9 @@ export class Trunks {
 	wsc: WuiWebSocketClient | null = null
 
 	com_env!: Environment
+	com_nav_links!: NavLinks
 	targets: MapIDTarget = {}
+	navLinks: MapIDNavLink = {}
 
 	constructor() {
 		this.el = document.createElement("div")
@@ -190,23 +198,12 @@ export class Trunks {
 			return
 		}
 
-		let hdr = document.createElement("h3")
-		hdr.textContent = "Links"
-		this.el_nav_links.appendChild(hdr)
+		this.com_nav_links = new NavLinks(this, res.data)
+		this.el_nav_links.appendChild(this.com_nav_links.el_nav)
 
-		let navLinks = res.data
-		for (let nav of navLinks) {
-			let com_nav = document.createElement("a")
-			com_nav.href = nav.Href
-			com_nav.textContent = nav.Text
-			com_nav.target = "_blank"
-
-			let div = document.createElement("div")
-			div.classList.add(CLASS_NAV_LINK)
-			div.appendChild(com_nav)
-			this.el_nav_links.appendChild(div)
+		for (let nav of res.data) {
+			this.navLinks[nav.ID] = nav
 		}
-
 	}
 
 	async initTargets() {
@@ -266,19 +263,22 @@ export class Trunks {
 			return
 		}
 
+		console.log("paths: ", paths)
+
 		let el: HTMLElement | null
 		let target = this.targets[paths[1]]
 		switch (paths.length) {
 			case 2:
 			case 3:
-				if (!target) {
-					return
-				}
-				this.el_content.innerHTML = ""
-				this.el_content.appendChild(target.el_content)
-				el = document.getElementById(paths[1])
-				if (el) {
-					el.scrollIntoView()
+				if (target) {
+					this.el_content.innerHTML = ""
+					this.el_content.appendChild(
+						target.el_content,
+					)
+					el = document.getElementById(paths[1])
+					if (el) {
+						el.scrollIntoView()
+					}
 				}
 				break
 
@@ -293,6 +293,10 @@ export class Trunks {
 					this.el_content.appendChild(
 						target.el_content,
 					)
+				} else if (paths[2] === "link") {
+					let nav = this.navLinks[paths[3]]
+					this.el_content.innerHTML = ""
+					this.com_nav_links.open(nav)
 				}
 				el = document.getElementById(paths[3])
 				if (el) {
@@ -448,6 +452,7 @@ export class Trunks {
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
 		ws_target: WebSocketTargetInterface,
+		nav_link: NavLinkInterface,
 		el: HTMLElement,
 	): void {
 		let hash = "#/" + target.ID
@@ -455,6 +460,8 @@ export class Trunks {
 			hash += "/http/" + http_target.ID
 		} else if (ws_target) {
 			hash += "/ws/" + ws_target.ID
+		} else if (nav_link) {
+			hash += "/link/" + nav_link.ID
 		}
 		window.location.hash = hash
 
@@ -548,9 +555,12 @@ export class Trunks {
 		return json_res
 	}
 
-	SetContent(path: string, el: HTMLElement): void {
+	SetContent(path: string, el: HTMLElement | null): void {
 		this.el_content.innerHTML = ""
-		this.el_content.appendChild(el)
+
+		if (el) {
+			this.el_content.appendChild(el)
+		}
 
 		window.location.hash = "#/" + path
 	}
