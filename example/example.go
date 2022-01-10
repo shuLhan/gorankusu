@@ -399,7 +399,11 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) ([]byte, error)
 
 func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
 	if req.Target.HttpClient == nil {
-		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
+		httpcOpts := &libhttp.ClientOptions{
+			ServerUrl:     req.Target.BaseUrl,
+			AllowInsecure: true,
+		}
+		req.Target.HttpClient = libhttp.NewClient(httpcOpts)
 	}
 
 	res = &trunks.RunResponse{}
@@ -486,7 +490,11 @@ func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 
 func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
 	if req.Target.HttpClient == nil {
-		req.Target.HttpClient = libhttp.NewClient(req.Target.BaseUrl, nil, true)
+		httpcOpts := &libhttp.ClientOptions{
+			ServerUrl:     req.Target.BaseUrl,
+			AllowInsecure: true,
+		}
+		req.Target.HttpClient = libhttp.NewClient(httpcOpts)
 	}
 
 	res = &trunks.RunResponse{}

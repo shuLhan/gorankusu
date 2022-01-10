@@ -348,10 +348,16 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *Htt
 func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error) {
 	var (
 		logp    = "runHttpTarget"
-		httpc   = libhttp.NewClient(rr.Target.BaseUrl, nil, true)
 		headers = rr.HttpTarget.Headers.ToHttpHeader()
 		params  interface{}
 	)
+
+	httpcOpts := &libhttp.ClientOptions{
+		ServerUrl:     rr.Target.BaseUrl,
+		AllowInsecure: true,
+	}
+
+	httpc := libhttp.NewClient(httpcOpts)
 
 	switch rr.HttpTarget.RequestType {
 	case libhttp.RequestTypeJSON:

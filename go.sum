@@ -1,7 +1,7 @@
 git.sr.ht/~shulhan/asciidoctor-go v0.1.1 h1:Qxc1t07JGHvL0jHGdDTzaS4CCF9M/7ssmkGE9pONEQs=
 git.sr.ht/~shulhan/asciidoctor-go v0.1.1/go.mod h1:fKngGZlw91mhM+ASRjw1h9bsN4YqM9eDiwfo9uv/mrk=
-git.sr.ht/~shulhan/ciigo v0.7.1-0.20211220103326-55bbd8309fd7 h1:JSRCpVa/C53m035g1QKN4asjiCsi16EnkcBVHMGQiIA=
-git.sr.ht/~shulhan/ciigo v0.7.1-0.20211220103326-55bbd8309fd7/go.mod h1:r1NZSMDT1gI3LZ+eTzItr/OieJnjzQMNZS2IDIJbPxA=
+git.sr.ht/~shulhan/ciigo v0.7.1 h1:s3mhrJtCU50/EXP5513X6YJoJ1Q5ORmpjZQ65iBXUyM=
+git.sr.ht/~shulhan/ciigo v0.7.1/go.mod h1:jVzpgL6cejf5x4NEaZG0iP9Y3lI17DbduIL6EZWPBoM=
 github.com/alecthomas/jsonschema v0.0.0-20180308105923-f2c93856175a/go.mod h1:qpebaTNSsyUn5rPSJMsfqEtDw71TTggXM6stUDI16HA=
 github.com/bmizerany/perks v0.0.0-20141205001514-d9a9656a3a4b h1:AP/Y7sqYicnjGDfD5VcY4CIfh1hRXBUavxrvELjTiOE=
 github.com/bmizerany/perks v0.0.0-20141205001514-d9a9656a3a4b/go.mod h1:ac9efd0D1fsDb3EJvhqgXRbFx7bs2wqZ10HQPeU8U/Q=
@@ -31,8 +31,8 @@ github.com/mailru/easyjson v0.7.7 h1:UGYAvKxe3sBsEDzO8ZeWOSlIQfWFlxbzLZe7hwFURr0
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
 github.com/miekg/dns v1.1.17/go.mod h1:WgzbA6oji13JREwiNsRDNfl7jYdPnmz+VEuLrA+/48M=
 github.com/shuLhan/share v0.32.0/go.mod h1:1E7VQSKC7cbCmAi6izvm2S8jH5Z98a9SSS2IlvmNs/Y=
-github.com/shuLhan/share v0.32.1-0.20211220053556-5748b1b96617 h1:XEBBHp5fzgr1XBJLuCb5Rw8wUmIewpvfVEI+G1wDkzg=
-github.com/shuLhan/share v0.32.1-0.20211220053556-5748b1b96617/go.mod h1:6YvVpuViRgLm4e+8AIh1izGaWgV5lyuj53H19GKCZzI=
+github.com/shuLhan/share v0.33.0 h1:fM/yLmAzqMECP3Gp1lFH/l4zH1UZVCvgn8BLuPI2Dnc=
+github.com/shuLhan/share v0.33.0/go.mod h1:6YvVpuViRgLm4e+8AIh1izGaWgV5lyuj53H19GKCZzI=
 github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25 h1:7z3LSn867ex6VSaahyKadf4WtSsJIgne6A1WLOAGM8A=
 github.com/streadway/quantile v0.0.0-20150917103942-b0c588724d25/go.mod h1:lbP8tGiBjZ5YWIc2fzuRpTaz0b/53vT6PEs3QuAWzuU=
 github.com/tsenart/go-tsz v0.0.0-20180814232043-cdeb9e1e981e/go.mod h1:SWZznP1z5Ki7hDT2ioqiFKEse8K9tU2OUvaRI0NeGQo=
