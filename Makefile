@@ -6,7 +6,7 @@
 
 all:
 	go run ./internal/cmd/trunks build
-	go test -v -race ./...
+	CGO_ENABLED=1 go test -v -race ./...
 
 dev:
 	go run ./internal/cmd/trunks
