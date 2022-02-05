@@ -1,0 +1,14 @@
+= trunks CHANGELOG
+Shulhan <ms@kilabit.info>
+:toc:
+:sectanchors:
+:sectlinks:
+
+== trunks v0.1.0 (2022-02-05)
+
+Module trunks is a library and HTTP service that provide web user interface
+to test HTTP service, similar to Postman, and for load testing.
+
+For the load testing we use vegeta [1] as the backend.
+
+[1] https://github.com/tsenart/vegeta

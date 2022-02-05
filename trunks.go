@@ -20,6 +20,8 @@ import (
 )
 
 const (
+	Version = "0.1.0"
+
 	DefaultAttackDuration      = 10 * time.Second
 	DefaultAttackRatePerSecond = 500
 	DefaultAttackTimeout       = 30 * time.Second
