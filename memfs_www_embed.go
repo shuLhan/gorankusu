@@ -526,6 +526,7 @@ func init() {
 				`/wui\.local`,
 			},
 			Embed: memfs.EmbedOptions{
+				CommentHeader:  ``,
 				PackageName:    "trunks",
 				VarName:        "memfsWWW",
 				GoFileName:     "memfs_www_embed.go",
