@@ -1,6 +1,5 @@
-// Copyright 2021, Shulhan <ms@kilabit.info>. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 //
 // Program trunks provide an example how to use the Trunks module.
@@ -100,6 +99,9 @@ func workerBuild(oneTime bool) {
 			`/wui\.local`,
 		},
 		Embed: memfs.EmbedOptions{
+			CommentHeader: `// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: GPL-3.0-or-later
+`,
 			PackageName: "trunks",
 			VarName:     "memfsWWW",
 			GoFileName:  "memfs_www_embed.go",
