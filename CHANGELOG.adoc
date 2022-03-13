@@ -6,6 +6,13 @@ Shulhan <ms@kilabit.info>
 :sectanchors:
 :sectlinks:
 
+== trunks v0.2.0 (2022-03-13)
+
+Release trunks under GPL 3.0 or later license.
+
+See https://kilabit.info/journal/2022/gpl for more information.
+
+
 == trunks v0.1.0 (2022-02-05)
 
 Module trunks is a library and HTTP service that provide web user interface
