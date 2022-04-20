@@ -86,7 +86,6 @@ export class Trunks {
 
 		this.wsc_opts = {
 			address: "",
-			insecure: true,
 			auto_reconnect: true,
 			auto_reconnect_interval: WSC_RECONNECT_INTERVAL,
 			onBroadcast: (res: WuiWebSocketResponse) => {
@@ -172,8 +171,15 @@ export class Trunks {
 			this.windowOnHashChange()
 		}
 
+		let scheme = "ws://"
+		let url: URL = new URL(window.location.href)
+		if (url.protocol === "https:") {
+			scheme = "wss://"
+		}
+
 		this.wsc_opts.address =
-			window.location.hostname +
+			scheme +
+			url.hostname +
 			":" +
 			this.env.WebSocketListenPort
 		this.wsc = new WuiWebSocketClient(this.wsc_opts)
