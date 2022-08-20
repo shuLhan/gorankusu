@@ -9,9 +9,7 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-//
 // Target contains group of HttpTarget that can be tested by Trunks.
-//
 type Target struct {
 	// HttpClient that can be used for running HttpTarget.
 	HttpClient *libhttp.Client `json:"-"`

@@ -11,9 +11,7 @@ import (
 	"time"
 )
 
-//
 // Environment contains global configuration for load testing.
-//
 type Environment struct {
 	// AttackRunning will be set to non-nil if there is a load
 	// testing currently running.

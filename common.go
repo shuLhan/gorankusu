@@ -8,9 +8,7 @@ import (
 	"unicode"
 )
 
-//
 // generateID replace non-letter and non-number from input string with '_'.
-//
 func generateID(in string) (out string) {
 	var r []rune = make([]rune, 0, len(in))
 	in = strings.ToLower(in)

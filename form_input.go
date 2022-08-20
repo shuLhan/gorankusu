@@ -10,7 +10,6 @@ const (
 	FormInputKindString = "string"
 )
 
-//
 // FormInput provide the information to create an input component.
 //
 // The Label field define the input text, the Hint field provide a
@@ -20,7 +19,6 @@ const (
 //
 // The Max and Min fields is optional, it only affect if the Kind is
 // FormInputKindNumber.
-//
 type FormInput struct {
 	Label string        `json:"label"`
 	Hint  string        `json:"hint"`

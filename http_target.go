@@ -15,22 +15,16 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
-//
 // HttpConvertParams is a handler that will be called inside the Run handler
 // to convert the Params values to type that will be send as request.
-//
 type HttpConvertParams func(target *HttpTarget) (interface{}, error)
 
-//
 // HttpRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
-//
 type HttpRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
 
-//
 // HttpAttackHandler define the function type that will be called when client
 // send request to attack HTTP target.
-//
 type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
 
 // HttpPreAttackHandler define the function type that will be called before

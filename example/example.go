@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-//
 // Package example provide an example how to use the Trunks library from
 // setting it up to creating targets.
 //
@@ -10,7 +9,6 @@
 //	$ go run ./internal/cmd/trunks
 //
 // It will run a web user interface at http://127.0.0.1:8217 .
-//
 package example
 
 import (
@@ -59,9 +57,7 @@ type Example struct {
 	targetExamplePostForm vegeta.Target
 }
 
-//
 // New create, initialize, and setup an example service.
-//
 func New() (ex *Example, err error) {
 	env := &trunks.Environment{
 		ResultsDir:    "example/testdata/",
@@ -122,9 +118,7 @@ func (ex *Example) Stop() {
 	ex.trunks.Stop()
 }
 
-//
 // registerEndpoints register HTTP endpoints for testing.
-//
 func (ex *Example) registerEndpoints() (err error) {
 	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,

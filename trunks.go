@@ -42,10 +42,8 @@ const (
 	apiAttackResult = "/_trunks/api/attack/result"
 )
 
-//
 // Trunks is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
-//
 type Trunks struct {
 	Env   *Environment
 	Httpd *libhttp.Server
@@ -59,9 +57,7 @@ type Trunks struct {
 	navLinks []*NavLink
 }
 
-//
 // New create and initialize new Trunks service.
-//
 func New(env *Environment) (trunks *Trunks, err error) {
 	var (
 		logp          = "trunks.New"
@@ -92,9 +88,7 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	return trunks, nil
 }
 
-//
 // AttackHttp start attacking the HTTP target defined in req.
-//
 func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 	logp := "AttackHttp"
 
@@ -133,10 +127,8 @@ func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 	return nil
 }
 
-//
 // AttackHttpCancel cancel any running attack.
 // It will return an error if no attack is running.
-//
 func (trunks *Trunks) AttackHttpCancel() (rr *RunRequest, err error) {
 	rr = trunks.Env.getRunningAttack()
 	if rr == nil {
@@ -153,9 +145,7 @@ func (trunks *Trunks) AttackHttpCancel() (rr *RunRequest, err error) {
 	return rr, nil
 }
 
-//
 // RegisterNavLink register custom navigation link.
-//
 func (trunks *Trunks) RegisterNavLink(nav *NavLink) (err error) {
 	if nav == nil {
 		return
@@ -186,10 +176,8 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 	return nil
 }
 
-//
 // RunHttp send the HTTP request to the HTTP target defined in RunRequest with
 // optional Headers and Parameters.
-//
 func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 	origTarget := trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
@@ -215,10 +203,8 @@ func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 	return res, nil
 }
 
-//
 // Start the Trunks HTTP server that provide user interface for running and
 // load testing registered Targets.
-//
 func (trunks *Trunks) Start() (err error) {
 	mlog.Outf("trunks: scanning previous attack results...\n")
 	trunks.scanResultsDir()
@@ -246,9 +232,7 @@ func (trunks *Trunks) Start() (err error) {
 	return err
 }
 
-//
 // Stop the Trunks HTTP server.
-//
 func (trunks *Trunks) Stop() {
 	logp := "trunks.Stop"
 	mlog.Outf("=== Stopping the Trunks service ...\n")
@@ -400,13 +384,11 @@ func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error
 	return res, nil
 }
 
-//
 // scanResultsDir scan the environment's ResultsDir for the past attack
 // results and add it to each target based on ID on file name.
 //
 // Due to size of file can be big (maybe more than 5000 records), this
 // function only parse the file name and append it to Results field.
-//
 func (trunks *Trunks) scanResultsDir() {
 	logp := "scanResultsDir"
 

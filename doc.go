@@ -7,17 +7,16 @@ to test HTTP service, similar to Postman, and for load testing.
 
 For the load testing we use vegeta [1] as the backend.
 
-Usage
+# Usage
 
 See the example package on how to programmatically use and create service
 using this module, or
 
-	* clone this repository,
-	* execute `make run`, and
-	* open http://127.0.0.1:8217.
+  - clone this repository,
+  - execute `make run`, and
+  - open http://127.0.0.1:8217.
 
-
-Screen shots
+# Screen shots
 
 The following screenshot display the main interface to Run or Attack the
 registered HTTP service,
@@ -29,15 +28,13 @@ metrics and vegeta histogram,
 
 https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_attack_result.png
 
-
-Web user interface
+# Web user interface
 
 By default, the Trunks user interface can be viewed by opening in browser at
 http://127.0.0.1:8217.
 One can change address through Environment's ListenAddress.
 
-
-File name format
+# File name format
 
 Each attack result is saved in Environment's ResultsDir with the following
 file name format,
@@ -50,17 +47,14 @@ The "DateTime" is in the following layout,
 
 The "ResultsSuffix" is the one that defined in Environment.
 
-
-License
+# License
 
 Copyright 2021, Shulhan <ms@kilabit.info>.
 All rights reserved.
 Use of this source code is governed by a BSD-style license that can be found in the LICENSE file.
 
-
-References
+# References
 
 [1] https://github.com/tsenart/vegeta
-
 */
 package trunks

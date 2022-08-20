@@ -11,9 +11,7 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
-//
 // RunRequest define the request to run HTTP or WebSocket target.
-//
 type RunRequest struct {
 	result *AttackResult
 
@@ -24,10 +22,8 @@ type RunRequest struct {
 	Locker sync.Mutex `json:"-"`
 }
 
-//
 // generateRunRequest merge the run request with original target and HTTP
 // target into new RunRequest.
-//
 func generateRunRequest(
 	env *Environment,
 	req *RunRequest,
@@ -65,10 +61,8 @@ func generateRunRequest(
 	return outrr
 }
 
-//
 // generateWebSocketTarget merge the run request with original target and
 // WebSocket target into new RunRequest
-//
 func generateWebSocketTarget(
 	env *Environment,
 	req *RunRequest,
