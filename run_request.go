@@ -5,7 +5,6 @@ package trunks
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	vegeta "github.com/tsenart/vegeta/v12/lib"
@@ -18,8 +17,6 @@ type RunRequest struct {
 	Target          Target
 	WebSocketTarget WebSocketTarget
 	HttpTarget      HttpTarget
-
-	Locker sync.Mutex `json:"-"`
 }
 
 // generateRunRequest merge the run request with original target and HTTP
