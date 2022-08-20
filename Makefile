@@ -6,6 +6,7 @@
 all:
 	go run ./internal/cmd/trunks build
 	CGO_ENABLED=1 go test -v -race ./...
+	-golangci-lint run ./...
 
 dev:
 	go run ./internal/cmd/trunks

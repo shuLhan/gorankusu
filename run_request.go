@@ -50,9 +50,10 @@ func generateRunRequest(
 	}
 
 	outrr = &RunRequest{
-		Target:     *origTarget,
-		HttpTarget: *origHttpTarget,
+		Target: *origTarget,
 	}
+
+	outrr.HttpTarget.clone(origHttpTarget)
 
 	outrr.Target.Vars = req.Target.Vars
 	outrr.HttpTarget.Headers = req.HttpTarget.Headers
@@ -95,5 +96,5 @@ func generateWebSocketTarget(
 }
 
 func (rr *RunRequest) String() string {
-	return fmt.Sprintf("Target:%v HttpTarget:%v\n", rr.Target, rr.HttpTarget)
+	return fmt.Sprintf("Target:%v HttpTarget:%s\n", rr.Target, rr.HttpTarget.String())
 }

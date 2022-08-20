@@ -17,7 +17,7 @@ type KeyFormInput map[string]FormInput
 // ToHttpHeader convert the KeyFormInputs to the standard http.Header.
 func (kfi KeyFormInput) ToHttpHeader() (headers http.Header) {
 	headers = http.Header{}
-	if kfi == nil || len(kfi) == 0 {
+	if len(kfi) == 0 {
 		return headers
 	}
 	for k, fi := range kfi {
@@ -44,7 +44,7 @@ func (kfi KeyFormInput) ToJsonObject() (data map[string]interface{}) {
 // bytes.
 func (kfi KeyFormInput) ToMultipartFormData() (data map[string][]byte) {
 	data = make(map[string][]byte, len(kfi))
-	if kfi == nil || len(kfi) == 0 {
+	if len(kfi) == 0 {
 		return data
 	}
 	for k, fi := range kfi {
@@ -56,7 +56,7 @@ func (kfi KeyFormInput) ToMultipartFormData() (data map[string][]byte) {
 // ToUrlValues convert the KeyFormInput to the standard url.Values.
 func (kfi KeyFormInput) ToUrlValues() (vals url.Values) {
 	vals = url.Values{}
-	if kfi == nil || len(kfi) == 0 {
+	if len(kfi) == 0 {
 		return vals
 	}
 	for k, fi := range kfi {

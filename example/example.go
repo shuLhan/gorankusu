@@ -374,8 +374,11 @@ func (ex *Example) pathExampleErrorGet(epr *libhttp.EndpointRequest) ([]byte, er
 	return nil, liberrors.Internal(fmt.Errorf("server error"))
 }
 
-func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) ([]byte, error) {
-	epr.HttpRequest.ParseMultipartForm(0)
+func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, err error) {
+	err = epr.HttpRequest.ParseMultipartForm(0)
+	if err != nil {
+		return nil, err
+	}
 
 	data := &requestResponse{
 		Method:        epr.HttpRequest.Method,
@@ -469,18 +472,18 @@ func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 
 func (ex *Example) attackExampleErrorGet(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.AttackLocker.Lock()
+		rr.HttpTarget.Lock()
 		*tgt = ex.targetExampleErrorGet
-		rr.HttpTarget.AttackLocker.Unlock()
+		rr.HttpTarget.Unlock()
 		return nil
 	}
 }
 
 func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.AttackLocker.Lock()
+		rr.HttpTarget.Lock()
 		*tgt = ex.targetExampleGet
-		rr.HttpTarget.AttackLocker.Unlock()
+		rr.HttpTarget.Unlock()
 		return nil
 	}
 }
@@ -545,9 +548,9 @@ func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
 
 func (ex *Example) attackExamplePostForm(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.AttackLocker.Lock()
+		rr.HttpTarget.Lock()
 		*tgt = ex.targetExamplePostForm
-		rr.HttpTarget.AttackLocker.Unlock()
+		rr.HttpTarget.Unlock()
 		return nil
 	}
 }

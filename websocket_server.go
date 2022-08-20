@@ -53,16 +53,23 @@ func (trunks *Trunks) initWebSocketServer() (err error) {
 
 	trunks.Wsd = websocket.NewServer(opts)
 
-	trunks.Wsd.RegisterTextHandler(
+	err = trunks.Wsd.RegisterTextHandler(
 		"POST",
 		apiAttackHttp,
 		trunks.handleWsAttackHttp,
 	)
-	trunks.Wsd.RegisterTextHandler(
+	if err != nil {
+		return err
+	}
+
+	err = trunks.Wsd.RegisterTextHandler(
 		"DELETE",
 		apiAttackHttp,
 		trunks.handleWsAttackHttpCancel,
 	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 
 	libhttp "github.com/shuLhan/share/lib/http"
@@ -53,7 +54,7 @@ type HttpTarget struct {
 	RequestType libhttp.RequestType
 	Method      libhttp.RequestMethod
 
-	AttackLocker sync.Mutex `json:"-"` // Use this inside the Attack to lock resource.
+	sync.Mutex `json:"-"` // Use this inside the Attack to lock resource.
 
 	// AllowAttack if its true the "Attack" button will be showed on user
 	// interface and client will be allowed to run load testing on this
@@ -63,6 +64,26 @@ type HttpTarget struct {
 	// IsCustomizable allow client to modify the Method, Path, and
 	// RequestType.
 	IsCustomizable bool
+}
+
+// clone the source HttpTarget.
+// This method is provided to prevent the sync.Mutex being copied.
+func (ht *HttpTarget) clone(src *HttpTarget) {
+	ht.Params = src.Params
+	ht.ConvertParams = src.ConvertParams
+	ht.Headers = src.Headers
+	ht.Run = src.Run
+	ht.PreAttack = src.PreAttack
+	ht.Attack = src.Attack
+	ht.ID = src.ID
+	ht.Name = src.Name
+	ht.Hint = src.Hint
+	ht.Path = src.Path
+	ht.Results = src.Results
+	ht.RequestType = src.RequestType
+	ht.Method = src.Method
+	ht.AllowAttack = src.AllowAttack
+	ht.IsCustomizable = src.IsCustomizable
 }
 
 func (ht *HttpTarget) init() (err error) {
@@ -131,4 +152,17 @@ func (ht *HttpTarget) sortResults() {
 	sort.Slice(ht.Results, func(x, y int) bool {
 		return ht.Results[x].Name > ht.Results[y].Name
 	})
+}
+
+func (ht *HttpTarget) String() string {
+	var sb strings.Builder
+
+	fmt.Fprintf(&sb, `ID:%s Name:%s Hint:%s Path:%s `+
+		`Params:%v ConvertParams:%v Headers:%v `+
+		`AllowAttack:%t IsCustomizable:%t`,
+		ht.ID, ht.Name, ht.Hint, ht.Path,
+		ht.Params, ht.ConvertParams, ht.Headers,
+		ht.AllowAttack, ht.IsCustomizable)
+
+	return sb.String()
 }
