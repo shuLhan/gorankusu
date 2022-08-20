@@ -71,14 +71,14 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 			Includes: []string{
 				`.*\.(js|html|ico|png)$`,
 			},
-			Development: true,
+			TryDirect: true,
 		}
 		memfsWWW, err = memfs.New(&mfsOptions)
 		if err != nil {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 	} else {
-		memfsWWW.Opts.Development = isDevelopment
+		memfsWWW.Opts.TryDirect = isDevelopment
 	}
 
 	httpdOpts := &libhttp.ServerOptions{
@@ -134,9 +134,7 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 	return nil
 }
 
-//
 // apiEnvironmentGet get the Trunks environment including its state.
-//
 func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK

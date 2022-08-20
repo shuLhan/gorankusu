@@ -5,17 +5,15 @@ package trunks
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httputil"
 
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-//
 // RunResponse contains the raw request and response when running HTTP or
 // WebSocket target.
-//
 type RunResponse struct {
 	ResponseStatus string
 	ResponseType   string
@@ -27,10 +25,8 @@ type RunResponse struct {
 	ResponseStatusCode int
 }
 
-//
 // SetHttpResponse dump the HTTP request including body into the DumpRequest
 // field.
-//
 func (rres *RunResponse) SetHttpRequest(req *http.Request) (err error) {
 	rres.DumpRequest, err = httputil.DumpRequest(req, true)
 	if err != nil {
@@ -39,10 +35,8 @@ func (rres *RunResponse) SetHttpRequest(req *http.Request) (err error) {
 	return nil
 }
 
-//
 // SetHttpResponse dump the HTTP response including body into the DumpResponse
 // field.
-//
 func (rres *RunResponse) SetHttpResponse(res *http.Response) (err error) {
 	logp := "SetHttpResponse"
 
@@ -56,7 +50,7 @@ func (rres *RunResponse) SetHttpResponse(res *http.Response) (err error) {
 
 	rres.ResponseType = res.Header.Get(libhttp.HeaderContentType)
 
-	rres.ResponseBody, err = ioutil.ReadAll(res.Body)
+	rres.ResponseBody, err = io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}

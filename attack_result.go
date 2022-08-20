@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -25,9 +24,7 @@ const (
 	outputSuffixDate = "20060102_150405"
 )
 
-//
 // AttackResult represent the output from load testing.
-//
 type AttackResult struct {
 	fout    *os.File
 	encoder vegeta.Encoder
@@ -45,9 +42,7 @@ type AttackResult struct {
 	mtx sync.Mutex
 }
 
-//
 // newAttackResult create new load testing result from request.
-//
 func newAttackResult(env *Environment, rr *RunRequest) (
 	ar *AttackResult, err error,
 ) {
@@ -164,7 +159,7 @@ func (ar *AttackResult) load() (err error) {
 		return nil
 	}
 
-	result, err := ioutil.ReadFile(ar.fullpath)
+	result, err := os.ReadFile(ar.fullpath)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-//
 // Program trunks provide an example how to use the Trunks module.
-//
 package main
 
 import (
@@ -14,7 +12,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/shuLhan/share/lib/io"
 	"github.com/shuLhan/share/lib/memfs"
 	"github.com/shuLhan/share/lib/mlog"
 	"github.com/shuLhan/share/lib/os/exec"
@@ -64,7 +61,6 @@ func main() {
 	}
 }
 
-//
 // workerBuild watch update on .ts and .js files inside _www directory.
 //
 // Every 5 seconds, it will recompile TypeScript to JavaScript, by running
@@ -74,13 +70,11 @@ func main() {
 //
 // If oneTime parameter is true, it will recompile the .ts and embed the .js
 // files only, without watching updates.
-//
 func workerBuild(oneTime bool) {
 	var (
 		logp       = "workerBuild"
 		tsCount    = 0
 		embedCount = 0
-		changeq    = make(chan *io.NodeState, 64)
 	)
 
 	mfsOpts := &memfs.Options{
@@ -125,7 +119,7 @@ func workerBuild(oneTime bool) {
 		return
 	}
 
-	dirWatchWww := io.DirWatcher{
+	dirWatchWww := memfs.DirWatcher{
 		Options: memfs.Options{
 			Root: "_www",
 			Includes: []string{
@@ -144,9 +138,6 @@ func workerBuild(oneTime bool) {
 				`docs`,
 			},
 		},
-		Callback: func(ns *io.NodeState) {
-			changeq <- ns
-		},
 	}
 
 	err = dirWatchWww.Start()
@@ -159,7 +150,7 @@ func workerBuild(oneTime bool) {
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
-		case ns := <-changeq:
+		case ns := <-dirWatchWww.C:
 			if strings.HasSuffix(ns.Node.SysPath, ".ts") {
 				mlog.Outf("%s: update %s\n", logp, ns.Node.SysPath)
 				tsCount++
@@ -198,10 +189,8 @@ func workerBuild(oneTime bool) {
 	}
 }
 
-//
 // workerDocs a goroutine that watch any changes to .adoc files inside
 // "_www/docs" directory and convert them into HTML files.
-//
 func workerDocs() {
 	logp := "workerDocs"
 
