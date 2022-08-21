@@ -375,11 +375,6 @@ func (ex *Example) pathExampleErrorGet(epr *libhttp.EndpointRequest) ([]byte, er
 }
 
 func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, err error) {
-	err = epr.HttpRequest.ParseMultipartForm(0)
-	if err != nil {
-		return nil, err
-	}
-
 	data := &requestResponse{
 		Method:        epr.HttpRequest.Method,
 		Url:           epr.HttpRequest.URL.String(),
