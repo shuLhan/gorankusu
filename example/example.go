@@ -106,7 +106,7 @@ func (ex *Example) Start() (err error) {
 	go func() {
 		err = ex.wsServer.Start()
 		if err != nil {
-			mlog.Errf("example.Start: %s\n", err)
+			mlog.Errf(`example.Start: %s`, err)
 		}
 	}()
 

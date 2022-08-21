@@ -37,12 +37,12 @@ func main() {
 
 	err := os.Setenv(trunks.EnvDevelopment, "1")
 	if err != nil {
-		mlog.Fatalf("%s\n", err)
+		mlog.Fatalf(`%s`, err)
 	}
 
 	ex, err := example.New()
 	if err != nil {
-		mlog.Fatalf("%s\n", err)
+		mlog.Fatalf(`%s`, err)
 	}
 
 	go workerBuild(false)
@@ -57,7 +57,7 @@ func main() {
 
 	err = ex.Start()
 	if err != nil {
-		mlog.Fatalf("%s\n", err)
+		mlog.Fatalf(`%s`, err)
 	}
 }
 
@@ -104,7 +104,7 @@ func workerBuild(oneTime bool) {
 
 	mfsWww, err := memfs.New(mfsOpts)
 	if err != nil {
-		mlog.Fatalf("%s: %s", logp, err)
+		mlog.Fatalf(`%s: %s`, logp, err)
 	}
 
 	if oneTime {
@@ -142,38 +142,38 @@ func workerBuild(oneTime bool) {
 
 	err = dirWatchWww.Start()
 	if err != nil {
-		mlog.Fatalf("%s: %s", logp, err)
+		mlog.Fatalf(`%s: %s`, logp, err)
 	}
 
-	mlog.Outf("%s: started ...\n", logp)
+	mlog.Outf(`%s: started ...`, logp)
 
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case ns := <-dirWatchWww.C:
 			if strings.HasSuffix(ns.Node.SysPath, ".ts") {
-				mlog.Outf("%s: update %s\n", logp, ns.Node.SysPath)
+				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
 				tsCount++
 			} else if strings.HasSuffix(ns.Node.SysPath, ".json") {
-				mlog.Outf("%s: update %s\n", logp, ns.Node.SysPath)
+				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
 				tsCount++
 			} else if strings.HasSuffix(ns.Node.SysPath, ".js") ||
 				strings.HasSuffix(ns.Node.SysPath, ".html") {
 				embedCount++
-				mlog.Outf("%s: update %s\n", logp, ns.Node.Path)
+				mlog.Outf(`%s: update %s`, logp, ns.Node.Path)
 				node, err := mfsWww.Get(ns.Node.Path)
 				if err != nil {
-					mlog.Errf("%s: %q: %s", logp, ns.Node.Path, err)
+					mlog.Errf(`%s: %q: %s`, logp, ns.Node.Path, err)
 					continue
 				}
 				if node != nil {
 					err = node.Update(nil, 0)
 					if err != nil {
-						mlog.Errf("%s: %q: %s", logp, node.Path, err)
+						mlog.Errf(`%s: %q: %s`, logp, node.Path, err)
 					}
 				}
 			} else {
-				mlog.Outf("%s: unknown file updated %s\n", logp, ns.Node.SysPath)
+				mlog.Outf(`%s: unknown file updated %s`, logp, ns.Node.SysPath)
 			}
 
 		case <-ticker.C:
@@ -194,32 +194,32 @@ func workerBuild(oneTime bool) {
 func workerDocs() {
 	logp := "workerDocs"
 
-	mlog.Outf("%s: started ...\n", logp)
+	mlog.Outf(`%s: started ...`, logp)
 
 	opts := &ciigo.ConvertOptions{
 		Root: "_www/docs",
 	}
 	err := ciigo.Watch(opts)
 	if err != nil {
-		mlog.Errf("%s: %s", logp, err)
+		mlog.Errf(`%s: %s`, logp, err)
 	}
 }
 
 func doRunTsc(logp string) (err error) {
-	mlog.Outf("%s: execute %s\n", logp, cmdTsc)
+	mlog.Outf(`%s: execute %s`, logp, cmdTsc)
 	err = exec.Run(cmdTsc, nil, nil)
 	if err != nil {
-		mlog.Errf("%s: %s", logp, err)
+		mlog.Errf(`%s: %s`, logp, err)
 		return err
 	}
 	return nil
 }
 
 func doGoEmbed(logp string, mfs *memfs.MemFS) (err error) {
-	mlog.Outf("%s: generate memfs_www_embed.go\n", logp)
+	mlog.Outf(`%s: generate memfs_www_embed.go`, logp)
 	err = mfs.GoEmbed()
 	if err != nil {
-		mlog.Errf("%s: %s", logp, err)
+		mlog.Errf(`%s: %s`, logp, err)
 		return err
 	}
 	return nil

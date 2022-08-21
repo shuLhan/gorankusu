@@ -125,7 +125,7 @@ func (ht *HttpTarget) deleteResult(result *AttackResult) {
 
 	err := os.Remove(result.fullpath)
 	if err != nil {
-		mlog.Errf("deleteResult: %q: %s\n", result.fullpath, err)
+		mlog.Errf(`deleteResult: %q: %s`, result.fullpath, err)
 	}
 }
 

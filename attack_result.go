@@ -99,14 +99,14 @@ func (ar *AttackResult) cancel() {
 	if ar.fout != nil {
 		err := ar.fout.Close()
 		if err != nil {
-			mlog.Errf("AttackResult.cancel %s: %s\n", ar.HttpTargetID, err)
+			mlog.Errf(`AttackResult.cancel %s: %s`, ar.HttpTargetID, err)
 		}
 		ar.fout = nil
 
 		if len(ar.fullpath) > 0 {
 			err = os.Remove(ar.fullpath)
 			if err != nil {
-				mlog.Errf("AttackResult.cancel %s: %s\n", ar.HttpTargetID, err)
+				mlog.Errf(`AttackResult.cancel %s: %s`, ar.HttpTargetID, err)
 			}
 		}
 	}

@@ -122,7 +122,7 @@ func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 		req.Target.BaseUrl, req.HttpTarget.Path,
 		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
 
-	mlog.Outf("%s: %s\n", logp, msg)
+	mlog.Outf(`%s: %s`, logp, msg)
 
 	return nil
 }
@@ -206,21 +206,23 @@ func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 // Start the Trunks HTTP server that provide user interface for running and
 // load testing registered Targets.
 func (trunks *Trunks) Start() (err error) {
-	mlog.Outf("trunks: scanning previous attack results...\n")
+	mlog.Outf(`trunks: scanning previous attack results...`)
+
 	trunks.scanResultsDir()
 
-	mlog.Outf("trunks: starting attack worker...\n")
+	mlog.Outf(`trunks: starting attack worker...`)
 	go trunks.workerAttackQueue()
 
-	mlog.Outf("trunks: starting HTTP server at http://%s\n", trunks.Env.ListenAddress)
+	mlog.Outf(`trunks: starting HTTP server at http://%s`, trunks.Env.ListenAddress)
 	go func() {
 		err := trunks.Httpd.Start()
 		if err != nil {
 			trunks.errq <- err
 		}
 	}()
+
 	go func() {
-		mlog.Outf("trunks: starting WebSocket server at ws://%s\n", trunks.Env.websocketListenAddress)
+		mlog.Outf(`trunks: starting WebSocket server at ws://%s`, trunks.Env.websocketListenAddress)
 		err := trunks.Wsd.Start()
 		if err != nil {
 			trunks.errq <- err
@@ -235,11 +237,11 @@ func (trunks *Trunks) Start() (err error) {
 // Stop the Trunks HTTP server.
 func (trunks *Trunks) Stop() {
 	logp := "trunks.Stop"
-	mlog.Outf("=== Stopping the Trunks service ...\n")
+	mlog.Outf(`=== Stopping the Trunks service ...`)
 
 	err := trunks.Httpd.Stop(0)
 	if err != nil {
-		mlog.Errf("!!! %s: %s", logp, err)
+		mlog.Errf(`!!! %s: %s`, logp, err)
 	}
 
 	trunks.Wsd.Stop()
@@ -394,17 +396,17 @@ func (trunks *Trunks) scanResultsDir() {
 
 	dir, err := os.Open(trunks.Env.ResultsDir)
 	if err != nil {
-		mlog.Errf("%s: %s\n", logp, err)
+		mlog.Errf(`%s: %s`, logp, err)
 		return
 	}
 
 	fis, err := dir.Readdir(0)
 	if err != nil {
-		mlog.Errf("%s: %s\n", logp, err)
+		mlog.Errf(`%s: %s`, logp, err)
 		return
 	}
 
-	mlog.Outf("--- %s: loading %d files from past results ...\n", logp, len(fis))
+	mlog.Outf(`--- %s: loading %d files from past results ...`, logp, len(fis))
 
 	for x, fi := range fis {
 		name := fi.Name()
@@ -417,20 +419,20 @@ func (trunks *Trunks) scanResultsDir() {
 
 		t, ht := trunks.getTargetByResultFilename(name)
 		if t == nil {
-			mlog.Outf("--- %s %d/%d: Target ID not found for %q\n", logp, x+1, len(fis), name)
+			mlog.Outf(`--- %s %d/%d: Target ID not found for %q`, logp, x+1, len(fis), name)
 			continue
 		}
 		if ht == nil {
-			mlog.Outf("--- %s %d/%d: HttpTarget ID not found for %q\n", logp, x+1, len(fis), name)
+			mlog.Outf(`--- %s %d/%d: HttpTarget ID not found for %q`, logp, x+1, len(fis), name)
 			continue
 		}
 
-		mlog.Outf("--- %s %d/%d: loading %q with size %d Kb\n", logp, x+1, len(fis), name, fi.Size()/1024)
+		mlog.Outf(`--- %s %d/%d: loading %q with size %d Kb`, logp, x+1, len(fis), name, fi.Size()/1024)
 
 		ht.addResult(trunks.Env.ResultsDir, name)
 	}
 
-	mlog.Outf("--- %s: all pass results has been loaded ...\n", logp)
+	mlog.Outf(`--- %s: all pass results has been loaded ...`, logp)
 
 	for _, target := range trunks.targets {
 		for _, httpTarget := range target.HttpTargets {
@@ -481,22 +483,22 @@ func (trunks *Trunks) workerAttackQueue() {
 			rr.result.cancel()
 
 			if err != nil {
-				mlog.Errf("%s: %s fail: %s.\n", logp, rr.result.Name, err)
+				mlog.Errf(`%s: %s fail: %s.`, logp, rr.result.Name, err)
 			} else {
-				mlog.Outf("%s: %s canceled.\n", logp, rr.result.Name)
+				mlog.Outf(`%s: %s canceled.`, logp, rr.result.Name)
 				// Inform the caller that the attack has been canceled.
 				trunks.cancelq <- true
 			}
 		} else {
 			err = rr.result.finish()
 			if err != nil {
-				mlog.Errf("%s %s: %s\n", logp, rr.result.Name, err)
+				mlog.Errf(`%s %s: %s`, logp, rr.result.Name, err)
 			}
 
 			trunks.addHttpAttackResult(rr)
 
 			trunks.wsBroadcastAttackFinish(rr.result)
-			mlog.Outf("%s: %s finished.\n", logp, rr.result.Name)
+			mlog.Outf(`%s: %s finished.`, logp, rr.result.Name)
 		}
 
 		rr.result = nil
