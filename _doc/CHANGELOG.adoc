@@ -6,6 +6,33 @@ Shulhan <ms@kilabit.info>
 :sectanchors:
 :sectlinks:
 
+[#v0_3_0]
+== trunks v0.3.0 (2022-08-25)
+
+This release set the minimum Go version to 1.18 and update all modules.
+
+[#v0_3_0_chores]
+===  Chores
+
+all: group all documentations under directory _doc::
++
+The _doc directory provides an entry point for all documentation.
+While at it we reformat the README to use AsciiDoc markup.
+
+example: fix the HTTP POST handler::
++
+Remove call to ParseMultipartform since the request type is
+x-www-form-urlencoded not multipart/form-data.
+
+all: remove unused field Locker in RunRequest::
+
+all: fix all linter warnings::
++
+Some linter, govet, warns about possible copied Mutex on HttpRequest.
+To fix this we implement method clone and Stringer on HttpRequest.
+
+
+[#v0_2_0]
 == trunks v0.2.0 (2022-03-13)
 
 Release trunks under GPL 3.0 or later license.
@@ -13,6 +40,7 @@ Release trunks under GPL 3.0 or later license.
 See https://kilabit.info/journal/2022/gpl for more information.
 
 
+[#v0_1_0]
 == trunks v0.1.0 (2022-02-05)
 
 Module trunks is a library and HTTP service that provide web user interface
