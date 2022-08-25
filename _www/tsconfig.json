@@ -8,5 +8,5 @@
 		"strict": true,
 		"target": "es2015"
 	},
-	"exclude": ["docs"]
+	"exclude": ["doc"]
 }

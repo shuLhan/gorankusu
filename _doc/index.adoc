@@ -1,0 +1,24 @@
+= trunks
+:toc:
+:sectanchors:
+:sectlinks:
+
+
+==  Documentation
+
+link:CHANGELOG.html[CHANGELOG^]:: History of each release.
+
+link:README.html[README^]:: Manual page for trunks' users.
+
+link:SPECS.html[Specification^]:: Manual page for trunks' developers.
+
+
+== Development
+
+https://git.sr.ht/~shulhan/trunks[Repository^]:: Link to the source code.
+
+https://lists.sr.ht/~shulhan/trunks[Mailing list^]:: Link to discussion and
+where to send patches.
+
+https://todo.sr.ht/~shulhan/trunks[Issues^]:: Link to report for bug or
+feature.

@@ -1,0 +1,72 @@
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+// SPDX-License-Identifier: GPL-3.0-or-later
+= Trunks
+:toc:
+:sectanchors:
+:sectlinks:
+
+Trunks is a Go library that provide HTTP service with web user interface
+to test HTTP and/or WebSocket endpoints and for load testing HTTP endpoints.
+
+For testing HTTP endpoints it use the
+https://pkg.go.dev/github.com/shuLhan/share/lib/http[lib/http^]
+package as the client, a wrapper for standard Go HTTP package.
+For testing WebSocket endpoints it use the
+https://pkg.go.dev/github.com/shuLhan/share/lib/websocket[lib/websocket^]
+package as the client.
+For the load testing we use
+https://github.com/tsenart/vegeta[vegeta^]
+as the backend.
+
+This documentation provide the development of Trunks.
+
+[#schemas]
+==  Schemas
+
+[#schema_environment]
+===  Environment
+
+----
+{
+	"ListenAddress": string,
+	"WebSocketListenPort": number,
+	"MaxAttackDuration": number,
+	"MaxAttackRate": number,
+	"ResultsDir": string,
+	"ResultsSuffix": string,
+	"AttackRunning": <AttackRunning>
+}
+----
+
+
+[#http_api]
+==  HTTP APIs
+
+All of HTTP APIs return a JSON object using the following response schema
+
+----
+{
+	"code": number,
+	"message": string,
+	"data": any
+}
+----
+
+* `code` field contains the HTTP status code
+* `message` field contains the error message for HTTP status 4xx or 5xx.
+* `data` field contains the actual response data.
+
+===  Get environment
+
+HTTP API to get the current Trunks environment.
+
+*Request*
+
+----
+GET /_trunks/api/environment
+----
+
+*Response*
+
+On success, it will return the
+link:#schema_environment[Environment schema].
