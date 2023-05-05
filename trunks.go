@@ -346,13 +346,20 @@ func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error
 
 	httpc := libhttp.NewClient(httpcOpts)
 
-	switch rr.HttpTarget.RequestType {
-	case libhttp.RequestTypeJSON:
-		params = rr.HttpTarget.Params.ToJsonObject()
-	case libhttp.RequestTypeMultipartForm:
-		params = rr.HttpTarget.Params.ToMultipartFormData()
-	default:
-		params = rr.HttpTarget.Params.ToUrlValues()
+	if rr.HttpTarget.ConvertParams == nil {
+		switch rr.HttpTarget.RequestType {
+		case libhttp.RequestTypeJSON:
+			params = rr.HttpTarget.Params.ToJsonObject()
+		case libhttp.RequestTypeMultipartForm:
+			params = rr.HttpTarget.Params.ToMultipartFormData()
+		default:
+			params = rr.HttpTarget.Params.ToUrlValues()
+		}
+	} else {
+		params, err = rr.HttpTarget.ConvertParams(&rr.HttpTarget)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
 	}
 
 	res = &RunResponse{}
