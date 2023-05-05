@@ -5,9 +5,14 @@ package trunks
 
 type FormInputKind string
 
+// List of valid value for field FormInput.Kind.
 const (
-	FormInputKindNumber = "number"
-	FormInputKindString = "string"
+	// FormInputKindBoolean only used for convertion, for example
+	// ToJsonObject.
+	// In the WUI, it will be rendered as string.
+	FormInputKindBoolean = `boolean`
+	FormInputKindNumber  = `number`
+	FormInputKindString  = `string`
 )
 
 // FormInput provide the information to create an input component.

@@ -6,6 +6,7 @@ package trunks
 import (
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/shuLhan/share/lib/math/big"
 )
@@ -27,10 +28,25 @@ func (kfi KeyFormInput) ToHttpHeader() (headers http.Header) {
 }
 
 // ToJsonObject convert the KeyFormInput into JSON object.
+// FormInput with Kind is FormInputKindBoolean will be converted to true if
+// the Value is either "true", "yes", or "1".
 func (kfi KeyFormInput) ToJsonObject() (data map[string]interface{}) {
+	var (
+		k    string
+		fi   FormInput
+		vstr string
+	)
+
 	data = make(map[string]interface{}, len(kfi))
-	for k, fi := range kfi {
+	for k, fi = range kfi {
 		switch fi.Kind {
+		case FormInputKindBoolean:
+			vstr = strings.ToLower(fi.Value)
+			if vstr == `true` || vstr == `yes` || vstr == `1` {
+				data[k] = true
+			} else {
+				data[k] = false
+			}
 		case FormInputKindNumber:
 			data[k], _ = big.NewRat(fi.Value).Float64()
 		default:
