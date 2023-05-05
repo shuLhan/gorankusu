@@ -192,6 +192,7 @@ func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 	if origHttpTarget.Run == nil {
 		req.Target.BaseUrl = origTarget.BaseUrl
 		req.Target.Name = origTarget.Name
+		req.HttpTarget.ConvertParams = origHttpTarget.ConvertParams
 		res, err = trunks.runHttpTarget(req)
 	} else {
 		req := generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
