@@ -21,15 +21,28 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
+	apiAttackHttp = libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         `/_trunks/api/attack/http`,
+		RequestType:  libhttp.RequestTypeJSON,
+		ResponseType: libhttp.ResponseTypeJSON,
+	}
+	apiAttackHttpCancel = libhttp.Endpoint{
+		Method:       libhttp.RequestMethodDelete,
+		Path:         `/_trunks/api/attack/http`,
+		RequestType:  libhttp.RequestTypeJSON,
+		ResponseType: libhttp.ResponseTypeJSON,
+	}
+
 	apiAttackResultDelete = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
-		Path:         apiAttackResult,
+		Path:         pathApiAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 	apiAttackResultGet = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         apiAttackResult,
+		Path:         pathApiAttackResult,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
@@ -97,6 +110,18 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
+	apiAttackHttp.Call = trunks.apiAttackHttp
+	err = trunks.Httpd.RegisterEndpoint(&apiAttackHttp)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	apiAttackHttpCancel.Call = trunks.apiAttackHttpCancel
+	err = trunks.Httpd.RegisterEndpoint(&apiAttackHttpCancel)
+	if err != nil {
+		return fmt.Errorf(`%s: %w`, logp, err)
+	}
+
 	apiAttackResultDelete.Call = trunks.apiAttackResultDelete
 	err = trunks.Httpd.RegisterEndpoint(apiAttackResultDelete)
 	if err != nil {
@@ -140,6 +165,92 @@ func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody [
 	res.Code = http.StatusOK
 	res.Data = trunks.Env
 	return json.Marshal(&res)
+}
+
+// apiAttackHttp request to attack HTTP target.
+//
+// Request format,
+//
+//	POST /_trunks/api/attack/http
+//	Content-Type: application/json
+//
+//	<RunRequest>
+//
+// Response format,
+//
+//	Content-Type: application/json
+//
+//	{"data":<RunRequest>}
+//
+// Response codes,
+//   - 200 OK: success.
+//   - 500 ERR_INTERNAL: internal server error.
+func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	var (
+		logp       = `apiAttackHttp`
+		runRequest = &RunRequest{}
+	)
+
+	err = json.Unmarshal(epr.RequestBody, runRequest)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	err = trunks.AttackHttp(runRequest)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var res = &libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Name = `OK_ATTACK_HTTP`
+	res.Data = runRequest
+
+	resbody, err = json.Marshal(res)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	return resbody, nil
+}
+
+// apiAttackHttpCancel request to cancel the running attack on HTTP target.
+//
+// Request format,
+//
+//	DELETE /_trunks/api/attack/http
+//
+// Response format,
+//
+//	Content-Type: application/json
+//
+//	{"data":<RunRequest>}
+//
+// Response codes,
+//   - 200 OK: success, return the RunRequest object that has been cancelled.
+//   - 500 ERR_INTERNAL: internal server error.
+func (trunks *Trunks) apiAttackHttpCancel(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	var (
+		logp       = `apiAttackHttpCancel`
+		runRequest *RunRequest
+	)
+
+	runRequest, err = trunks.AttackHttpCancel()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var res = &libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Name = `OK_ATTACK_HTTP_CANCEL`
+	res.Message = fmt.Sprintf(`Attack on target "%s/%s" has been canceled`,
+		runRequest.Target.Name, runRequest.HttpTarget.Name)
+	res.Data = runRequest
+
+	resbody, err = json.Marshal(res)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+	return resbody, nil
 }
 
 func (trunks *Trunks) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {

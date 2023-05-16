@@ -30,7 +30,7 @@ func (trunks *Trunks) wsBroadcastAttackFinish(result *AttackResult) {
 	}
 
 	packet, err := websocket.NewBroadcast(
-		apiAttackResult,
+		pathApiAttackResult,
 		base64.StdEncoding.EncodeToString(jsonb),
 	)
 	if err != nil {
@@ -55,7 +55,7 @@ func (trunks *Trunks) initWebSocketServer() (err error) {
 
 	err = trunks.Wsd.RegisterTextHandler(
 		"POST",
-		apiAttackHttp,
+		pathApiAttackHttp,
 		trunks.handleWsAttackHttp,
 	)
 	if err != nil {
@@ -64,7 +64,7 @@ func (trunks *Trunks) initWebSocketServer() (err error) {
 
 	err = trunks.Wsd.RegisterTextHandler(
 		"DELETE",
-		apiAttackHttp,
+		pathApiAttackHttp,
 		trunks.handleWsAttackHttpCancel,
 	)
 	if err != nil {

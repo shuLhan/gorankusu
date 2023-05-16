@@ -38,8 +38,8 @@ const (
 	paramNameName = "name"
 
 	// List of HTTP APIs and/or WebSocket broadcast messages.
-	apiAttackHttp   = "/_trunks/api/attack/http"
-	apiAttackResult = "/_trunks/api/attack/result"
+	pathApiAttackHttp   = "/_trunks/api/attack/http"
+	pathApiAttackResult = "/_trunks/api/attack/result"
 )
 
 // Trunks is the HTTP server with web user interface and APIs for running and
