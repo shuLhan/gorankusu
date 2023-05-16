@@ -1,13 +1,6 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import {
-	WuiWebSocketClient,
-	WuiWebSocketOptions,
-	WuiWebSocketRequest,
-	WuiWebSocketResponse,
-} from "./wui/websocket_client.js"
-
 import { Environment } from "./environment.js"
 import { Save } from "./functions.js"
 import {
@@ -44,8 +37,6 @@ const CLASS_FOOTER = "trunks_footer"
 const CLASS_MAIN = "trunks_main"
 const CLASS_NAV = "trunks_nav"
 
-const WSC_RECONNECT_INTERVAL = 5000
-
 interface MapIDTarget {
 	[key: string]: Target
 }
@@ -73,9 +64,6 @@ export class Trunks {
 		AttackRunning: null,
 	}
 
-	wsc_opts: WuiWebSocketOptions
-	wsc: WuiWebSocketClient | null = null
-
 	com_env!: Environment
 	com_nav_links!: NavLinks
 	targets: MapIDTarget = {}
@@ -83,24 +71,6 @@ export class Trunks {
 
 	constructor() {
 		this.el = document.createElement("div")
-
-		this.wsc_opts = {
-			address: "",
-			auto_reconnect: true,
-			auto_reconnect_interval: WSC_RECONNECT_INTERVAL,
-			onBroadcast: (res: WuiWebSocketResponse) => {
-				this.wsOnBroadcast(res)
-			},
-			onConnected: () => {
-				this.wsOnConnected()
-			},
-			onDisconnected: () => {
-				this.wsOnDisconnected()
-			},
-			onError: () => {
-				this.wsOnError()
-			},
-		}
 
 		this.com_env = new Environment(this, this.env)
 		this.generateNav()
@@ -170,19 +140,6 @@ export class Trunks {
 		window.onhashchange = () => {
 			this.windowOnHashChange()
 		}
-
-		let scheme = "ws://"
-		let url: URL = new URL(window.location.href)
-		if (url.protocol === "https:") {
-			scheme = "wss://"
-		}
-
-		this.wsc_opts.address =
-			scheme +
-			url.hostname +
-			":" +
-			this.env.WebSocketListenPort
-		this.wsc = new WuiWebSocketClient(this.wsc_opts)
 	}
 
 	async apiEnvironmentGet() {
@@ -236,26 +193,17 @@ export class Trunks {
 	}
 
 	private async onClickAttackCancel() {
-		if (!this.wsc) {
-			console.error("websocket is not connected")
-			return
-		}
-
-		let req: WuiWebSocketRequest = {
-			id: Date.now(),
+		let fres = await fetch(API_ATTACK_HTTP, {
 			method: "DELETE",
-			target: API_ATTACK_HTTP,
-		}
-
-		let json_res = await this.wsc.Send(req)
+		})
+		let json_res = await fres.json()
 		if (json_res.code != 200) {
 			wui_notif.Error(json_res.message)
-			return
+			return null
 		}
-
-		this.setAttackRunning(null)
-
 		wui_notif.Info(json_res.message)
+		this.setAttackRunning(null)
+		return json_res
 	}
 
 	private windowOnHashChange() {
@@ -315,39 +263,6 @@ export class Trunks {
 		}
 	}
 
-	private wsOnBroadcast(res: WuiWebSocketResponse) {
-		switch (res.message) {
-			case API_ATTACK_RESULT:
-				let result = JSON.parse(
-					atob(res.body),
-				) as AttackResult
-
-				this.setAttackRunning(null)
-
-				let comTarget = this.targets[result.TargetID]
-				let comHttpTarget =
-					comTarget.http_targets[
-						result.HttpTargetID
-					]
-
-				comHttpTarget.AddAttackResult(result)
-
-				wui_notif.Info(
-					`Attack finished on "${comTarget.opts.Name}/${comHttpTarget.opts.Name}".`,
-				)
-		}
-	}
-
-	private wsOnConnected() {
-		this.el_ws_conn_status.innerHTML = "&#9670; Connected"
-	}
-	private wsOnDisconnected() {
-		this.el_ws_conn_status.innerHTML = "&#9671; Disconnected"
-	}
-	private wsOnError() {
-		// TODO
-	}
-
 	setAttackRunning(runRequest: RunRequestInterface | null) {
 		if (!runRequest) {
 			this.el_attack_running.innerHTML = "-"
@@ -376,11 +291,6 @@ export class Trunks {
 		target: TargetInterface,
 		http_target: HttpTargetInterface,
 	): Promise<HttpResponseInterface | null> {
-		if (!this.wsc) {
-			console.error("websocket is not connected")
-			return null
-		}
-
 		Save(target, http_target, null)
 
 		let attackReq: RunRequestInterface = {
@@ -408,14 +318,14 @@ export class Trunks {
 			WebSocketTarget: null,
 		}
 
-		let req: WuiWebSocketRequest = {
-			id: Date.now(),
+		let http_res = await fetch(API_ATTACK_HTTP, {
 			method: "POST",
-			target: API_ATTACK_HTTP,
-			body: btoa(JSON.stringify(attackReq)),
-		}
-
-		let json_res = await this.wsc.Send(req)
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(attackReq),
+		})
+		let json_res = await http_res.json()
 		if (json_res.code != 200) {
 			wui_notif.Error(json_res.message)
 			return null
