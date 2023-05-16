@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	Version = `0.4.0-dev`
+	Version = `0.4.0`
 
 	DefaultAttackDuration      = 10 * time.Second
 	DefaultAttackRatePerSecond = 500
