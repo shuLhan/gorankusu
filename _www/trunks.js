@@ -59,8 +59,8 @@ export class Trunks {
         el_nav_footer.classList.add(CLASS_FOOTER);
         el_nav_footer.innerHTML = `
 			<div>
-				Powered by
-				<a href="https://sr.ht/~shulhan/trunks" target="_blank">Trunks</a>
+				<div>Powered by <a href="https://sr.ht/~shulhan/trunks" target="_blank">Trunks</a></div>
+				<div><a href="/doc/" target="_blank">Documentation</a></div>
 			</div>
 		`;
         el_nav.appendChild(this.el_ws_conn_status);

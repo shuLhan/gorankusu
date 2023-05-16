@@ -190,14 +190,14 @@ func workerBuild(oneTime bool) {
 }
 
 // workerDocs a goroutine that watch any changes to .adoc files inside
-// "_doc" directory and convert them into HTML files.
+// "_www/doc" directory and convert them into HTML files.
 func workerDocs() {
 	logp := "workerDocs"
 
 	mlog.Outf(`%s: started ...`, logp)
 
 	opts := &ciigo.ConvertOptions{
-		Root: "_doc",
+		Root: `_www/doc`,
 	}
 	err := ciigo.Watch(opts)
 	if err != nil {
