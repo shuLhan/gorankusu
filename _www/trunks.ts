@@ -56,7 +56,6 @@ export class Trunks {
 
 	env: EnvironmentInterface = {
 		ListenAddress: "",
-		WebSocketListenPort: 8218,
 		MaxAttackDuration: 0,
 		MaxAttackRate: 0,
 		ResultsDir: "",

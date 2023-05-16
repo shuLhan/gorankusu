@@ -15,11 +15,10 @@ import (
 	liberrors "github.com/shuLhan/share/lib/errors"
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/mlog"
-	"github.com/shuLhan/share/lib/websocket"
 )
 
 const (
-	Version = "0.3.0"
+	Version = `0.4.0-dev`
 
 	DefaultAttackDuration      = 10 * time.Second
 	DefaultAttackRatePerSecond = 500
@@ -27,8 +26,7 @@ const (
 	DefaultMaxAttackDuration   = 30 * time.Second
 	DefaultMaxAttackRate       = 3000
 
-	DefaultListenAddress       = "127.0.0.1:8217"
-	DefaultWebSocketListenPort = 8218
+	DefaultListenAddress = `127.0.0.1:8217`
 
 	// Setting this environment variable will enable trunks development
 	// mode.
@@ -37,9 +35,9 @@ const (
 	// List of HTTP parameters.
 	paramNameName = "name"
 
-	// List of HTTP APIs and/or WebSocket broadcast messages.
-	pathApiAttackHttp   = "/_trunks/api/attack/http"
-	pathApiAttackResult = "/_trunks/api/attack/result"
+	// List of HTTP APIs.
+	pathApiAttackHttp   = `/_trunks/api/attack/http`
+	pathApiAttackResult = `/_trunks/api/attack/result`
 )
 
 // Trunks is the HTTP server with web user interface and APIs for running and
@@ -47,7 +45,6 @@ const (
 type Trunks struct {
 	Env   *Environment
 	Httpd *libhttp.Server
-	Wsd   *websocket.Server
 
 	attackq chan *RunRequest
 	cancelq chan bool
@@ -77,10 +74,6 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	}
 
 	err = trunks.initHttpServer(isDevelopment)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-	err = trunks.initWebSocketServer()
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -225,14 +218,6 @@ func (trunks *Trunks) Start() (err error) {
 		}
 	}()
 
-	go func() {
-		mlog.Outf(`trunks: starting WebSocket server at ws://%s`, trunks.Env.websocketListenAddress)
-		err := trunks.Wsd.Start()
-		if err != nil {
-			trunks.errq <- err
-		}
-	}()
-
 	err = <-trunks.errq
 
 	return err
@@ -247,8 +232,6 @@ func (trunks *Trunks) Stop() {
 	if err != nil {
 		mlog.Errf(`!!! %s: %s`, logp, err)
 	}
-
-	trunks.Wsd.Stop()
 
 	if trunks.isLoadTesting() {
 		trunks.cancelq <- true
@@ -508,7 +491,6 @@ func (trunks *Trunks) workerAttackQueue() {
 
 			trunks.addHttpAttackResult(rr)
 
-			trunks.wsBroadcastAttackFinish(rr.result)
 			mlog.Outf(`%s: %s finished.`, logp, rr.result.Name)
 		}
 

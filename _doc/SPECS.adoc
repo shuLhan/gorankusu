@@ -29,7 +29,6 @@ This documentation provide the development of Trunks.
 ----
 {
 	"ListenAddress": string,
-	"WebSocketListenPort": number,
 	"MaxAttackDuration": number,
 	"MaxAttackRate": number,
 	"ResultsDir": string,

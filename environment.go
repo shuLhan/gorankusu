@@ -5,7 +5,6 @@ package trunks
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"sync"
 	"time"
@@ -22,8 +21,6 @@ type Environment struct {
 	// If its emtpy, it will set to DefaultListenAddress.
 	ListenAddress string `ini:"trunks::listen_address"`
 
-	websocketListenAddress string
-
 	// ResultsDir is the path where the output of load testing will be
 	// stored.
 	// This field is optional, if its empty it will be set to the working
@@ -33,11 +30,6 @@ type Environment struct {
 	// ResultsSuffix define custom string to add to the file name to
 	// uniquely identify results on each run.
 	ResultsSuffix string `ini:"trunks:result:suffix"`
-
-	// WebSocketListenPort is the port number where Trunks WebSocket API
-	// will run.
-	// If its empty, it will set to DefaultWebSocketListenPort.
-	WebSocketListenPort int
 
 	// MaxAttackRate define the maximum AttackRate can be set by client.
 	// The purpose of this option is to prevent client to set attack rate
@@ -63,9 +55,6 @@ func (env *Environment) init() (err error) {
 	if len(env.ListenAddress) == 0 {
 		env.ListenAddress = DefaultListenAddress
 	}
-	if env.WebSocketListenPort <= 0 {
-		env.WebSocketListenPort = DefaultWebSocketListenPort
-	}
 	if env.MaxAttackRate == 0 {
 		env.MaxAttackRate = DefaultMaxAttackRate
 	}
@@ -79,12 +68,6 @@ func (env *Environment) init() (err error) {
 			return fmt.Errorf("%s: %w", logp, err)
 		}
 	}
-
-	host, _, err := net.SplitHostPort(env.ListenAddress)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
-	}
-	env.websocketListenAddress = fmt.Sprintf("%s:%d", host, env.WebSocketListenPort)
 
 	return nil
 }
