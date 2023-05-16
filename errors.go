@@ -35,6 +35,14 @@ func errAttackNotAllowed() error {
 	return res
 }
 
+var errAttackHandlerNotSet = libhttp.EndpointResponse{
+	E: liberrors.E{
+		Code:    http.StatusNotAcceptable,
+		Message: `the Attack handler is not set`,
+		Name:    `ERR_ATTACK_HANDLER_NOT_SET`,
+	},
+}
+
 func errInternal(err error) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{

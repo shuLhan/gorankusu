@@ -108,6 +108,9 @@ func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 	if !origHttpTarget.AllowAttack {
 		return errAttackNotAllowed()
 	}
+	if origHttpTarget.Attack == nil {
+		return fmt.Errorf(`%s: %w`, logp, &errAttackHandlerNotSet)
+	}
 
 	req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
 
