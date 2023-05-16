@@ -1,85 +1,86 @@
-= Trunks
-:toc:
-:sectanchors:
-:sectlinks:
+# Trunks
 
 Trunks is a Go library that provide HTTP service with web user interface
 to test HTTP and/or WebSocket endpoints and for load testing HTTP endpoints.
 
 For testing HTTP endpoints it use the
-https://pkg.go.dev/github.com/shuLhan/share/lib/http[lib/http^]
+[lib/http](https://pkg.go.dev/github.com/shuLhan/share/lib/http)
 package as the client, a wrapper for standard Go HTTP package.
 For testing WebSocket endpoints it use the
-https://pkg.go.dev/github.com/shuLhan/share/lib/websocket[lib/websocket^]
+[lib/websocket](https://pkg.go.dev/github.com/shuLhan/share/lib/websocket)
 package as the client.
 For the load testing we use
-https://github.com/tsenart/vegeta[vegeta^]
+[vegeta](https://github.com/tsenart/vegeta)
 as the backend.
 
-https://pkg.go.dev/git.sr.ht/~shulhan/trunks[Go doc^].
+[Go documentation](https://pkg.go.dev/git.sr.ht/~shulhan/trunks)
 
-== Usage
+## Usage
 
 See the
-https://git.sr.ht/~shulhan/trunks/tree/main/item/example/[example^]
+[example](https://git.sr.ht/~shulhan/trunks/tree/main/item/example/)
 package on how to programmatically use and create service using this module,
 or,
 
 * clone this repository,
 * execute `make dev`, and
-* open http://127.0.0.1:8217.
+* open <http://127.0.0.1:8217>.
 
 
-== Screenshots
+## Screenshots
 
 The following screenshot display the main interface to Run or Attack the
 registered HTTP service,
 
-image:https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_example.png[Main interface,640]
+![Main interface](https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_example.png "Main interface")
 
 The following screenshot display the result of attack in two forms, vegeta
 metrics and vegeta histogram,
 
-image:https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_attack_result.png[Attack result,640]
+![Attack result](https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_attack_result.png "Attack result")
 
 
-== Web user interface (WUI)
+## Web user interface (WUI)
 
 By default, the Trunks user interface can be viewed by opening in browser at
-http://127.0.0.1:8217.
+<http://127.0.0.1:8217>.
 One can change address through Environment's ListenAddress.
 
 
-== File name format
+## File name format
 
 Each attack result is saved in Environment's ResultsDir with the following
 file name format,
 
-	<Target.ID> "." <HttpTarget.ID> "." <DateTime> "." <Rate> "x" <Duration> "." <ResultsSuffix>
+```
+<Target.ID> "." <HttpTarget.ID> "." <DateTime> "." <Rate> "x" <Duration> "." <ResultsSuffix>
+```
 
 The "DateTime" is in the following layout,
 
-	YearMonthDate "_" HourMinuteSeconds
+```
+YearMonthDate "_" HourMinuteSeconds
+```
 
 The "ResultsSuffix" is the one that defined in Environment.
 
 
-== Development
+## Development
 
-https://git.sr.ht/~shulhan/trunks[Repository^]:: Link to the source code.
+[Repository](https://git.sr.ht/~shulhan/trunks):: Link to the source code.
 
-https://lists.sr.ht/~shulhan/trunks[Mailing list^]:: Link to discussion and
+[Mailing list](https://lists.sr.ht/~shulhan/trunks):: Link to discussion and
 where to send patches.
 
-https://todo.sr.ht/~shulhan/trunks[Issues^]:: Link to report for bug or
+[Issues](https://todo.sr.ht/~shulhan/trunks):: Link to report for bug or
 feature.
 
 
-== Credits
+## Credits
 
-The Trunks icon and image is provided by https://www.spriters-resource.com/.
+The Trunks icon and image is provided by <https://www.spriters-resource.com/>.
 
-== License
+## License
 
 Copyright (C) 2021 M. Shulhan  <ms@kilabit.info>
 
@@ -94,4 +95,4 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 details.
 
 You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
+this program.  If not, see <https://www.gnu.org/licenses/>.
