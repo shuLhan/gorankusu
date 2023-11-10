@@ -1,265 +1,226 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js"
-import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js"
+import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js";
+import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js";
 
 import {
-	GenerateFormInput,
-	LoadTargetOptDuration,
-	LoadTargetOptRatePerSecond,
-	LoadTargetOptTimeout,
-	LoadTargetVar,
-} from "./functions.js"
+  GenerateFormInput,
+  LoadTargetOptDuration,
+  LoadTargetOptRatePerSecond,
+  LoadTargetOptTimeout,
+  LoadTargetVar,
+} from "./functions.js";
 import {
-	CLASS_INPUT,
-	CLASS_INPUT_LABEL,
-	CLASS_NAV_TARGET,
-	AttackOptionsInterface,
-	HttpTargetInterface,
-	KeyFormInput,
-	TargetInterface,
-	TrunksInterface,
-	WebSocketTargetInterface,
-} from "./interface.js"
-import { HttpTarget } from "./http_target.js"
-import { WebSocketTarget } from "./ws_target.js"
+  CLASS_INPUT,
+  CLASS_INPUT_LABEL,
+  CLASS_NAV_TARGET,
+  HttpTargetInterface,
+  TargetInterface,
+  TrunksInterface,
+  WebSocketTargetInterface,
+} from "./interface.js";
+import { HttpTarget } from "./http_target.js";
+import { WebSocketTarget } from "./ws_target.js";
 
-const CLASS_NAV_TARGET_HTTP = "nav_http_target"
-const CLASS_NAV_TARGET_WS = "nav_ws_target"
+const CLASS_NAV_TARGET_HTTP = "nav_http_target";
+const CLASS_NAV_TARGET_WS = "nav_ws_target";
 
 interface MapHttpTarget {
-	[key: string]: HttpTarget
+  [key: string]: HttpTarget;
 }
 
 interface MapWebSocketTarget {
-	[key: string]: WebSocketTarget
+  [key: string]: WebSocketTarget;
 }
 
 export class Target {
-	el_nav: HTMLElement = document.createElement("div")
-	el_content: HTMLElement = document.createElement("div")
+  el_nav: HTMLElement = document.createElement("div");
+  el_content: HTMLElement = document.createElement("div");
 
-	http_targets: MapHttpTarget = {}
-	ws_targets: MapWebSocketTarget = {}
+  http_targets: MapHttpTarget = {};
+  ws_targets: MapWebSocketTarget = {};
 
-	constructor(
-		public trunks: TrunksInterface,
-		public opts: TargetInterface,
-	) {
-		this.generateNav(trunks)
-		this.generateContent(trunks)
-	}
+  constructor(
+    public trunks: TrunksInterface,
+    public opts: TargetInterface,
+  ) {
+    this.generateNav(trunks);
+    this.generateContent(trunks);
+  }
 
-	private generateNav(trunks: TrunksInterface) {
-		this.el_nav.classList.add(CLASS_NAV_TARGET)
+  private generateNav(trunks: TrunksInterface) {
+    this.el_nav.classList.add(CLASS_NAV_TARGET);
 
-		let el_target_menu = document.createElement("h3")
-		el_target_menu.innerHTML = this.opts.Name
-		el_target_menu.onclick = () => {
-			trunks.ContentRenderer(
-				this.opts,
-				null,
-				null,
-				null,
-				this.el_content,
-			)
-		}
+    let el_target_menu = document.createElement("h3");
+    el_target_menu.innerHTML = this.opts.Name;
+    el_target_menu.onclick = () => {
+      trunks.ContentRenderer(this.opts, null, null, null, this.el_content);
+    };
 
-		this.el_nav.appendChild(el_target_menu)
+    this.el_nav.appendChild(el_target_menu);
 
-		if (this.opts.HttpTargets) {
-			for (let ht of this.opts.HttpTargets) {
-				let el_target_http =
-					document.createElement("div")
-				el_target_http.innerHTML = ht.Name
-				el_target_http.id = `/http/${this.opts.ID}/${ht.ID}`
-				el_target_http.classList.add(
-					CLASS_NAV_TARGET_HTTP,
-				)
-				el_target_http.onclick = () => {
-					trunks.ContentRenderer(
-						this.opts,
-						ht,
-						null,
-						null,
-						this.el_content,
-					)
-				}
-				this.el_nav.appendChild(el_target_http)
-			}
-		}
+    if (this.opts.HttpTargets) {
+      for (let ht of this.opts.HttpTargets) {
+        let el_target_http = document.createElement("div");
+        el_target_http.innerHTML = ht.Name;
+        el_target_http.id = `/http/${this.opts.ID}/${ht.ID}`;
+        el_target_http.classList.add(CLASS_NAV_TARGET_HTTP);
+        el_target_http.onclick = () => {
+          trunks.ContentRenderer(this.opts, ht, null, null, this.el_content);
+        };
+        this.el_nav.appendChild(el_target_http);
+      }
+    }
 
-		if (this.opts.WebSocketTargets) {
-			for (let wst of this.opts.WebSocketTargets) {
-				let el_target_ws =
-					document.createElement("div")
-				el_target_ws.innerHTML = wst.Name
-				el_target_ws.id = `/ws/${this.opts.ID}/${wst.ID}`
-				el_target_ws.classList.add(
-					CLASS_NAV_TARGET_WS,
-				)
-				el_target_ws.onclick = () => {
-					trunks.ContentRenderer(
-						this.opts,
-						null,
-						wst,
-						null,
-						this.el_content,
-					)
-				}
-				this.el_nav.appendChild(el_target_ws)
-			}
-		}
-	}
+    if (this.opts.WebSocketTargets) {
+      for (let wst of this.opts.WebSocketTargets) {
+        let el_target_ws = document.createElement("div");
+        el_target_ws.innerHTML = wst.Name;
+        el_target_ws.id = `/ws/${this.opts.ID}/${wst.ID}`;
+        el_target_ws.classList.add(CLASS_NAV_TARGET_WS);
+        el_target_ws.onclick = () => {
+          trunks.ContentRenderer(this.opts, null, wst, null, this.el_content);
+        };
+        this.el_nav.appendChild(el_target_ws);
+      }
+    }
+  }
 
-	private generateContent(trunks: TrunksInterface) {
-		this.generateContentBaseURL()
-		this.generateContentAttackOptions()
-		this.generateContentVars()
-		this.generateHttpTargets(trunks)
-		this.generateWebSocketTargets(trunks)
-	}
+  private generateContent(trunks: TrunksInterface) {
+    this.generateContentBaseURL();
+    this.generateContentAttackOptions();
+    this.generateContentVars();
+    this.generateHttpTargets(trunks);
+    this.generateWebSocketTargets(trunks);
+  }
 
-	private generateContentBaseURL() {
-		let hdr_target = document.createElement("h2")
-		hdr_target.innerText = this.opts.Name
-		hdr_target.id = this.opts.ID
+  private generateContentBaseURL() {
+    let hdr_target = document.createElement("h2");
+    hdr_target.innerText = this.opts.Name;
+    hdr_target.id = this.opts.ID;
 
-		let el_hint = document.createElement("p")
-		el_hint.innerHTML = this.opts.Hint || ""
+    let el_hint = document.createElement("p");
+    el_hint.innerHTML = this.opts.Hint || "";
 
-		let opts_base_url: WuiInputStringOpts = {
-			label: "Base URL",
-			hint: "The base URL where the HTTP request will be send or the target of attack.",
-			value: this.opts.BaseUrl,
-			class_input: CLASS_INPUT,
-			class_label: CLASS_INPUT_LABEL,
-			is_hint_toggled: true,
-			is_disabled: true,
-			onChangeHandler: (v: string) => {
-				this.opts.BaseUrl = v
-			},
-		}
-		let com_input_base_url = new WuiInputString(opts_base_url)
+    let opts_base_url: WuiInputStringOpts = {
+      label: "Base URL",
+      hint: "The base URL where the HTTP request will be send or the target of attack.",
+      value: this.opts.BaseUrl,
+      class_input: CLASS_INPUT,
+      class_label: CLASS_INPUT_LABEL,
+      is_hint_toggled: true,
+      is_disabled: true,
+      onChangeHandler: (v: string) => {
+        this.opts.BaseUrl = v;
+      },
+    };
+    let com_input_base_url = new WuiInputString(opts_base_url);
 
-		this.el_content.appendChild(hdr_target)
-		if (this.opts.Hint) {
-			this.el_content.appendChild(el_hint)
-		}
-		this.el_content.appendChild(com_input_base_url.el)
-	}
+    this.el_content.appendChild(hdr_target);
+    if (this.opts.Hint) {
+      this.el_content.appendChild(el_hint);
+    }
+    this.el_content.appendChild(com_input_base_url.el);
+  }
 
-	private generateContentAttackOptions() {
-		let wrapper = document.createElement("fieldset")
+  private generateContentAttackOptions() {
+    let wrapper = document.createElement("fieldset");
 
-		let legend = document.createElement("legend")
-		legend.innerText = "Attack options"
+    let legend = document.createElement("legend");
+    legend.innerText = "Attack options";
 
-		let opts_duration: WuiInputNumberOpts = {
-			label: "Duration",
-			hint: "The duration of attack, in seconds.",
-			value: LoadTargetOptDuration(this.opts),
-			min: 1,
-			class_input: CLASS_INPUT,
-			class_label: CLASS_INPUT_LABEL,
-			is_hint_toggled: true,
-			onChangeHandler: (v: number) => {
-				this.opts.Opts.Duration = v * 1e9
-			},
-		}
-		let com_input_duration = new WuiInputNumber(opts_duration)
+    let opts_duration: WuiInputNumberOpts = {
+      label: "Duration",
+      hint: "The duration of attack, in seconds.",
+      value: LoadTargetOptDuration(this.opts),
+      min: 1,
+      class_input: CLASS_INPUT,
+      class_label: CLASS_INPUT_LABEL,
+      is_hint_toggled: true,
+      onChangeHandler: (v: number) => {
+        this.opts.Opts.Duration = v * 1e9;
+      },
+    };
+    let com_input_duration = new WuiInputNumber(opts_duration);
 
-		let opts_rate: WuiInputNumberOpts = {
-			label: "Rate per second",
-			hint: "The number of request send per second when attacking target.",
-			value: LoadTargetOptRatePerSecond(this.opts),
-			min: 1,
-			class_input: CLASS_INPUT,
-			class_label: CLASS_INPUT_LABEL,
-			is_hint_toggled: true,
-			onChangeHandler: (v: number) => {
-				this.opts.Opts.RatePerSecond = v
-			},
-		}
-		let com_input_rate = new WuiInputNumber(opts_rate)
+    let opts_rate: WuiInputNumberOpts = {
+      label: "Rate per second",
+      hint: "The number of request send per second when attacking target.",
+      value: LoadTargetOptRatePerSecond(this.opts),
+      min: 1,
+      class_input: CLASS_INPUT,
+      class_label: CLASS_INPUT_LABEL,
+      is_hint_toggled: true,
+      onChangeHandler: (v: number) => {
+        this.opts.Opts.RatePerSecond = v;
+      },
+    };
+    let com_input_rate = new WuiInputNumber(opts_rate);
 
-		let opts_timeout: WuiInputNumberOpts = {
-			label: "Timeout (seconds)",
-			hint: "Timeout for each request, in seconds.",
-			value: LoadTargetOptTimeout(this.opts),
-			min: 5,
-			class_input: CLASS_INPUT,
-			class_label: CLASS_INPUT_LABEL,
-			is_hint_toggled: true,
-			onChangeHandler: (v: number) => {
-				this.opts.Opts.Timeout = v * 1e9
-			},
-		}
-		let com_input_timeout = new WuiInputNumber(opts_timeout)
+    let opts_timeout: WuiInputNumberOpts = {
+      label: "Timeout (seconds)",
+      hint: "Timeout for each request, in seconds.",
+      value: LoadTargetOptTimeout(this.opts),
+      min: 5,
+      class_input: CLASS_INPUT,
+      class_label: CLASS_INPUT_LABEL,
+      is_hint_toggled: true,
+      onChangeHandler: (v: number) => {
+        this.opts.Opts.Timeout = v * 1e9;
+      },
+    };
+    let com_input_timeout = new WuiInputNumber(opts_timeout);
 
-		wrapper.appendChild(legend)
-		wrapper.appendChild(com_input_duration.el)
-		wrapper.appendChild(com_input_rate.el)
-		wrapper.appendChild(com_input_timeout.el)
-		this.el_content.appendChild(wrapper)
-	}
+    wrapper.appendChild(legend);
+    wrapper.appendChild(com_input_duration.el);
+    wrapper.appendChild(com_input_rate.el);
+    wrapper.appendChild(com_input_timeout.el);
+    this.el_content.appendChild(wrapper);
+  }
 
-	private generateContentVars() {
-		if (!this.opts.Vars) {
-			return
-		}
+  private generateContentVars() {
+    if (!this.opts.Vars) {
+      return;
+    }
 
-		let wrapper = document.createElement("fieldset")
+    let wrapper = document.createElement("fieldset");
 
-		let legend = document.createElement("legend")
-		legend.innerText = "Variables"
-		wrapper.appendChild(legend)
+    let legend = document.createElement("legend");
+    legend.innerText = "Variables";
+    wrapper.appendChild(legend);
 
-		for (const key in this.opts.Vars) {
-			let fi = this.opts.Vars[key]
-			fi.value = LoadTargetVar(this.opts, key)
-			GenerateFormInput(wrapper, fi)
-		}
+    for (const [key, fi] of Object.entries(this.opts.Vars)) {
+      fi.value = LoadTargetVar(this.opts, key);
+      GenerateFormInput(wrapper, fi);
+    }
 
-		this.el_content.appendChild(wrapper)
-	}
+    this.el_content.appendChild(wrapper);
+  }
 
-	private generateHttpTargets(trunks: TrunksInterface) {
-		if (!this.opts.HttpTargets) {
-			return
-		}
+  private generateHttpTargets(trunks: TrunksInterface) {
+    if (!this.opts.HttpTargets) {
+      return;
+    }
 
-		for (let x = 0; x < this.opts.HttpTargets.length; x++) {
-			let http_target = this.opts.HttpTargets[x]
+    this.opts.HttpTargets.forEach((httpTarget: HttpTargetInterface) => {
+      let com_http_target = new HttpTarget(trunks, this.opts, httpTarget);
+      this.http_targets[httpTarget.ID] = com_http_target;
 
-			let com_http_target = new HttpTarget(
-				trunks,
-				this.opts,
-				http_target,
-			)
-			this.http_targets[http_target.ID] = com_http_target
+      this.el_content.appendChild(com_http_target.el);
+    });
+  }
 
-			this.el_content.appendChild(com_http_target.el)
-		}
-	}
+  private generateWebSocketTargets(trunks: TrunksInterface) {
+    if (!this.opts.WebSocketTargets) {
+      return;
+    }
 
-	private generateWebSocketTargets(trunks: TrunksInterface) {
-		if (!this.opts.WebSocketTargets) {
-			return
-		}
+    this.opts.WebSocketTargets.forEach((wsTarget: WebSocketTargetInterface) => {
+      let com_ws_target = new WebSocketTarget(trunks, this.opts, wsTarget);
+      this.ws_targets[wsTarget.ID] = com_ws_target;
 
-		for (let x = 0; x < this.opts.WebSocketTargets.length; x++) {
-			let ws_target = this.opts.WebSocketTargets[x]
-
-			let com_ws_target = new WebSocketTarget(
-				trunks,
-				this.opts,
-				ws_target,
-			)
-			this.ws_targets[ws_target.ID] = com_ws_target
-
-			this.el_content.appendChild(com_ws_target.el)
-		}
-	}
+      this.el_content.appendChild(com_ws_target.el);
+    });
+  }
 }
