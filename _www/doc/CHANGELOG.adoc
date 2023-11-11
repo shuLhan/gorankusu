@@ -4,6 +4,42 @@ Shulhan <ms@kilabit.info>
 :sectanchors:
 :sectlinks:
 
+[#v0_4_1]
+== trunks v0.4.1 (2023-11-11)
+
+This release only have chores, it should not break anything.
+
+go.mod: update all dependencies::
++
+--
+This changes set minimum Go version to version 1.20.
+The vegeta module finally has some update to v12.11.1.
+--
+
+gitmodules: use https instead of git scheme::
++
+Using git scheme require private key to clone the remote repository.
+
+_www: update wui module::
++
+While at it reformat all files using default prettier.
+
+_www: setup eslint for linting TypeScript files::
++
+This changes also apply all eslint recommendations.
+
+Makefile: replace the Go linter and apply all their recommendations::
++
+--
+Previously, we use golangci-lint as linter.
+This linter does not provides any useful recommendation lately and the
+development is quite a mess, sometimes its break when using Go tip.
+
+In this changes we replace it with revive, fieldalignment, and shadow;
+and fix all of their recommendations.
+--
+
+
 [#v0_4_0]
 == trunks v0.4.0 (2023-05-16)
 
