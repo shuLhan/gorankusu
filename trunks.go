@@ -17,9 +17,11 @@ import (
 	"github.com/shuLhan/share/lib/mlog"
 )
 
-const (
-	Version = `0.4.0`
+// Version of trunks module.
+const Version = `0.4.0`
 
+// List of default values.
+const (
 	DefaultAttackDuration      = 10 * time.Second
 	DefaultAttackRatePerSecond = 500
 	DefaultAttackTimeout       = 30 * time.Second
@@ -27,15 +29,19 @@ const (
 	DefaultMaxAttackRate       = 3000
 
 	DefaultListenAddress = `127.0.0.1:8217`
+)
 
-	// Setting this environment variable will enable trunks development
-	// mode.
-	EnvDevelopment = "TRUNKS_DEV"
+// EnvDevelopment setting this environment variable will enable trunks
+// development mode.
+const EnvDevelopment = "TRUNKS_DEV"
 
-	// List of HTTP parameters.
+// List of HTTP parameters.
+const (
 	paramNameName = "name"
+)
 
-	// List of HTTP APIs.
+// List of HTTP APIs.
+const (
 	pathApiAttackHttp   = `/_trunks/api/attack/http`
 	pathApiAttackResult = `/_trunks/api/attack/result`
 )
@@ -157,6 +163,7 @@ func (trunks *Trunks) RegisterNavLink(nav *NavLink) (err error) {
 	return nil
 }
 
+// RegisterTarget register Target to be attached to Trunks.
 func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 	if target == nil {
 		return
@@ -191,7 +198,7 @@ func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 		req.HttpTarget.ConvertParams = origHttpTarget.ConvertParams
 		res, err = trunks.runHttpTarget(req)
 	} else {
-		req := generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
+		req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
 		res, err = req.HttpTarget.Run(req)
 	}
 	if err != nil {
@@ -212,9 +219,9 @@ func (trunks *Trunks) Start() (err error) {
 
 	mlog.Outf(`trunks: starting HTTP server at http://%s`, trunks.Env.ListenAddress)
 	go func() {
-		err := trunks.Httpd.Start()
-		if err != nil {
-			trunks.errq <- err
+		var errStart = trunks.Httpd.Start()
+		if errStart != nil {
+			trunks.errq <- errStart
 		}
 	}()
 

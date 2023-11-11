@@ -48,6 +48,7 @@ type requestResponse struct {
 	Body          string
 }
 
+// Example contains an example how to use Trunks programmatically.
 type Example struct {
 	trunks   *trunks.Trunks
 	wsServer *websocket.Server
@@ -102,6 +103,7 @@ func New() (ex *Example, err error) {
 	return ex, nil
 }
 
+// Start the Example servers.
 func (ex *Example) Start() (err error) {
 	go func() {
 		err = ex.wsServer.Start()
@@ -113,6 +115,7 @@ func (ex *Example) Start() (err error) {
 	return ex.trunks.Start()
 }
 
+// Stop the Example servers.
 func (ex *Example) Stop() {
 	ex.wsServer.Stop()
 	ex.trunks.Stop()
@@ -370,7 +373,7 @@ func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) 
 	return json.Marshal(&res)
 }
 
-func (ex *Example) pathExampleErrorGet(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (ex *Example) pathExampleErrorGet(_ *libhttp.EndpointRequest) ([]byte, error) {
 	return nil, liberrors.Internal(fmt.Errorf("server error"))
 }
 
@@ -550,7 +553,7 @@ func (ex *Example) attackExamplePostForm(rr *trunks.RunRequest) vegeta.Targeter 
 	}
 }
 
-func (ex *Example) handleWSExampleGet(ctx context.Context, req *websocket.Request) (res websocket.Response) {
+func (ex *Example) handleWSExampleGet(_ context.Context, req *websocket.Request) (res websocket.Response) {
 	res.ID = req.ID
 	res.Code = http.StatusOK
 	res.Body = req.Body

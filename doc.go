@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 /*
-Module trunks is a library and HTTP service that provide web user interface
+Package trunks is a library and HTTP service that provide web user interface
 to test HTTP service, similar to Postman, and for load testing.
 
 For the load testing we use vegeta [1] as the backend.

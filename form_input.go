@@ -3,6 +3,7 @@
 
 package trunks
 
+// FormInputKind define type for form input.
 type FormInputKind string
 
 // List of valid value for field FormInput.Kind.

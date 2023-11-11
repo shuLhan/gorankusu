@@ -160,7 +160,7 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 }
 
 // apiEnvironmentGet get the Trunks environment including its state.
-func (trunks *Trunks) apiEnvironmentGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
 	res.Data = trunks.Env
@@ -228,7 +228,7 @@ func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byt
 // Response codes,
 //   - 200 OK: success, return the RunRequest object that has been cancelled.
 //   - 500 ERR_INTERNAL: internal server error.
-func (trunks *Trunks) apiAttackHttpCancel(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiAttackHttpCancel(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	var (
 		logp       = `apiAttackHttpCancel`
 		runRequest *RunRequest
@@ -298,7 +298,7 @@ func (trunks *Trunks) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody 
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiNavLinks(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiNavLinks(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
 	res.Data = trunks.navLinks
@@ -355,7 +355,7 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 	return json.Marshal(&epres)
 }
 
-func (trunks *Trunks) apiTargets(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiTargets(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
 	res.Data = trunks.targets

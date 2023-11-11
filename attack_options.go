@@ -9,6 +9,7 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
+// AttackOptions define the options for attacking HTTP endpoint.
 type AttackOptions struct {
 	// Duration define the duration for each attack to be executed,
 	// in seconds.

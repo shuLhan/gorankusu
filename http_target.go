@@ -32,6 +32,7 @@ type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
 // the actual Attack being called.
 type HttpPreAttackHandler func(rr *RunRequest)
 
+// HttpTarget define the HTTP endpoint that can be attached to Trunks.
 type HttpTarget struct {
 	Params        KeyFormInput
 	ConvertParams HttpConvertParams `json:"-"`
