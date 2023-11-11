@@ -11,13 +11,14 @@ import {
   TargetInterface,
   TrunksInterface,
 } from "./interface.js";
-import { GetDocumentHeight } from "./functions.js";
+
+import { getDocumentHeight } from "./functions.js";
 
 export class NavLinks {
-  el_nav: HTMLElement = document.createElement("div");
-  el_src: HTMLElement = document.createElement("div");
-  el_content: HTMLElement = document.createElement("div");
-  el_iframe: HTMLIFrameElement = document.createElement("iframe");
+  elNav: HTMLElement = document.createElement("div");
+  elSrc: HTMLElement = document.createElement("div");
+  elContent: HTMLElement = document.createElement("div");
+  elIframe: HTMLIFrameElement = document.createElement("iframe");
 
   constructor(
     public trunks: TrunksInterface,
@@ -26,11 +27,11 @@ export class NavLinks {
     const hdr = document.createElement("h3");
     hdr.innerText = "Links";
     hdr.onclick = () => {
-      trunks.SetContent(HASH_LINKS, null);
+      trunks.setContent(HASH_LINKS, null);
     };
 
-    this.el_nav.classList.add(CLASS_NAV_TARGET);
-    this.el_nav.appendChild(hdr);
+    this.elNav.classList.add(CLASS_NAV_TARGET);
+    this.elNav.appendChild(hdr);
 
     this.generateNav();
     this.generateContent();
@@ -45,22 +46,22 @@ export class NavLinks {
         this.open(nav);
       };
 
-      this.el_nav.appendChild(el);
+      this.elNav.appendChild(el);
     });
   }
 
   generateContent() {
-    this.el_iframe.width = "100%";
-    this.el_iframe.height = GetDocumentHeight() - 60 + "";
+    this.elIframe.width = "100%";
+    this.elIframe.height = getDocumentHeight() - 60 + "";
 
-    this.el_content.appendChild(this.el_src);
-    this.el_content.appendChild(this.el_iframe);
+    this.elContent.appendChild(this.elSrc);
+    this.elContent.appendChild(this.elIframe);
   }
 
   open(nav: NavLinkInterface) {
     if (nav.OpenInIFrame) {
-      this.el_src.textContent = "Source: " + nav.Href;
-      this.el_iframe.src = nav.Href;
+      this.elSrc.textContent = "Source: " + nav.Href;
+      this.elIframe.src = nav.Href;
       const target: TargetInterface = {
         ID: "nav",
         Name: "",
@@ -70,7 +71,7 @@ export class NavLinks {
         HttpTargets: [],
         WebSocketTargets: [],
       };
-      this.trunks.ContentRenderer(target, null, null, nav, this.el_content);
+      this.trunks.contentRenderer(target, null, null, nav, this.elContent);
     } else {
       window.open(nav.Href, "_blank");
     }

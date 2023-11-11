@@ -3,4 +3,4 @@
 
 import { WuiNotif } from "./wui/notif/notif.js";
 
-export const wui_notif = new WuiNotif();
+export const wuiNotif = new WuiNotif();

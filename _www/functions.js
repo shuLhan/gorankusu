@@ -3,47 +3,51 @@
 import { WuiInputNumber } from "./wui/input/number.js";
 import { WuiInputString } from "./wui/input/string.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, FormInputKindNumber, } from "./interface.js";
-export function GetDocumentHeight() {
+export function getDocumentHeight() {
     const D = document;
     return Math.max(Math.max(D.body.scrollHeight, D.documentElement.scrollHeight), Math.max(D.body.offsetHeight, D.documentElement.offsetHeight), Math.max(D.body.clientHeight, D.documentElement.clientHeight));
 }
-export function GenerateFormInput(parent, fi) {
+export function generateFormInput(parent, fi) {
+    let wuiInputNumberOpts;
+    let wuiInputStringOpts;
+    let wuiInputNumber;
+    let wuiInputString;
     switch (fi.kind) {
         case FormInputKindNumber:
-            const wui_input_number_opts = {
+            wuiInputNumberOpts = {
                 label: fi.label,
                 hint: fi.hint,
                 value: +fi.value,
                 class_input: CLASS_INPUT,
                 class_label: CLASS_INPUT_LABEL,
                 is_hint_toggled: true,
-                onChangeHandler: (new_value) => {
-                    fi.value = "" + new_value;
+                onChangeHandler: (newValue) => {
+                    fi.value = "" + newValue;
                 },
             };
             if (fi.max) {
-                wui_input_number_opts.max = fi.max;
+                wuiInputNumberOpts.max = fi.max;
             }
             if (fi.min) {
-                wui_input_number_opts.min = fi.min;
+                wuiInputNumberOpts.min = fi.min;
             }
-            const wui_input_number = new WuiInputNumber(wui_input_number_opts);
-            parent.appendChild(wui_input_number.el);
+            wuiInputNumber = new WuiInputNumber(wuiInputNumberOpts);
+            parent.appendChild(wuiInputNumber.el);
             break;
         default:
-            const wui_input_string_opts = {
+            wuiInputStringOpts = {
                 label: fi.label,
                 hint: fi.hint,
                 value: fi.value,
                 class_input: CLASS_INPUT,
                 class_label: CLASS_INPUT_LABEL,
                 is_hint_toggled: true,
-                onChangeHandler: (new_value) => {
-                    fi.value = new_value;
+                onChangeHandler: (newValue) => {
+                    fi.value = newValue;
                 },
             };
-            const wui_input_string = new WuiInputString(wui_input_string_opts);
-            parent.appendChild(wui_input_string.el);
+            wuiInputString = new WuiInputString(wuiInputStringOpts);
+            parent.appendChild(wuiInputString.el);
             break;
     }
 }
@@ -71,10 +75,10 @@ export function HttpMethodToString(m) {
     return "???";
 }
 //
-// LoadHttpTargetHeader get HttpTarget header from local storage by key.
+// loadHttpTargetHeader get HttpTarget header from local storage by key.
 // If no header exist in storage return the one from HttpTarget itself.
 //
-export function LoadHttpTargetHeader(target, httpTarget, key) {
+export function loadHttpTargetHeader(target, httpTarget, key) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -91,10 +95,10 @@ function saveHttpTargetHeader(target, httpTarget, key, value) {
     window.localStorage.setItem(storageKey, value);
 }
 //
-// LoadHttpTargetParam get HttpTarget parameter from local storage by key.
+// loadHttpTargetParam get HttpTarget parameter from local storage by key.
 // If no parameter exist in storage return the one from HttpTarget itself.
 //
-export function LoadHttpTargetParam(target, httpTarget, key) {
+export function loadHttpTargetParam(target, httpTarget, key) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -110,7 +114,7 @@ function saveHttpTargetParam(target, httpTarget, key, value) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
-export function LoadTargetOptDuration(target) {
+export function loadTargetOptDuration(target) {
     const storageKey = `${target.ID}.opt.Duration`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -122,7 +126,7 @@ function saveTargetOptDuration(target) {
     const storageKey = `${target.ID}.opt.Duration`;
     window.localStorage.setItem(storageKey, "" + target.Opts.Duration);
 }
-export function LoadTargetOptRatePerSecond(target) {
+export function loadTargetOptRatePerSecond(target) {
     const storageKey = `${target.ID}.opt.RatePerSecond`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -134,7 +138,7 @@ function saveTargetOptRatePerSecond(target) {
     const storageKey = `${target.ID}.opt.RatePerSecond`;
     window.localStorage.setItem(storageKey, "" + target.Opts.RatePerSecond);
 }
-export function LoadTargetOptTimeout(target) {
+export function loadTargetOptTimeout(target) {
     const storageKey = `${target.ID}.opt.Timeout`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -147,10 +151,10 @@ function saveTargetOptTimeout(target) {
     window.localStorage.setItem(storageKey, "" + target.Opts.Timeout);
 }
 //
-// LoadTargetVar get target variable from local storage or return the original
+// loadTargetVar get target variable from local storage or return the original
 // value.
 //
-export function LoadTargetVar(target, key) {
+export function loadTargetVar(target, key) {
     const storageKey = `${target.ID}.var.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -167,9 +171,9 @@ function saveTargetVar(target, key, value) {
     window.localStorage.setItem(storageKey, value);
 }
 //
-// LoadWsTargetHeader get the WebSocketTarget from local storage by key.
+// loadWsTargetHeader get the WebSocketTarget from local storage by key.
 //
-export function LoadWsTargetHeader(target, wsTarget, key) {
+export function loadWsTargetHeader(target, wsTarget, key) {
     const storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -186,10 +190,10 @@ function saveWsTargetHeader(target, wsTarget, key, value) {
     window.localStorage.setItem(storageKey, value);
 }
 //
-// LoadWsTargetParam get the WebSocketTarget parameter from local storage or
+// loadWsTargetParam get the WebSocketTarget parameter from local storage or
 // return the one from wsTarget if its not exist.
 //
-export function LoadWsTargetParam(target, wsTarget, key) {
+export function loadWsTargetParam(target, wsTarget, key) {
     const storageKey = `${target.ID}.ws.${wsTarget.ID}.param.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -206,10 +210,10 @@ function saveWsTargetParam(target, wsTarget, key, value) {
     window.localStorage.setItem(storageKey, value);
 }
 //
-// Save the variables on the Target, Params and Headers on HttpTarget or
+// save the variables on the Target, Params and Headers on HttpTarget or
 // WebSocket to local storage.
 //
-export function Save(target, httpTarget, wsTarget) {
+export function save(target, httpTarget, wsTarget) {
     saveTargetOptDuration(target);
     saveTargetOptRatePerSecond(target);
     saveTargetOptTimeout(target);

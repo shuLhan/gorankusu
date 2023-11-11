@@ -7,19 +7,19 @@ export class Environment {
     constructor(trunks, opts) {
         this.trunks = trunks;
         this.opts = opts;
-        this.el_nav = document.createElement("h3");
-        this.el_content = document.createElement("div");
-        this.el_nav.classList.add(CLASS_NAV_TARGET);
-        this.el_nav.innerText = "Environment";
-        this.el_nav.onclick = () => {
-            trunks.SetContent(HASH_ENVIRONMENT, this.el_content);
+        this.elNav = document.createElement("h3");
+        this.elContent = document.createElement("div");
+        this.elNav.classList.add(CLASS_NAV_TARGET);
+        this.elNav.innerText = "Environment";
+        this.elNav.onclick = () => {
+            trunks.setContent(HASH_ENVIRONMENT, this.elContent);
         };
         this.generateContent();
     }
     generateContent() {
-        const el_title = document.createElement("h2");
-        el_title.innerText = "Environment";
-        const opts_listen_address = {
+        const elTitle = document.createElement("h2");
+        elTitle.innerText = "Environment";
+        const optsListenAddress = {
             label: "Listen address",
             hint: "The address and port where Trunks is running.",
             value: this.opts.ListenAddress,
@@ -31,8 +31,8 @@ export class Environment {
                 this.opts.ListenAddress = v;
             },
         };
-        this.com_listen_address = new WuiInputString(opts_listen_address);
-        const opts_max_attack_dur = {
+        this.comListenAddress = new WuiInputString(optsListenAddress);
+        const optsMaxAttackDur = {
             label: "Max. attack duration (seconds)",
             hint: "Maximum attack duration for all targets, in seconds.",
             value: this.opts.MaxAttackDuration / 1e9,
@@ -45,8 +45,8 @@ export class Environment {
                 this.opts.MaxAttackDuration = v * 1e9;
             },
         };
-        this.com_max_attack_dur = new WuiInputNumber(opts_max_attack_dur);
-        const opts_max_attack_rate = {
+        this.comMaxAttackDur = new WuiInputNumber(optsMaxAttackDur);
+        const optsMaxAttackRate = {
             label: "Max. attack rate",
             hint: "Maximum attack rate for all targets.",
             value: this.opts.MaxAttackRate,
@@ -59,8 +59,8 @@ export class Environment {
                 this.opts.MaxAttackRate = v;
             },
         };
-        this.com_max_attack_rate = new WuiInputNumber(opts_max_attack_rate);
-        const opts_results_dir = {
+        this.comMaxAttackRate = new WuiInputNumber(optsMaxAttackRate);
+        const optsResultsDir = {
             label: "Results directory",
             hint: "The directory where the attack result will be saved.",
             value: this.opts.ResultsDir,
@@ -72,8 +72,8 @@ export class Environment {
                 this.opts.ResultsDir = v;
             },
         };
-        this.com_results_dir = new WuiInputString(opts_results_dir);
-        const opts_results_suffix = {
+        this.comResultsDir = new WuiInputString(optsResultsDir);
+        const optsResultsSuffix = {
             label: "Results suffix",
             hint: "Optional suffix for the file name of attack result.",
             value: this.opts.ResultsSuffix,
@@ -85,20 +85,20 @@ export class Environment {
                 this.opts.ResultsSuffix = v;
             },
         };
-        this.com_results_suffix = new WuiInputString(opts_results_suffix);
-        this.el_content.appendChild(el_title);
-        this.el_content.appendChild(this.com_listen_address.el);
-        this.el_content.appendChild(this.com_max_attack_dur.el);
-        this.el_content.appendChild(this.com_max_attack_rate.el);
-        this.el_content.appendChild(this.com_results_dir.el);
-        this.el_content.appendChild(this.com_results_suffix.el);
+        this.comResultsSuffix = new WuiInputString(optsResultsSuffix);
+        this.elContent.appendChild(elTitle);
+        this.elContent.appendChild(this.comListenAddress.el);
+        this.elContent.appendChild(this.comMaxAttackDur.el);
+        this.elContent.appendChild(this.comMaxAttackRate.el);
+        this.elContent.appendChild(this.comResultsDir.el);
+        this.elContent.appendChild(this.comResultsSuffix.el);
     }
-    Set(opts) {
+    set(opts) {
         this.opts = opts;
-        this.com_listen_address.Set(opts.ListenAddress);
-        this.com_max_attack_dur.Set(opts.MaxAttackDuration / 1e9);
-        this.com_max_attack_rate.Set(opts.MaxAttackRate);
-        this.com_results_dir.Set(opts.ResultsDir);
-        this.com_results_suffix.Set(opts.ResultsSuffix);
+        this.comListenAddress.set(opts.ListenAddress);
+        this.comMaxAttackDur.set(opts.MaxAttackDuration / 1e9);
+        this.comMaxAttackRate.set(opts.MaxAttackRate);
+        this.comResultsDir.set(opts.ResultsDir);
+        this.comResultsSuffix.set(opts.ResultsSuffix);
     }
 }

@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
-import { GenerateFormInput, LoadWsTargetHeader, LoadWsTargetParam, } from "./functions.js";
+import { generateFormInput, loadWsTargetHeader, loadWsTargetParam, } from "./functions.js";
 const CLASS_WS_TARGET = "ws_target";
 const CLASS_WS_TARGET_ACTIONS = "ws_target_actions";
 const CLASS_WS_TARGET_INPUT = "ws_target_input";
@@ -19,31 +19,31 @@ export class WebSocketTarget {
         this.el_out_response = document.createElement("pre");
         this.el.id = opts.ID;
         this.el.classList.add(CLASS_WS_TARGET);
-        const el_title = document.createElement("h3");
-        el_title.innerText = opts.Name;
-        this.el.appendChild(el_title);
-        this.generateActions(el_title);
+        const elTitle = document.createElement("h3");
+        elTitle.innerText = opts.Name;
+        this.el.appendChild(elTitle);
+        this.generateActions(elTitle);
         this.generateHint(this.el);
         this.generateInput(this.el);
         this.generateOutput(this.el);
     }
     generateActions(parent) {
-        const el_actions = document.createElement("span");
-        el_actions.classList.add(CLASS_WS_TARGET_ACTIONS);
+        const elActions = document.createElement("span");
+        elActions.classList.add(CLASS_WS_TARGET_ACTIONS);
         this.el_button_run.innerText = "Run";
         this.el_button_run.onclick = () => {
             this.onClickRun();
         };
-        el_actions.appendChild(this.el_button_run);
-        parent.appendChild(el_actions);
+        elActions.appendChild(this.el_button_run);
+        parent.appendChild(elActions);
     }
     generateHint(parent) {
         if (!this.opts.Hint) {
             return;
         }
-        const el_hint = document.createElement("p");
-        el_hint.innerHTML = this.opts.Hint;
-        parent.appendChild(el_hint);
+        const elHint = document.createElement("p");
+        elHint.innerHTML = this.opts.Hint;
+        parent.appendChild(elHint);
     }
     generateInput(parent) {
         this.el_request_input.classList.add(CLASS_WS_TARGET_INPUT);
@@ -64,8 +64,8 @@ export class WebSocketTarget {
         title.innerText = "Headers";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Headers)) {
-            fi.value = LoadWsTargetHeader(this.target, this.opts, key);
-            GenerateFormInput(wrapper, fi);
+            fi.value = loadWsTargetHeader(this.target, this.opts, key);
+            generateFormInput(wrapper, fi);
         }
         parent.appendChild(wrapper);
     }
@@ -82,8 +82,8 @@ export class WebSocketTarget {
         title.innerText = "Parameters";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Params)) {
-            fi.value = LoadWsTargetParam(this.target, this.opts, key);
-            GenerateFormInput(wrapper, fi);
+            fi.value = loadWsTargetParam(this.target, this.opts, key);
+            generateFormInput(wrapper, fi);
         }
         parent.appendChild(wrapper);
     }
@@ -92,12 +92,12 @@ export class WebSocketTarget {
         wrapper.classList.add(CLASS_WS_TARGET_OUT_RUN);
         const title = document.createElement("legend");
         title.innerText = "Run output";
-        const btn_clear = document.createElement("button");
-        btn_clear.innerText = "Clear";
-        btn_clear.onclick = () => {
+        const btnClear = document.createElement("button");
+        btnClear.innerText = "Clear";
+        btnClear.onclick = () => {
             this.onClickClearOutput();
         };
-        title.appendChild(btn_clear);
+        title.appendChild(btnClear);
         this.el_out_response.classList.add(CLASS_WS_TARGET_OUT_MONO);
         wrapper.appendChild(title);
         wrapper.appendChild(this.el_out_response);
@@ -107,7 +107,7 @@ export class WebSocketTarget {
         this.el_out_response.innerText = "";
     }
     async onClickRun() {
-        const res = await this.trunks.RunWebSocket(this.target, this.opts);
+        const res = await this.trunks.runWebSocket(this.target, this.opts);
         if (!res) {
             return;
         }

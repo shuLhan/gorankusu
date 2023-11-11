@@ -47,7 +47,7 @@ export interface FormInput {
 export interface HttpResponseInterface {
   code: number;
   message: string;
-  data?: any;
+  data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export interface HttpTargetInterface {
@@ -111,16 +111,16 @@ export interface TargetInterface {
 }
 
 export interface TrunksInterface {
-  AttackHttp(
+  attackHttp(
     target: TargetInterface,
     http_target: HttpTargetInterface,
   ): Promise<HttpResponseInterface | null>;
 
-  AttackHttpDelete(name: string): Promise<HttpResponseInterface | null>;
+  attackHttpDelete(name: string): Promise<HttpResponseInterface | null>;
 
-  AttackHttpGet(name: string): Promise<HttpResponseInterface>;
+  attackHttpGet(name: string): Promise<HttpResponseInterface>;
 
-  ContentRenderer(
+  contentRenderer(
     target: TargetInterface,
     http_target: HttpTargetInterface | null,
     ws_target: WebSocketTargetInterface | null,
@@ -128,14 +128,14 @@ export interface TrunksInterface {
     el: HTMLElement,
   ): void;
 
-  SetContent(path: string, el: HTMLElement | null): void;
+  setContent(path: string, el: HTMLElement | null): void;
 
-  RunHttp(
+  runHttp(
     target: TargetInterface,
     http_target: HttpTargetInterface,
   ): Promise<RunResponseInterface | null>;
 
-  RunWebSocket(
+  runWebSocket(
     target: TargetInterface,
     WebSocketTargetInterface: WebSocketTargetInterface,
   ): Promise<HttpResponseInterface | null>;

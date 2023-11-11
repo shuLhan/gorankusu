@@ -6,7 +6,7 @@ import { Trunks } from "./trunks.js";
 async function main() {
   const trunks = new Trunks();
 
-  await trunks.Init();
+  await trunks.init();
 }
 
 main();
