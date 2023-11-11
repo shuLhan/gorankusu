@@ -31,7 +31,7 @@ export class HttpTarget {
         this.el_out_attack_results = document.createElement("div");
         this.el.id = opts.ID;
         this.el.classList.add(CLASS_HTTP_TARGET);
-        let el_title = document.createElement("h3");
+        const el_title = document.createElement("h3");
         el_title.innerText = opts.Name;
         this.el.appendChild(el_title);
         this.generateActions(el_title);
@@ -41,7 +41,7 @@ export class HttpTarget {
         this.generateOutputAttack(this.el);
     }
     generateActions(parent) {
-        let el_actions = document.createElement("span");
+        const el_actions = document.createElement("span");
         el_actions.classList.add(CLASS_HTTP_TARGET_ACTIONS);
         this.el_button_run.innerText = "Run";
         this.el_button_run.onclick = () => {
@@ -61,7 +61,7 @@ export class HttpTarget {
         if (!this.opts.Hint) {
             return;
         }
-        let el_hint = document.createElement("p");
+        const el_hint = document.createElement("p");
         el_hint.innerHTML = this.opts.Hint;
         parent.appendChild(el_hint);
     }
@@ -74,8 +74,8 @@ export class HttpTarget {
         parent.appendChild(this.el_request_input);
     }
     generateRequestMethod(parent) {
-        let m = "" + this.opts.Method;
-        let select_opts = {
+        const m = "" + this.opts.Method;
+        const select_opts = {
             label: "",
             name: "",
             options: {
@@ -121,8 +121,8 @@ export class HttpTarget {
                 this.opts.Method = parseInt(value);
             },
         };
-        let wui_request_method = new WuiInputSelect(select_opts);
-        let path_opts = {
+        const wui_request_method = new WuiInputSelect(select_opts);
+        const path_opts = {
             label: wui_request_method.el,
             value: this.opts.Path,
             class_input: CLASS_INPUT,
@@ -132,12 +132,12 @@ export class HttpTarget {
                 this.opts.Path = path;
             },
         };
-        let wui_request_path = new WuiInputString(path_opts);
+        const wui_request_path = new WuiInputString(path_opts);
         parent.appendChild(wui_request_path.el);
     }
     generateRequestContentType(parent) {
-        let ct = "" + this.opts.RequestType;
-        let select_opts = {
+        const ct = "" + this.opts.RequestType;
+        const select_opts = {
             label: "Content type",
             name: "",
             options: {
@@ -169,7 +169,7 @@ export class HttpTarget {
                 this.opts.RequestType = parseInt(value);
             },
         };
-        let wui_request_type = new WuiInputSelect(select_opts);
+        const wui_request_type = new WuiInputSelect(select_opts);
         parent.appendChild(wui_request_type.el);
     }
     generateRequestHeaders(parent) {
@@ -179,9 +179,9 @@ export class HttpTarget {
         if (Object.keys(this.opts.Headers).length === 0) {
             return;
         }
-        let wrapper = document.createElement("fieldset");
+        const wrapper = document.createElement("fieldset");
         wrapper.classList.add(CLASS_HTTP_TARGET_INPUT_HEADER);
-        let legend = document.createElement("legend");
+        const legend = document.createElement("legend");
         legend.innerText = "Headers";
         wrapper.appendChild(legend);
         for (const [key, fi] of Object.entries(this.opts.Headers)) {
@@ -197,9 +197,9 @@ export class HttpTarget {
         if (Object.keys(this.opts.Params).length === 0) {
             return;
         }
-        let wrapper = document.createElement("fieldset");
+        const wrapper = document.createElement("fieldset");
         wrapper.classList.add(CLASS_HTTP_TARGET_INPUT_PARAMS);
-        let title = document.createElement("legend");
+        const title = document.createElement("legend");
         title.innerText = "Parameters";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Params)) {
@@ -209,11 +209,11 @@ export class HttpTarget {
         parent.appendChild(wrapper);
     }
     generateOutput(parent) {
-        let wrapper = document.createElement("fieldset");
+        const wrapper = document.createElement("fieldset");
         wrapper.classList.add(CLASS_HTTP_TARGET_OUT_RUN);
-        let title = document.createElement("legend");
+        const title = document.createElement("legend");
         title.innerText = "Run output";
-        let btn_clear = document.createElement("button");
+        const btn_clear = document.createElement("button");
         btn_clear.innerText = "Clear";
         btn_clear.onclick = () => {
             this.onClickClearOutput();
@@ -234,7 +234,7 @@ export class HttpTarget {
             return;
         }
         this.el_out_attack.classList.add(CLASS_HTTP_TARGET_OUT_ATTACK);
-        let title = document.createElement("legend");
+        const title = document.createElement("legend");
         title.innerText = "Attack results";
         this.generateAttackResults(this.el_out_attack_results);
         this.el_out_attack.appendChild(title);
@@ -246,25 +246,25 @@ export class HttpTarget {
         if (!this.opts.Results) {
             return;
         }
-        for (let result of this.opts.Results) {
-            let wrapper = document.createElement("div");
+        for (const result of this.opts.Results) {
+            const wrapper = document.createElement("div");
             wrapper.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT);
-            let el_report_text = document.createElement("div");
+            const el_report_text = document.createElement("div");
             el_report_text.style.display = "none";
             el_report_text.classList.add(CLASS_HTTP_TARGET_OUT_MONO);
-            let el_report_hist = document.createElement("div");
+            const el_report_hist = document.createElement("div");
             el_report_hist.style.display = "none";
             el_report_hist.classList.add(CLASS_HTTP_TARGET_OUT_MONO);
-            let el = document.createElement("div");
+            const el = document.createElement("div");
             el.innerText = result.Name;
-            let actions = document.createElement("span");
+            const actions = document.createElement("span");
             actions.classList.add(CLASS_HTTP_TARGET_ATTACK_RESULT_ACTIONS);
-            let btn_attack_show = document.createElement("button");
+            const btn_attack_show = document.createElement("button");
             btn_attack_show.innerText = "Show";
             btn_attack_show.onclick = () => {
                 this.onClickAttackShow(result.Name, btn_attack_show, el_report_text, el_report_hist);
             };
-            let btn_attack_del = document.createElement("button");
+            const btn_attack_del = document.createElement("button");
             btn_attack_del.innerText = "Delete";
             btn_attack_del.onclick = () => {
                 this.onClickAttackDelete(result);
@@ -282,7 +282,7 @@ export class HttpTarget {
         await this.trunks.AttackHttp(this.target, this.opts);
     }
     async onClickAttackDelete(result) {
-        let res = await this.trunks.AttackHttpDelete(result.Name);
+        const res = await this.trunks.AttackHttpDelete(result.Name);
         if (!res) {
             return;
         }
@@ -301,11 +301,11 @@ export class HttpTarget {
             el_report_hist.style.display = "none";
             return;
         }
-        let res_json = await this.trunks.AttackHttpGet(result_name);
+        const res_json = await this.trunks.AttackHttpGet(result_name);
         if (res_json.code != 200) {
             return;
         }
-        let res = res_json.data;
+        const res = res_json.data;
         el_report_text.innerText = atob(res.TextReport);
         el_report_text.style.display = "block";
         el_report_hist.innerText = atob(res.HistReport);
@@ -318,13 +318,13 @@ export class HttpTarget {
         this.el_out_response_body.innerText = "JSON formatted response body";
     }
     async onClickRun() {
-        let res = await this.trunks.RunHttp(this.target, this.opts);
+        const res = await this.trunks.RunHttp(this.target, this.opts);
         if (!res) {
             return;
         }
         this.el_out_request.innerText = atob(res.DumpRequest);
         this.el_out_response.innerText = atob(res.DumpResponse);
-        let body = atob(res.ResponseBody);
+        const body = atob(res.ResponseBody);
         if (res.ResponseType === CONTENT_TYPE_JSON) {
             this.el_out_response_body.innerText = JSON.stringify(JSON.parse(body), null, 2);
         }

@@ -19,7 +19,7 @@ export class WebSocketTarget {
         this.el_out_response = document.createElement("pre");
         this.el.id = opts.ID;
         this.el.classList.add(CLASS_WS_TARGET);
-        let el_title = document.createElement("h3");
+        const el_title = document.createElement("h3");
         el_title.innerText = opts.Name;
         this.el.appendChild(el_title);
         this.generateActions(el_title);
@@ -28,7 +28,7 @@ export class WebSocketTarget {
         this.generateOutput(this.el);
     }
     generateActions(parent) {
-        let el_actions = document.createElement("span");
+        const el_actions = document.createElement("span");
         el_actions.classList.add(CLASS_WS_TARGET_ACTIONS);
         this.el_button_run.innerText = "Run";
         this.el_button_run.onclick = () => {
@@ -41,7 +41,7 @@ export class WebSocketTarget {
         if (!this.opts.Hint) {
             return;
         }
-        let el_hint = document.createElement("p");
+        const el_hint = document.createElement("p");
         el_hint.innerHTML = this.opts.Hint;
         parent.appendChild(el_hint);
     }
@@ -58,9 +58,9 @@ export class WebSocketTarget {
         if (Object.keys(this.opts.Headers).length === 0) {
             return;
         }
-        let wrapper = document.createElement("div");
+        const wrapper = document.createElement("div");
         wrapper.classList.add(CLASS_WS_TARGET_INPUT_HEADER);
-        let title = document.createElement("h4");
+        const title = document.createElement("h4");
         title.innerText = "Headers";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Headers)) {
@@ -76,9 +76,9 @@ export class WebSocketTarget {
         if (Object.keys(this.opts.Params).length === 0) {
             return;
         }
-        let wrapper = document.createElement("fieldset");
+        const wrapper = document.createElement("fieldset");
         wrapper.classList.add(CLASS_WS_TARGET_INPUT_PARAM);
-        let title = document.createElement("legend");
+        const title = document.createElement("legend");
         title.innerText = "Parameters";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Params)) {
@@ -88,11 +88,11 @@ export class WebSocketTarget {
         parent.appendChild(wrapper);
     }
     generateOutput(parent) {
-        let wrapper = document.createElement("fieldset");
+        const wrapper = document.createElement("fieldset");
         wrapper.classList.add(CLASS_WS_TARGET_OUT_RUN);
-        let title = document.createElement("legend");
+        const title = document.createElement("legend");
         title.innerText = "Run output";
-        let btn_clear = document.createElement("button");
+        const btn_clear = document.createElement("button");
         btn_clear.innerText = "Clear";
         btn_clear.onclick = () => {
             this.onClickClearOutput();
@@ -107,7 +107,7 @@ export class WebSocketTarget {
         this.el_out_response.innerText = "";
     }
     async onClickRun() {
-        let res = await this.trunks.RunWebSocket(this.target, this.opts);
+        const res = await this.trunks.RunWebSocket(this.target, this.opts);
         if (!res) {
             return;
         }

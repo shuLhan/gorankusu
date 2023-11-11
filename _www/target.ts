@@ -52,7 +52,7 @@ export class Target {
   private generateNav(trunks: TrunksInterface) {
     this.el_nav.classList.add(CLASS_NAV_TARGET);
 
-    let el_target_menu = document.createElement("h3");
+    const el_target_menu = document.createElement("h3");
     el_target_menu.innerHTML = this.opts.Name;
     el_target_menu.onclick = () => {
       trunks.ContentRenderer(this.opts, null, null, null, this.el_content);
@@ -61,8 +61,8 @@ export class Target {
     this.el_nav.appendChild(el_target_menu);
 
     if (this.opts.HttpTargets) {
-      for (let ht of this.opts.HttpTargets) {
-        let el_target_http = document.createElement("div");
+      for (const ht of this.opts.HttpTargets) {
+        const el_target_http = document.createElement("div");
         el_target_http.innerHTML = ht.Name;
         el_target_http.id = `/http/${this.opts.ID}/${ht.ID}`;
         el_target_http.classList.add(CLASS_NAV_TARGET_HTTP);
@@ -74,8 +74,8 @@ export class Target {
     }
 
     if (this.opts.WebSocketTargets) {
-      for (let wst of this.opts.WebSocketTargets) {
-        let el_target_ws = document.createElement("div");
+      for (const wst of this.opts.WebSocketTargets) {
+        const el_target_ws = document.createElement("div");
         el_target_ws.innerHTML = wst.Name;
         el_target_ws.id = `/ws/${this.opts.ID}/${wst.ID}`;
         el_target_ws.classList.add(CLASS_NAV_TARGET_WS);
@@ -96,14 +96,14 @@ export class Target {
   }
 
   private generateContentBaseURL() {
-    let hdr_target = document.createElement("h2");
+    const hdr_target = document.createElement("h2");
     hdr_target.innerText = this.opts.Name;
     hdr_target.id = this.opts.ID;
 
-    let el_hint = document.createElement("p");
+    const el_hint = document.createElement("p");
     el_hint.innerHTML = this.opts.Hint || "";
 
-    let opts_base_url: WuiInputStringOpts = {
+    const opts_base_url: WuiInputStringOpts = {
       label: "Base URL",
       hint: "The base URL where the HTTP request will be send or the target of attack.",
       value: this.opts.BaseUrl,
@@ -115,7 +115,7 @@ export class Target {
         this.opts.BaseUrl = v;
       },
     };
-    let com_input_base_url = new WuiInputString(opts_base_url);
+    const com_input_base_url = new WuiInputString(opts_base_url);
 
     this.el_content.appendChild(hdr_target);
     if (this.opts.Hint) {
@@ -125,12 +125,12 @@ export class Target {
   }
 
   private generateContentAttackOptions() {
-    let wrapper = document.createElement("fieldset");
+    const wrapper = document.createElement("fieldset");
 
-    let legend = document.createElement("legend");
+    const legend = document.createElement("legend");
     legend.innerText = "Attack options";
 
-    let opts_duration: WuiInputNumberOpts = {
+    const opts_duration: WuiInputNumberOpts = {
       label: "Duration",
       hint: "The duration of attack, in seconds.",
       value: LoadTargetOptDuration(this.opts),
@@ -142,9 +142,9 @@ export class Target {
         this.opts.Opts.Duration = v * 1e9;
       },
     };
-    let com_input_duration = new WuiInputNumber(opts_duration);
+    const com_input_duration = new WuiInputNumber(opts_duration);
 
-    let opts_rate: WuiInputNumberOpts = {
+    const opts_rate: WuiInputNumberOpts = {
       label: "Rate per second",
       hint: "The number of request send per second when attacking target.",
       value: LoadTargetOptRatePerSecond(this.opts),
@@ -156,9 +156,9 @@ export class Target {
         this.opts.Opts.RatePerSecond = v;
       },
     };
-    let com_input_rate = new WuiInputNumber(opts_rate);
+    const com_input_rate = new WuiInputNumber(opts_rate);
 
-    let opts_timeout: WuiInputNumberOpts = {
+    const opts_timeout: WuiInputNumberOpts = {
       label: "Timeout (seconds)",
       hint: "Timeout for each request, in seconds.",
       value: LoadTargetOptTimeout(this.opts),
@@ -170,7 +170,7 @@ export class Target {
         this.opts.Opts.Timeout = v * 1e9;
       },
     };
-    let com_input_timeout = new WuiInputNumber(opts_timeout);
+    const com_input_timeout = new WuiInputNumber(opts_timeout);
 
     wrapper.appendChild(legend);
     wrapper.appendChild(com_input_duration.el);
@@ -184,9 +184,9 @@ export class Target {
       return;
     }
 
-    let wrapper = document.createElement("fieldset");
+    const wrapper = document.createElement("fieldset");
 
-    let legend = document.createElement("legend");
+    const legend = document.createElement("legend");
     legend.innerText = "Variables";
     wrapper.appendChild(legend);
 
@@ -204,7 +204,7 @@ export class Target {
     }
 
     this.opts.HttpTargets.forEach((httpTarget: HttpTargetInterface) => {
-      let com_http_target = new HttpTarget(trunks, this.opts, httpTarget);
+      const com_http_target = new HttpTarget(trunks, this.opts, httpTarget);
       this.http_targets[httpTarget.ID] = com_http_target;
 
       this.el_content.appendChild(com_http_target.el);
@@ -217,7 +217,7 @@ export class Target {
     }
 
     this.opts.WebSocketTargets.forEach((wsTarget: WebSocketTargetInterface) => {
-      let com_ws_target = new WebSocketTarget(trunks, this.opts, wsTarget);
+      const com_ws_target = new WebSocketTarget(trunks, this.opts, wsTarget);
       this.ws_targets[wsTarget.ID] = com_ws_target;
 
       this.el_content.appendChild(com_ws_target.el);

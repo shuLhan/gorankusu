@@ -4,13 +4,13 @@ import { WuiInputNumber } from "./wui/input/number.js";
 import { WuiInputString } from "./wui/input/string.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, FormInputKindNumber, } from "./interface.js";
 export function GetDocumentHeight() {
-    var D = document;
+    const D = document;
     return Math.max(Math.max(D.body.scrollHeight, D.documentElement.scrollHeight), Math.max(D.body.offsetHeight, D.documentElement.offsetHeight), Math.max(D.body.clientHeight, D.documentElement.clientHeight));
 }
 export function GenerateFormInput(parent, fi) {
     switch (fi.kind) {
         case FormInputKindNumber:
-            let wui_input_number_opts = {
+            const wui_input_number_opts = {
                 label: fi.label,
                 hint: fi.hint,
                 value: +fi.value,
@@ -27,11 +27,11 @@ export function GenerateFormInput(parent, fi) {
             if (fi.min) {
                 wui_input_number_opts.min = fi.min;
             }
-            let wui_input_number = new WuiInputNumber(wui_input_number_opts);
+            const wui_input_number = new WuiInputNumber(wui_input_number_opts);
             parent.appendChild(wui_input_number.el);
             break;
         default:
-            let wui_input_string_opts = {
+            const wui_input_string_opts = {
                 label: fi.label,
                 hint: fi.hint,
                 value: fi.value,
@@ -42,7 +42,7 @@ export function GenerateFormInput(parent, fi) {
                     fi.value = new_value;
                 },
             };
-            let wui_input_string = new WuiInputString(wui_input_string_opts);
+            const wui_input_string = new WuiInputString(wui_input_string_opts);
             parent.appendChild(wui_input_string.el);
             break;
     }
@@ -75,7 +75,7 @@ export function HttpMethodToString(m) {
 // If no header exist in storage return the one from HttpTarget itself.
 //
 export function LoadHttpTargetHeader(target, httpTarget, key) {
-    let storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
+    const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
         return val;
@@ -87,7 +87,7 @@ export function LoadHttpTargetHeader(target, httpTarget, key) {
     return "";
 }
 function saveHttpTargetHeader(target, httpTarget, key, value) {
-    let storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
+    const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 //
@@ -95,7 +95,7 @@ function saveHttpTargetHeader(target, httpTarget, key, value) {
 // If no parameter exist in storage return the one from HttpTarget itself.
 //
 export function LoadHttpTargetParam(target, httpTarget, key) {
-    let storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
+    const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
         return val;
@@ -107,43 +107,43 @@ export function LoadHttpTargetParam(target, httpTarget, key) {
     return "";
 }
 function saveHttpTargetParam(target, httpTarget, key, value) {
-    let storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
+    const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 export function LoadTargetOptDuration(target) {
-    let storageKey = `${target.ID}.opt.Duration`;
-    let val = window.localStorage.getItem(storageKey);
+    const storageKey = `${target.ID}.opt.Duration`;
+    const val = window.localStorage.getItem(storageKey);
     if (val) {
         return +val / 1e9;
     }
     return target.Opts.Duration / 1e9;
 }
 function saveTargetOptDuration(target) {
-    let storageKey = `${target.ID}.opt.Duration`;
+    const storageKey = `${target.ID}.opt.Duration`;
     window.localStorage.setItem(storageKey, "" + target.Opts.Duration);
 }
 export function LoadTargetOptRatePerSecond(target) {
-    let storageKey = `${target.ID}.opt.RatePerSecond`;
-    let val = window.localStorage.getItem(storageKey);
+    const storageKey = `${target.ID}.opt.RatePerSecond`;
+    const val = window.localStorage.getItem(storageKey);
     if (val) {
         return +val;
     }
     return target.Opts.RatePerSecond;
 }
 function saveTargetOptRatePerSecond(target) {
-    let storageKey = `${target.ID}.opt.RatePerSecond`;
+    const storageKey = `${target.ID}.opt.RatePerSecond`;
     window.localStorage.setItem(storageKey, "" + target.Opts.RatePerSecond);
 }
 export function LoadTargetOptTimeout(target) {
-    let storageKey = `${target.ID}.opt.Timeout`;
-    let val = window.localStorage.getItem(storageKey);
+    const storageKey = `${target.ID}.opt.Timeout`;
+    const val = window.localStorage.getItem(storageKey);
     if (val) {
         return +val / 1e9;
     }
     return target.Opts.Timeout / 1e9;
 }
 function saveTargetOptTimeout(target) {
-    let storageKey = `${target.ID}.opt.Timeout`;
+    const storageKey = `${target.ID}.opt.Timeout`;
     window.localStorage.setItem(storageKey, "" + target.Opts.Timeout);
 }
 //
@@ -151,7 +151,7 @@ function saveTargetOptTimeout(target) {
 // value.
 //
 export function LoadTargetVar(target, key) {
-    let storageKey = `${target.ID}.var.${key}`;
+    const storageKey = `${target.ID}.var.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
         return val;
@@ -163,14 +163,14 @@ export function LoadTargetVar(target, key) {
     return "";
 }
 function saveTargetVar(target, key, value) {
-    let storageKey = `${target.ID}.var.${key}`;
+    const storageKey = `${target.ID}.var.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 //
 // LoadWsTargetHeader get the WebSocketTarget from local storage by key.
 //
 export function LoadWsTargetHeader(target, wsTarget, key) {
-    let storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`;
+    const storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
         return val;
@@ -182,7 +182,7 @@ export function LoadWsTargetHeader(target, wsTarget, key) {
     return "";
 }
 function saveWsTargetHeader(target, wsTarget, key, value) {
-    let storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`;
+    const storageKey = `${target.ID}.ws.${wsTarget.ID}.header.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 //
@@ -190,8 +190,8 @@ function saveWsTargetHeader(target, wsTarget, key, value) {
 // return the one from wsTarget if its not exist.
 //
 export function LoadWsTargetParam(target, wsTarget, key) {
-    let storageKey = `${target.ID}.ws.${wsTarget.ID}.param.${key}`;
-    let val = window.localStorage.getItem(storageKey);
+    const storageKey = `${target.ID}.ws.${wsTarget.ID}.param.${key}`;
+    const val = window.localStorage.getItem(storageKey);
     if (val) {
         return val;
     }
@@ -202,7 +202,7 @@ export function LoadWsTargetParam(target, wsTarget, key) {
     return "";
 }
 function saveWsTargetParam(target, wsTarget, key, value) {
-    let storageKey = `${target.ID}.ws.${wsTarget.ID}.param.${key}`;
+    const storageKey = `${target.ID}.ws.${wsTarget.ID}.param.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 //

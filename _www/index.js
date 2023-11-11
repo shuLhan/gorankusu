@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import { Trunks } from "./trunks.js";
 async function main() {
-    let trunks = new Trunks();
+    const trunks = new Trunks();
     await trunks.Init();
 }
 main();

@@ -36,17 +36,17 @@ export class Trunks {
         document.body.appendChild(this.el);
     }
     generateNav() {
-        let el_nav = document.createElement("div");
+        const el_nav = document.createElement("div");
         el_nav.classList.add(CLASS_NAV);
         this.el_ws_conn_status = document.createElement("div");
-        let fs_attack_running = document.createElement("fieldset");
-        let legend = document.createElement("legend");
+        const fs_attack_running = document.createElement("fieldset");
+        const legend = document.createElement("legend");
         legend.innerText = "Attack running";
         this.el_attack_running = document.createElement("span");
         this.el_attack_running.classList.add(CLASS_ATTACK_RUNNING);
         this.el_nav_content = document.createElement("div");
         this.el_nav_links = document.createElement("div");
-        let el_nav_footer = document.createElement("div");
+        const el_nav_footer = document.createElement("div");
         el_nav_footer.classList.add(CLASS_FOOTER);
         el_nav_footer.innerHTML = `
 			<div>
@@ -66,7 +66,7 @@ export class Trunks {
         this.el.appendChild(el_nav);
     }
     generateContent() {
-        let wrapper = document.createElement("div");
+        const wrapper = document.createElement("div");
         wrapper.classList.add(CLASS_MAIN);
         this.el_attack_cancel = document.createElement("button");
         this.el_attack_cancel.innerHTML = "Cancel";
@@ -84,8 +84,8 @@ export class Trunks {
         };
     }
     async apiEnvironmentGet() {
-        let http_res = await fetch(API_ENVIRONMENT);
-        let res = await http_res.json();
+        const http_res = await fetch(API_ENVIRONMENT);
+        const res = await http_res.json();
         if (res.code != 200) {
             wui_notif.error(res.message);
             return;
@@ -95,38 +95,38 @@ export class Trunks {
         this.com_env.Set(this.env);
     }
     async initNavLinks() {
-        let http_res = await fetch(API_NAVLINKS);
-        let res = await http_res.json();
+        const http_res = await fetch(API_NAVLINKS);
+        const res = await http_res.json();
         if (res.code != 200) {
             wui_notif.error(res.message);
             return;
         }
         this.com_nav_links = new NavLinks(this, res.data);
         this.el_nav_links.appendChild(this.com_nav_links.el_nav);
-        for (let nav of res.data) {
+        for (const nav of res.data) {
             this.navLinks[nav.ID] = nav;
         }
     }
     async initTargets() {
-        let http_res = await fetch(API_TARGETS);
-        let res = await http_res.json();
+        const http_res = await fetch(API_TARGETS);
+        const res = await http_res.json();
         if (res.code != 200) {
             wui_notif.error(res.message);
             return;
         }
-        let targets = res.data;
+        const targets = res.data;
         this.el_nav_content.innerHTML = "";
-        for (let target of targets) {
-            let com_target = new Target(this, target);
+        for (const target of targets) {
+            const com_target = new Target(this, target);
             this.targets[target.ID] = com_target;
             this.el_nav_content.appendChild(com_target.el_nav);
         }
     }
     async onClickAttackCancel() {
-        let fres = await fetch(API_ATTACK_HTTP, {
+        const fres = await fetch(API_ATTACK_HTTP, {
             method: "DELETE",
         });
-        let json_res = await fres.json();
+        const json_res = await fres.json();
         if (json_res.code != 200) {
             wui_notif.error(json_res.message);
             return null;
@@ -137,8 +137,8 @@ export class Trunks {
     }
     windowOnHashChange() {
         // Parse the location hash.
-        let path = window.location.hash.substring(1);
-        let paths = path.split("/");
+        const path = window.location.hash.substring(1);
+        const paths = path.split("/");
         if (paths.length < 2) {
             return;
         }
@@ -152,7 +152,7 @@ export class Trunks {
         if (!paths[1]) {
             return;
         }
-        let target = this.targets[paths[1]];
+        const target = this.targets[paths[1]];
         if (!target) {
             return;
         }
@@ -179,7 +179,7 @@ export class Trunks {
                 }
                 else if (paths[2] === "link") {
                     if (paths[3]) {
-                        let nav = this.navLinks[paths[3]];
+                        const nav = this.navLinks[paths[3]];
                         if (nav) {
                             this.el_content.innerHTML = "";
                             this.com_nav_links.open(nav);
@@ -215,7 +215,7 @@ export class Trunks {
     }
     async AttackHttp(target, http_target) {
         Save(target, http_target, null);
-        let attackReq = {
+        const attackReq = {
             Target: {
                 ID: target.ID,
                 Opts: target.Opts,
@@ -239,14 +239,14 @@ export class Trunks {
             },
             WebSocketTarget: null,
         };
-        let http_res = await fetch(API_ATTACK_HTTP, {
+        const http_res = await fetch(API_ATTACK_HTTP, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(attackReq),
         });
-        let json_res = await http_res.json();
+        const json_res = await http_res.json();
         if (json_res.code != 200) {
             wui_notif.error(json_res.message);
             return null;
@@ -255,16 +255,16 @@ export class Trunks {
         return json_res;
     }
     async AttackHttpDelete(name) {
-        let msg = `Are you sure you want to delete the result: ${name}?`;
-        let yes = window.confirm(msg);
+        const msg = `Are you sure you want to delete the result: ${name}?`;
+        const yes = window.confirm(msg);
         if (!yes) {
             return null;
         }
-        let url = API_ATTACK_RESULT + "?name=" + name;
-        let fres = await fetch(url, {
+        const url = API_ATTACK_RESULT + "?name=" + name;
+        const fres = await fetch(url, {
             method: "DELETE",
         });
-        let json_res = await fres.json();
+        const json_res = await fres.json();
         if (json_res.code != 200) {
             wui_notif.error(json_res.message);
             return null;
@@ -272,9 +272,9 @@ export class Trunks {
         return json_res;
     }
     async AttackHttpGet(name) {
-        let url = API_ATTACK_RESULT + "?name=" + name;
-        let fres = await fetch(url);
-        let res = await fres.json();
+        const url = API_ATTACK_RESULT + "?name=" + name;
+        const fres = await fetch(url);
+        const res = await fres.json();
         if (res.code != 200) {
             wui_notif.error(res.message);
         }
@@ -297,7 +297,7 @@ export class Trunks {
     }
     async RunHttp(target, http_target) {
         Save(target, http_target, null);
-        let req = {
+        const req = {
             Target: {
                 ID: target.ID,
                 Opts: target.Opts,
@@ -310,19 +310,19 @@ export class Trunks {
             HttpTarget: http_target,
             WebSocketTarget: null,
         };
-        let http_res = await fetch(API_TARGET_RUN_HTTP, {
+        const http_res = await fetch(API_TARGET_RUN_HTTP, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(req),
         });
-        let json_res = await http_res.json();
+        const json_res = await http_res.json();
         if (json_res.code != 200) {
             wui_notif.error(json_res.message);
             return null;
         }
-        let res = json_res.data;
+        const res = json_res.data;
         if (res.ResponseStatusCode != 200) {
             wui_notif.error(`${http_target.Name}: ${res.ResponseStatus}`);
         }
@@ -333,7 +333,7 @@ export class Trunks {
     }
     async RunWebSocket(target, ws_target) {
         Save(target, null, ws_target);
-        let req = {
+        const req = {
             Target: {
                 ID: target.ID,
                 Opts: target.Opts,
@@ -346,14 +346,14 @@ export class Trunks {
             HttpTarget: null,
             WebSocketTarget: ws_target,
         };
-        let fres = await fetch(API_TARGET_RUN_WEBSOCKET, {
+        const fres = await fetch(API_TARGET_RUN_WEBSOCKET, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(req),
         });
-        let json_res = await fres.json();
+        const json_res = await fres.json();
         if (json_res.code != 200) {
             wui_notif.error(json_res.message);
             return null;

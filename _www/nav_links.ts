@@ -23,7 +23,7 @@ export class NavLinks {
     public trunks: TrunksInterface,
     public navs: NavLinkInterface[],
   ) {
-    let hdr = document.createElement("h3");
+    const hdr = document.createElement("h3");
     hdr.innerText = "Links";
     hdr.onclick = () => {
       trunks.SetContent(HASH_LINKS, null);
@@ -38,7 +38,7 @@ export class NavLinks {
 
   generateNav() {
     this.navs.forEach((nav: NavLinkInterface) => {
-      let el = document.createElement("div");
+      const el = document.createElement("div");
       el.classList.add(CLASS_NAV_LINK);
       el.textContent = nav.Text;
       el.onclick = () => {
@@ -61,7 +61,7 @@ export class NavLinks {
     if (nav.OpenInIFrame) {
       this.el_src.textContent = "Source: " + nav.Href;
       this.el_iframe.src = nav.Href;
-      let target: TargetInterface = {
+      const target: TargetInterface = {
         ID: "nav",
         Name: "",
         BaseUrl: "",

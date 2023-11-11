@@ -17,9 +17,9 @@ export class Environment {
         this.generateContent();
     }
     generateContent() {
-        let el_title = document.createElement("h2");
+        const el_title = document.createElement("h2");
         el_title.innerText = "Environment";
-        let opts_listen_address = {
+        const opts_listen_address = {
             label: "Listen address",
             hint: "The address and port where Trunks is running.",
             value: this.opts.ListenAddress,
@@ -32,7 +32,7 @@ export class Environment {
             },
         };
         this.com_listen_address = new WuiInputString(opts_listen_address);
-        let opts_max_attack_dur = {
+        const opts_max_attack_dur = {
             label: "Max. attack duration (seconds)",
             hint: "Maximum attack duration for all targets, in seconds.",
             value: this.opts.MaxAttackDuration / 1e9,
@@ -46,7 +46,7 @@ export class Environment {
             },
         };
         this.com_max_attack_dur = new WuiInputNumber(opts_max_attack_dur);
-        let opts_max_attack_rate = {
+        const opts_max_attack_rate = {
             label: "Max. attack rate",
             hint: "Maximum attack rate for all targets.",
             value: this.opts.MaxAttackRate,
@@ -60,7 +60,7 @@ export class Environment {
             },
         };
         this.com_max_attack_rate = new WuiInputNumber(opts_max_attack_rate);
-        let opts_results_dir = {
+        const opts_results_dir = {
             label: "Results directory",
             hint: "The directory where the attack result will be saved.",
             value: this.opts.ResultsDir,
@@ -73,7 +73,7 @@ export class Environment {
             },
         };
         this.com_results_dir = new WuiInputString(opts_results_dir);
-        let opts_results_suffix = {
+        const opts_results_suffix = {
             label: "Results suffix",
             hint: "Optional suffix for the file name of attack result.",
             value: this.opts.ResultsSuffix,

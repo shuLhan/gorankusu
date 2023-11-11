@@ -34,7 +34,7 @@ export class WebSocketTarget {
     this.el.id = opts.ID;
     this.el.classList.add(CLASS_WS_TARGET);
 
-    let el_title = document.createElement("h3");
+    const el_title = document.createElement("h3");
     el_title.innerText = opts.Name;
     this.el.appendChild(el_title);
 
@@ -45,7 +45,7 @@ export class WebSocketTarget {
   }
 
   private generateActions(parent: HTMLElement) {
-    let el_actions = document.createElement("span");
+    const el_actions = document.createElement("span");
     el_actions.classList.add(CLASS_WS_TARGET_ACTIONS);
 
     this.el_button_run.innerText = "Run";
@@ -61,7 +61,7 @@ export class WebSocketTarget {
     if (!this.opts.Hint) {
       return;
     }
-    let el_hint = document.createElement("p");
+    const el_hint = document.createElement("p");
     el_hint.innerHTML = this.opts.Hint;
     parent.appendChild(el_hint);
   }
@@ -83,10 +83,10 @@ export class WebSocketTarget {
       return;
     }
 
-    let wrapper = document.createElement("div");
+    const wrapper = document.createElement("div");
     wrapper.classList.add(CLASS_WS_TARGET_INPUT_HEADER);
 
-    let title = document.createElement("h4");
+    const title = document.createElement("h4");
     title.innerText = "Headers";
     wrapper.appendChild(title);
 
@@ -106,10 +106,10 @@ export class WebSocketTarget {
       return;
     }
 
-    let wrapper = document.createElement("fieldset");
+    const wrapper = document.createElement("fieldset");
     wrapper.classList.add(CLASS_WS_TARGET_INPUT_PARAM);
 
-    let title = document.createElement("legend");
+    const title = document.createElement("legend");
     title.innerText = "Parameters";
     wrapper.appendChild(title);
 
@@ -122,13 +122,13 @@ export class WebSocketTarget {
   }
 
   private generateOutput(parent: HTMLElement) {
-    let wrapper = document.createElement("fieldset");
+    const wrapper = document.createElement("fieldset");
     wrapper.classList.add(CLASS_WS_TARGET_OUT_RUN);
 
-    let title = document.createElement("legend");
+    const title = document.createElement("legend");
     title.innerText = "Run output";
 
-    let btn_clear = document.createElement("button");
+    const btn_clear = document.createElement("button");
     btn_clear.innerText = "Clear";
     btn_clear.onclick = () => {
       this.onClickClearOutput();
@@ -148,7 +148,7 @@ export class WebSocketTarget {
   }
 
   private async onClickRun() {
-    let res = await this.trunks.RunWebSocket(this.target, this.opts);
+    const res = await this.trunks.RunWebSocket(this.target, this.opts);
     if (!res) {
       return;
     }
