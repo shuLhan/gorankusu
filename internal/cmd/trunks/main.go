@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	subCommandBuild = "build"
-	cmdTsc          = "tsc -b _www"
+	subCommandBuild = `build`
+	cmdTsc          = `tsc --project _www`
 )
 
 func main() {
