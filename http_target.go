@@ -5,6 +5,7 @@ package trunks
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -13,6 +14,7 @@ import (
 
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/mlog"
+	libpath "github.com/shuLhan/share/lib/path"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
@@ -147,6 +149,44 @@ func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {
 		}
 	}
 	return nil
+}
+
+// paramsToPath fill the key in path with value from parameter.
+// The key is sub-path that start with ":", for example "/:name", the key is
+// name.
+// The key in Params will be deleted if its exists in Path.
+func (ht *HttpTarget) paramsToPath() {
+	var (
+		logp = `paramsToPath`
+
+		rute *libpath.Route
+		err  error
+	)
+
+	rute, err = libpath.NewRoute(ht.Path)
+	if err != nil {
+		log.Printf(`%s %q: %s`, logp, ht.ID, err)
+		return
+	}
+
+	var (
+		fin FormInput
+		key string
+		ok  bool
+	)
+
+	for _, key = range rute.Keys() {
+		fin, ok = ht.Params[key]
+		if !ok {
+			continue
+		}
+		ok = rute.Set(key, fin.Value)
+		if ok {
+			delete(ht.Params, key)
+		}
+	}
+
+	ht.Path = rute.String()
 }
 
 func (ht *HttpTarget) sortResults() {

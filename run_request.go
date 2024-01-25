@@ -55,6 +55,7 @@ func generateRunRequest(
 	outrr.Target.Vars = req.Target.Vars
 	outrr.HttpTarget.Headers = req.HttpTarget.Headers
 	outrr.HttpTarget.Params = req.HttpTarget.Params
+	outrr.HttpTarget.paramsToPath()
 
 	return outrr
 }

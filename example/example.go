@@ -31,8 +31,9 @@ import (
 )
 
 const (
-	pathExample      = "/example"
-	pathExampleError = "/example/error"
+	pathExample         = `/example`
+	pathExampleError    = `/example/error`
+	pathExampleNamePage = `/example/:name/page`
 )
 
 const (
@@ -149,6 +150,14 @@ func (ex *Example) registerEndpoints() (err error) {
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         ex.pathExamplePost,
+	})
+
+	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         pathExampleNamePage,
+		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePost,
 	})
@@ -289,6 +298,24 @@ func (ex *Example) registerTargets() (err error) {
 				},
 			},
 			IsCustomizable: true,
+		}, {
+			Name:        `HTTP Post path binding`,
+			Hint:        `Test parameter with parameter in path`,
+			Method:      libhttp.RequestMethodPost,
+			Path:        pathExampleNamePage,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: trunks.KeyFormInput{
+				`name`: trunks.FormInput{
+					Label: `Name`,
+					Hint:  `This parameter send in path.`,
+					Value: `testname`,
+				},
+				`id`: trunks.FormInput{
+					Label: `ID`,
+					Hint:  `This parameter send in body as JSON.`,
+					Value: `123`,
+				},
+			},
 		}},
 	}
 

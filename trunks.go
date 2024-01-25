@@ -196,7 +196,7 @@ func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
 		req.Target.BaseUrl = origTarget.BaseUrl
 		req.Target.Name = origTarget.Name
 		req.HttpTarget.ConvertParams = origHttpTarget.ConvertParams
-		res, err = trunks.runHttpTarget(req)
+		res, err = trunks.runHTTPTarget(req)
 	} else {
 		req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
 		res, err = req.HttpTarget.Run(req)
@@ -326,9 +326,11 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *Htt
 	return t, ht
 }
 
-func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error) {
+// runHTTPTarget default [HttpTarget.Run] handler that generate HTTP request
+// and send it to the target.
+func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error) {
 	var (
-		logp    = "runHttpTarget"
+		logp    = `runHTTPTarget`
 		headers = rr.HttpTarget.Headers.ToHttpHeader()
 		params  interface{}
 	)
@@ -339,6 +341,8 @@ func (trunks *Trunks) runHttpTarget(rr *RunRequest) (res *RunResponse, err error
 	}
 
 	httpc := libhttp.NewClient(httpcOpts)
+
+	rr.HttpTarget.paramsToPath()
 
 	if rr.HttpTarget.ConvertParams == nil {
 		switch rr.HttpTarget.RequestType {
