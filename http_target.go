@@ -18,32 +18,32 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
-// HttpConvertParams is a handler that will be called inside the Run handler
+// HTTPConvertParams is a handler that will be called inside the Run handler
 // to convert the Params values to type that will be send as request.
-type HttpConvertParams func(target *HttpTarget) (interface{}, error)
+type HTTPConvertParams func(target *HTTPTarget) (interface{}, error)
 
-// HttpRunHandler define the function type that will be called when client
+// HTTPRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
-type HttpRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
+type HTTPRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
 
-// HttpAttackHandler define the function type that will be called when client
+// HTTPAttackHandler define the function type that will be called when client
 // send request to attack HTTP target.
-type HttpAttackHandler func(rr *RunRequest) vegeta.Targeter
+type HTTPAttackHandler func(rr *RunRequest) vegeta.Targeter
 
-// HttpPreAttackHandler define the function type that will be called before
+// HTTPPreAttackHandler define the function type that will be called before
 // the actual Attack being called.
-type HttpPreAttackHandler func(rr *RunRequest)
+type HTTPPreAttackHandler func(rr *RunRequest)
 
-// HttpTarget define the HTTP endpoint that can be attached to Trunks.
-type HttpTarget struct {
+// HTTPTarget define the HTTP endpoint that can be attached to Trunks.
+type HTTPTarget struct {
 	Params        KeyFormInput
-	ConvertParams HttpConvertParams `json:"-"`
+	ConvertParams HTTPConvertParams `json:"-"`
 
 	Headers KeyFormInput
 
-	Run       HttpRunHandler       `json:"-"`
-	PreAttack HttpPreAttackHandler `json:"-"`
-	Attack    HttpAttackHandler    `json:"-"`
+	Run       HTTPRunHandler       `json:"-"`
+	PreAttack HTTPPreAttackHandler `json:"-"`
+	Attack    HTTPAttackHandler    `json:"-"`
 
 	// ID of target, optional.
 	// If its empty, it will generated using value from Name.
@@ -61,7 +61,7 @@ type HttpTarget struct {
 
 	// AllowAttack if its true the "Attack" button will be showed on user
 	// interface and client will be allowed to run load testing on this
-	// HttpTarget.
+	// HTTPTarget.
 	AllowAttack bool
 
 	// IsCustomizable allow client to modify the Method, Path, and
@@ -69,9 +69,9 @@ type HttpTarget struct {
 	IsCustomizable bool
 }
 
-// clone the source HttpTarget.
+// clone the source HTTPTarget.
 // This method is provided to prevent the sync.Mutex being copied.
-func (ht *HttpTarget) clone(src *HttpTarget) {
+func (ht *HTTPTarget) clone(src *HTTPTarget) {
 	ht.Params = src.Params
 	ht.ConvertParams = src.ConvertParams
 	ht.Headers = src.Headers
@@ -89,9 +89,9 @@ func (ht *HttpTarget) clone(src *HttpTarget) {
 	ht.IsCustomizable = src.IsCustomizable
 }
 
-func (ht *HttpTarget) init() (err error) {
+func (ht *HTTPTarget) init() (err error) {
 	if len(ht.Name) == 0 {
-		return fmt.Errorf("HttpTarget.Name is empty")
+		return fmt.Errorf(`HTTPTarget.Name is empty`)
 
 	}
 	if len(ht.ID) == 0 {
@@ -109,7 +109,7 @@ func (ht *HttpTarget) init() (err error) {
 	return nil
 }
 
-func (ht *HttpTarget) deleteResult(result *AttackResult) {
+func (ht *HTTPTarget) deleteResult(result *AttackResult) {
 	var x int
 	for ; x < len(ht.Results); x++ {
 		if ht.Results[x].Name == result.Name {
@@ -132,9 +132,9 @@ func (ht *HttpTarget) deleteResult(result *AttackResult) {
 	}
 }
 
-func (ht *HttpTarget) addResult(dir, name string) {
+func (ht *HTTPTarget) addResult(dir, name string) {
 	ar := &AttackResult{
-		HttpTargetID: ht.ID,
+		HTTPTargetID: ht.ID,
 		Name:         name,
 		fullpath:     filepath.Join(dir, name),
 	}
@@ -142,7 +142,7 @@ func (ht *HttpTarget) addResult(dir, name string) {
 	ht.Results = append(ht.Results, ar)
 }
 
-func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {
+func (ht *HTTPTarget) getResultByName(name string) (result *AttackResult) {
 	for _, result = range ht.Results {
 		if result.Name == name {
 			return result
@@ -155,7 +155,7 @@ func (ht *HttpTarget) getResultByName(name string) (result *AttackResult) {
 // The key is sub-path that start with ":", for example "/:name", the key is
 // name.
 // The key in Params will be deleted if its exists in Path.
-func (ht *HttpTarget) paramsToPath() {
+func (ht *HTTPTarget) paramsToPath() {
 	var (
 		logp = `paramsToPath`
 
@@ -189,13 +189,13 @@ func (ht *HttpTarget) paramsToPath() {
 	ht.Path = rute.String()
 }
 
-func (ht *HttpTarget) sortResults() {
+func (ht *HTTPTarget) sortResults() {
 	sort.Slice(ht.Results, func(x, y int) bool {
 		return ht.Results[x].Name > ht.Results[y].Name
 	})
 }
 
-func (ht *HttpTarget) String() string {
+func (ht *HTTPTarget) String() string {
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, `ID:%s Name:%s Hint:%s Path:%s `+

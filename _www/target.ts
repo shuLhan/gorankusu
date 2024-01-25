@@ -15,19 +15,19 @@ import {
   CLASS_INPUT,
   CLASS_INPUT_LABEL,
   CLASS_NAV_TARGET,
-  HttpTargetInterface,
+  HTTPTargetInterface,
   TargetInterface,
   TrunksInterface,
   WebSocketTargetInterface,
 } from "./interface.js";
-import { HttpTarget } from "./http_target.js";
+import { HTTPTarget } from "./http_target.js";
 import { WebSocketTarget } from "./ws_target.js";
 
 const CLASS_NAV_TARGET_HTTP = "nav_http_target";
 const CLASS_NAV_TARGET_WS = "nav_ws_target";
 
-interface MapHttpTarget {
-  [key: string]: HttpTarget;
+interface MapHTTPTarget {
+  [key: string]: HTTPTarget;
 }
 
 interface MapWebSocketTarget {
@@ -38,7 +38,7 @@ export class Target {
   elNav: HTMLElement = document.createElement("div");
   elContent: HTMLElement = document.createElement("div");
 
-  http_targets: MapHttpTarget = {};
+  http_targets: MapHTTPTarget = {};
   ws_targets: MapWebSocketTarget = {};
 
   constructor(
@@ -60,16 +60,16 @@ export class Target {
 
     this.elNav.appendChild(elTargetMenu);
 
-    if (this.opts.HttpTargets) {
-      for (const ht of this.opts.HttpTargets) {
-        const elTargetHttp = document.createElement("div");
-        elTargetHttp.innerHTML = ht.Name;
-        elTargetHttp.id = `/http/${this.opts.ID}/${ht.ID}`;
-        elTargetHttp.classList.add(CLASS_NAV_TARGET_HTTP);
-        elTargetHttp.onclick = () => {
+    if (this.opts.HTTPTargets) {
+      for (const ht of this.opts.HTTPTargets) {
+        const elTargetHTTP = document.createElement("div");
+        elTargetHTTP.innerHTML = ht.Name;
+        elTargetHTTP.id = `/http/${this.opts.ID}/${ht.ID}`;
+        elTargetHTTP.classList.add(CLASS_NAV_TARGET_HTTP);
+        elTargetHTTP.onclick = () => {
           trunks.contentRenderer(this.opts, ht, null, null, this.elContent);
         };
-        this.elNav.appendChild(elTargetHttp);
+        this.elNav.appendChild(elTargetHTTP);
       }
     }
 
@@ -91,7 +91,7 @@ export class Target {
     this.generateContentBaseURL();
     this.generateContentAttackOptions();
     this.generateContentVars();
-    this.generateHttpTargets(trunks);
+    this.generateHTTPTargets(trunks);
     this.generateWebSocketTargets(trunks);
   }
 
@@ -103,25 +103,25 @@ export class Target {
     const elHint = document.createElement("p");
     elHint.innerHTML = this.opts.Hint || "";
 
-    const optsBaseUrl: WuiInputStringOpts = {
+    const optsBaseURL: WuiInputStringOpts = {
       label: "Base URL",
       hint: "The base URL where the HTTP request will be send or the target of attack.",
-      value: this.opts.BaseUrl,
+      value: this.opts.BaseURL,
       class_input: CLASS_INPUT,
       class_label: CLASS_INPUT_LABEL,
       is_hint_toggled: true,
       is_disabled: true,
       onChangeHandler: (v: string) => {
-        this.opts.BaseUrl = v;
+        this.opts.BaseURL = v;
       },
     };
-    const comInputBaseUrl = new WuiInputString(optsBaseUrl);
+    const comInputBaseURL = new WuiInputString(optsBaseURL);
 
     this.elContent.appendChild(hdrTarget);
     if (this.opts.Hint) {
       this.elContent.appendChild(elHint);
     }
-    this.elContent.appendChild(comInputBaseUrl.el);
+    this.elContent.appendChild(comInputBaseURL.el);
   }
 
   private generateContentAttackOptions() {
@@ -198,16 +198,16 @@ export class Target {
     this.elContent.appendChild(wrapper);
   }
 
-  private generateHttpTargets(trunks: TrunksInterface) {
-    if (!this.opts.HttpTargets) {
+  private generateHTTPTargets(trunks: TrunksInterface) {
+    if (!this.opts.HTTPTargets) {
       return;
     }
 
-    this.opts.HttpTargets.forEach((httpTarget: HttpTargetInterface) => {
-      const comHttpTarget = new HttpTarget(trunks, this.opts, httpTarget);
-      this.http_targets[httpTarget.ID] = comHttpTarget;
+    this.opts.HTTPTargets.forEach((httpTarget: HTTPTargetInterface) => {
+      const comHTTPTarget = new HTTPTarget(trunks, this.opts, httpTarget);
+      this.http_targets[httpTarget.ID] = comHTTPTarget;
 
-      this.elContent.appendChild(comHttpTarget.el);
+      this.elContent.appendChild(comHTTPTarget.el);
     });
   }
 

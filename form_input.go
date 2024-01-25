@@ -9,7 +9,7 @@ type FormInputKind string
 // List of valid value for field FormInput.Kind.
 const (
 	// FormInputKindBoolean only used for convertion, for example
-	// ToJsonObject.
+	// ToJSONObject.
 	// In the WUI, it will be rendered as string.
 	FormInputKindBoolean = `boolean`
 	FormInputKindNumber  = `number`

@@ -198,22 +198,22 @@ export class Trunks {
             this.elAttackRunning.innerHTML = "-";
             return;
         }
-        if (!runRequest.Target || !runRequest.HttpTarget) {
+        if (!runRequest.Target || !runRequest.HTTPTarget) {
             this.elAttackRunning.innerHTML = "-";
             return;
         }
         this.elAttackRunning.innerHTML = `
 			${runRequest.Target.Name} <br/>
-			/ ${runRequest.HttpTarget.Name} <br/>
+			/ ${runRequest.HTTPTarget.Name} <br/>
 			<br/>
 		`;
         this.elAttackCancel.onclick = () => {
             this.onClickAttackCancel();
         };
         this.elAttackRunning.appendChild(this.elAttackCancel);
-        wuiNotif.info(`Attacking "${runRequest.Target.Name}/${runRequest.HttpTarget.Name}" ...`);
+        wuiNotif.info(`Attacking "${runRequest.Target.Name}/${runRequest.HTTPTarget.Name}" ...`);
     }
-    async attackHttp(target, httpTarget) {
+    async attackHTTP(target, httpTarget) {
         save(target, httpTarget, null);
         const attackReq = {
             Target: {
@@ -221,11 +221,11 @@ export class Trunks {
                 Opts: target.Opts,
                 Vars: target.Vars,
                 Name: target.Name,
-                BaseUrl: target.BaseUrl,
-                HttpTargets: [],
+                BaseURL: target.BaseURL,
+                HTTPTargets: [],
                 WebSocketTargets: [],
             },
-            HttpTarget: {
+            HTTPTarget: {
                 ID: httpTarget.ID,
                 Name: httpTarget.Name,
                 Method: httpTarget.Method,
@@ -254,7 +254,7 @@ export class Trunks {
         this.setAttackRunning(attackReq);
         return jsonRes;
     }
-    async attackHttpDelete(name) {
+    async attackHTTPDelete(name) {
         const msg = `Are you sure you want to delete the result: ${name}?`;
         const yes = window.confirm(msg);
         if (!yes) {
@@ -271,7 +271,7 @@ export class Trunks {
         }
         return jsonRes;
     }
-    async attackHttpGet(name) {
+    async attackHTTPGet(name) {
         const url = API_ATTACK_RESULT + "?name=" + name;
         const fres = await fetch(url);
         const res = await fres.json();
@@ -295,7 +295,7 @@ export class Trunks {
         this.elContent.innerHTML = "";
         this.elContent.appendChild(el);
     }
-    async runHttp(target, httpTarget) {
+    async runHTTP(target, httpTarget) {
         save(target, httpTarget, null);
         const req = {
             Target: {
@@ -303,11 +303,11 @@ export class Trunks {
                 Opts: target.Opts,
                 Vars: target.Vars,
                 Name: "",
-                BaseUrl: "",
-                HttpTargets: [],
+                BaseURL: "",
+                HTTPTargets: [],
                 WebSocketTargets: [],
             },
-            HttpTarget: httpTarget,
+            HTTPTarget: httpTarget,
             WebSocketTarget: null,
         };
         const httpRes = await fetch(API_TARGET_RUN_HTTP, {
@@ -339,11 +339,11 @@ export class Trunks {
                 Opts: target.Opts,
                 Vars: target.Vars,
                 Name: "",
-                BaseUrl: "",
-                HttpTargets: [],
+                BaseURL: "",
+                HTTPTargets: [],
                 WebSocketTargets: [],
             },
-            HttpTarget: null,
+            HTTPTarget: null,
             WebSocketTarget: wsTarget,
         };
         const fres = await fetch(API_TARGET_RUN_WEBSOCKET, {

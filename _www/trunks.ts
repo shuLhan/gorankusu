@@ -6,8 +6,8 @@ import { save } from "./functions.js";
 import {
   HASH_ENVIRONMENT,
   EnvironmentInterface,
-  HttpResponseInterface,
-  HttpTargetInterface,
+  HTTPResponseInterface,
+  HTTPTargetInterface,
   NavLinkInterface,
   RunRequestInterface,
   RunResponseInterface,
@@ -266,13 +266,13 @@ export class Trunks {
       this.elAttackRunning.innerHTML = "-";
       return;
     }
-    if (!runRequest.Target || !runRequest.HttpTarget) {
+    if (!runRequest.Target || !runRequest.HTTPTarget) {
       this.elAttackRunning.innerHTML = "-";
       return;
     }
     this.elAttackRunning.innerHTML = `
 			${runRequest.Target.Name} <br/>
-			/ ${runRequest.HttpTarget.Name} <br/>
+			/ ${runRequest.HTTPTarget.Name} <br/>
 			<br/>
 		`;
     this.elAttackCancel.onclick = () => {
@@ -281,14 +281,14 @@ export class Trunks {
     this.elAttackRunning.appendChild(this.elAttackCancel);
 
     wuiNotif.info(
-      `Attacking "${runRequest.Target.Name}/${runRequest.HttpTarget.Name}" ...`,
+      `Attacking "${runRequest.Target.Name}/${runRequest.HTTPTarget.Name}" ...`,
     );
   }
 
-  async attackHttp(
+  async attackHTTP(
     target: TargetInterface,
-    httpTarget: HttpTargetInterface,
-  ): Promise<HttpResponseInterface | null> {
+    httpTarget: HTTPTargetInterface,
+  ): Promise<HTTPResponseInterface | null> {
     save(target, httpTarget, null);
 
     const attackReq: RunRequestInterface = {
@@ -297,11 +297,11 @@ export class Trunks {
         Opts: target.Opts,
         Vars: target.Vars,
         Name: target.Name,
-        BaseUrl: target.BaseUrl,
-        HttpTargets: [],
+        BaseURL: target.BaseURL,
+        HTTPTargets: [],
         WebSocketTargets: [],
       },
-      HttpTarget: {
+      HTTPTarget: {
         ID: httpTarget.ID,
         Name: httpTarget.Name,
         Method: httpTarget.Method,
@@ -334,7 +334,7 @@ export class Trunks {
     return jsonRes;
   }
 
-  async attackHttpDelete(name: string): Promise<HttpResponseInterface | null> {
+  async attackHTTPDelete(name: string): Promise<HTTPResponseInterface | null> {
     const msg = `Are you sure you want to delete the result: ${name}?`;
     const yes = window.confirm(msg);
     if (!yes) {
@@ -353,7 +353,7 @@ export class Trunks {
     return jsonRes;
   }
 
-  async attackHttpGet(name: string): Promise<HttpResponseInterface> {
+  async attackHTTPGet(name: string): Promise<HTTPResponseInterface> {
     const url = API_ATTACK_RESULT + "?name=" + name;
     const fres = await fetch(url);
     const res = await fres.json();
@@ -365,7 +365,7 @@ export class Trunks {
 
   contentRenderer(
     target: TargetInterface,
-    httpTarget: HttpTargetInterface,
+    httpTarget: HTTPTargetInterface,
     wsTarget: WebSocketTargetInterface,
     navLink: NavLinkInterface,
     el: HTMLElement,
@@ -384,9 +384,9 @@ export class Trunks {
     this.elContent.appendChild(el);
   }
 
-  async runHttp(
+  async runHTTP(
     target: TargetInterface,
-    httpTarget: HttpTargetInterface,
+    httpTarget: HTTPTargetInterface,
   ): Promise<RunResponseInterface | null> {
     save(target, httpTarget, null);
 
@@ -396,11 +396,11 @@ export class Trunks {
         Opts: target.Opts,
         Vars: target.Vars,
         Name: "",
-        BaseUrl: "",
-        HttpTargets: [],
+        BaseURL: "",
+        HTTPTargets: [],
         WebSocketTargets: [],
       },
-      HttpTarget: httpTarget,
+      HTTPTarget: httpTarget,
       WebSocketTarget: null,
     };
 
@@ -432,7 +432,7 @@ export class Trunks {
   async runWebSocket(
     target: TargetInterface,
     wsTarget: WebSocketTargetInterface,
-  ): Promise<HttpResponseInterface | null> {
+  ): Promise<HTTPResponseInterface | null> {
     save(target, null, wsTarget);
 
     const req: RunRequestInterface = {
@@ -441,11 +441,11 @@ export class Trunks {
         Opts: target.Opts,
         Vars: target.Vars,
         Name: "",
-        BaseUrl: "",
-        HttpTargets: [],
+        BaseURL: "",
+        HTTPTargets: [],
         WebSocketTargets: [],
       },
-      HttpTarget: null,
+      HTTPTarget: null,
       WebSocketTarget: wsTarget,
     };
 

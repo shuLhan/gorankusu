@@ -40,12 +40,6 @@ const (
 	paramNameName = "name"
 )
 
-// List of HTTP APIs.
-const (
-	pathApiAttackHttp   = `/_trunks/api/attack/http`
-	pathApiAttackResult = `/_trunks/api/attack/result`
-)
-
 // Trunks is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
 type Trunks struct {
@@ -79,7 +73,7 @@ func New(env *Environment) (trunks *Trunks, err error) {
 		errq:    make(chan error, 1),
 	}
 
-	err = trunks.initHttpServer(isDevelopment)
+	err = trunks.initHTTPServer(isDevelopment)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -87,31 +81,31 @@ func New(env *Environment) (trunks *Trunks, err error) {
 	return trunks, nil
 }
 
-// AttackHttp start attacking the HTTP target defined in req.
-func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
-	logp := "AttackHttp"
+// AttackHTTP start attacking the HTTP target defined in req.
+func (trunks *Trunks) AttackHTTP(req *RunRequest) (err error) {
+	var logp = `AttackHTTP`
 
 	if trunks.Env.isAttackRunning() {
 		return errAttackConflict(trunks.Env.getRunningAttack())
 	}
 
-	origTarget := trunks.getTargetByID(req.Target.ID)
+	var origTarget = trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return errInvalidTarget(req.Target.ID)
 	}
 
-	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
+	var origHTTPTarget = origTarget.getHTTPTarget(req.HTTPTarget.ID)
 	if origTarget == nil {
-		return errInvalidHttpTarget(req.HttpTarget.ID)
+		return errInvalidHTTPTarget(req.HTTPTarget.ID)
 	}
-	if !origHttpTarget.AllowAttack {
+	if !origHTTPTarget.AllowAttack {
 		return errAttackNotAllowed()
 	}
-	if origHttpTarget.Attack == nil {
+	if origHTTPTarget.Attack == nil {
 		return fmt.Errorf(`%s: %w`, logp, &errAttackHandlerNotSet)
 	}
 
-	req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
+	req = generateRunRequest(trunks.Env, req, origTarget, origHTTPTarget)
 
 	req.result, err = newAttackResult(trunks.Env, req)
 	if err != nil {
@@ -121,7 +115,7 @@ func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 	trunks.attackq <- req
 
 	msg := fmt.Sprintf("Attacking %s%s with %d RPS for %s seconds",
-		req.Target.BaseUrl, req.HttpTarget.Path,
+		req.Target.BaseURL, req.HTTPTarget.Path,
 		req.Target.Opts.RatePerSecond, req.Target.Opts.Duration)
 
 	mlog.Outf(`%s: %s`, logp, msg)
@@ -129,9 +123,9 @@ func (trunks *Trunks) AttackHttp(req *RunRequest) (err error) {
 	return nil
 }
 
-// AttackHttpCancel cancel any running attack.
+// AttackHTTPCancel cancel any running attack.
 // It will return an error if no attack is running.
-func (trunks *Trunks) AttackHttpCancel() (rr *RunRequest, err error) {
+func (trunks *Trunks) AttackHTTPCancel() (rr *RunRequest, err error) {
 	rr = trunks.Env.getRunningAttack()
 	if rr == nil {
 		e := &liberrors.E{
@@ -179,27 +173,27 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 	return nil
 }
 
-// RunHttp send the HTTP request to the HTTP target defined in RunRequest with
+// RunHTTP send the HTTP request to the HTTP target defined in RunRequest with
 // optional Headers and Parameters.
-func (trunks *Trunks) RunHttp(req *RunRequest) (res *RunResponse, err error) {
-	origTarget := trunks.getTargetByID(req.Target.ID)
+func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
+	var origTarget = trunks.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
 	}
 
-	origHttpTarget := origTarget.getHttpTargetByID(req.HttpTarget.ID)
-	if origHttpTarget == nil {
-		return nil, errInvalidHttpTarget(req.HttpTarget.ID)
+	var origHTTPTarget = origTarget.getHTTPTarget(req.HTTPTarget.ID)
+	if origHTTPTarget == nil {
+		return nil, errInvalidHTTPTarget(req.HTTPTarget.ID)
 	}
 
-	if origHttpTarget.Run == nil {
-		req.Target.BaseUrl = origTarget.BaseUrl
+	if origHTTPTarget.Run == nil {
+		req.Target.BaseURL = origTarget.BaseURL
 		req.Target.Name = origTarget.Name
-		req.HttpTarget.ConvertParams = origHttpTarget.ConvertParams
+		req.HTTPTarget.ConvertParams = origHTTPTarget.ConvertParams
 		res, err = trunks.runHTTPTarget(req)
 	} else {
-		req = generateRunRequest(trunks.Env, req, origTarget, origHttpTarget)
-		res, err = req.HttpTarget.Run(req)
+		req = generateRunRequest(trunks.Env, req, origTarget, origHTTPTarget)
+		res, err = req.HTTPTarget.Run(req)
 	}
 	if err != nil {
 		return nil, err
@@ -248,13 +242,17 @@ func (trunks *Trunks) Stop() {
 	trunks.errq <- nil
 }
 
-func (trunks *Trunks) addHttpAttackResult(rr *RunRequest) (ok bool) {
-	for _, target := range trunks.targets {
+func (trunks *Trunks) addHTTPAttackResult(rr *RunRequest) (ok bool) {
+	var (
+		target     *Target
+		httpTarget *HTTPTarget
+	)
+	for _, target = range trunks.targets {
 		if target.ID != rr.Target.ID {
 			continue
 		}
-		for _, httpTarget := range target.HttpTargets {
-			if httpTarget.ID != rr.HttpTarget.ID {
+		for _, httpTarget = range target.HTTPTargets {
+			if httpTarget.ID != rr.HTTPTarget.ID {
 				continue
 			}
 
@@ -284,7 +282,7 @@ func (trunks *Trunks) getTargetByID(id string) *Target {
 	return nil
 }
 
-func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HttpTarget, result *AttackResult, err error) {
+func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HTTPTarget, result *AttackResult, err error) {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
 			Code: http.StatusNotFound,
@@ -298,7 +296,7 @@ func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HttpTar
 		return nil, nil, nil, res
 	}
 	if ht == nil {
-		res.Message = "HttpTarget ID not found"
+		res.Message = `HTTPTarget ID not found`
 		return nil, nil, nil, res
 	}
 
@@ -311,7 +309,7 @@ func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HttpTar
 	return t, ht, result, nil
 }
 
-func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HttpTarget) {
+func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HTTPTarget) {
 	names := strings.Split(name, ".")
 
 	t = trunks.getTargetByID(names[0])
@@ -320,41 +318,41 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *Htt
 	}
 
 	if len(names) > 0 {
-		ht = t.getHttpTargetByID(names[1])
+		ht = t.getHTTPTarget(names[1])
 	}
 
 	return t, ht
 }
 
-// runHTTPTarget default [HttpTarget.Run] handler that generate HTTP request
+// runHTTPTarget default [HTTPTarget.Run] handler that generate HTTP request
 // and send it to the target.
 func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error) {
 	var (
 		logp    = `runHTTPTarget`
-		headers = rr.HttpTarget.Headers.ToHttpHeader()
+		headers = rr.HTTPTarget.Headers.ToHTTPHeader()
 		params  interface{}
 	)
 
 	httpcOpts := &libhttp.ClientOptions{
-		ServerUrl:     rr.Target.BaseUrl,
+		ServerUrl:     rr.Target.BaseURL,
 		AllowInsecure: true,
 	}
 
 	httpc := libhttp.NewClient(httpcOpts)
 
-	rr.HttpTarget.paramsToPath()
+	rr.HTTPTarget.paramsToPath()
 
-	if rr.HttpTarget.ConvertParams == nil {
-		switch rr.HttpTarget.RequestType {
+	if rr.HTTPTarget.ConvertParams == nil {
+		switch rr.HTTPTarget.RequestType {
 		case libhttp.RequestTypeJSON:
-			params = rr.HttpTarget.Params.ToJsonObject()
+			params = rr.HTTPTarget.Params.ToJSONObject()
 		case libhttp.RequestTypeMultipartForm:
-			params = rr.HttpTarget.Params.ToMultipartFormData()
+			params = rr.HTTPTarget.Params.ToMultipartFormData()
 		default:
-			params = rr.HttpTarget.Params.ToUrlValues()
+			params = rr.HTTPTarget.Params.ToURLValues()
 		}
 	} else {
-		params, err = rr.HttpTarget.ConvertParams(&rr.HttpTarget)
+		params, err = rr.HTTPTarget.ConvertParams(&rr.HTTPTarget)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
@@ -363,9 +361,9 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 	res = &RunResponse{}
 
 	httpRequest, err := httpc.GenerateHttpRequest(
-		rr.HttpTarget.Method,
-		rr.HttpTarget.Path,
-		rr.HttpTarget.RequestType,
+		rr.HTTPTarget.Method,
+		rr.HTTPTarget.Path,
+		rr.HTTPTarget.RequestType,
 		headers,
 		params,
 	)
@@ -373,7 +371,7 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = res.SetHttpRequest(httpRequest)
+	err = res.SetHTTPRequest(httpRequest)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -383,7 +381,7 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = res.SetHttpResponse(httpResponse)
+	err = res.SetHTTPResponse(httpResponse)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -428,7 +426,7 @@ func (trunks *Trunks) scanResultsDir() {
 			continue
 		}
 		if ht == nil {
-			mlog.Outf(`--- %s %d/%d: HttpTarget ID not found for %q`, logp, x+1, len(fis), name)
+			mlog.Outf(`--- %s %d/%d: HTTPTarget ID not found for %q`, logp, x+1, len(fis), name)
 			continue
 		}
 
@@ -439,8 +437,12 @@ func (trunks *Trunks) scanResultsDir() {
 
 	mlog.Outf(`--- %s: all pass results has been loaded ...`, logp)
 
-	for _, target := range trunks.targets {
-		for _, httpTarget := range target.HttpTargets {
+	var (
+		target     *Target
+		httpTarget *HTTPTarget
+	)
+	for _, target = range trunks.targets {
+		for _, httpTarget = range target.HTTPTargets {
 			httpTarget.sortResults()
 		}
 	}
@@ -453,8 +455,8 @@ func (trunks *Trunks) workerAttackQueue() {
 		var err error
 		trunks.Env.AttackRunning = rr
 
-		if rr.HttpTarget.PreAttack != nil {
-			rr.HttpTarget.PreAttack(rr)
+		if rr.HTTPTarget.PreAttack != nil {
+			rr.HTTPTarget.PreAttack(rr)
 		}
 
 		isCancelled := false
@@ -463,10 +465,10 @@ func (trunks *Trunks) workerAttackQueue() {
 		)
 
 		for res := range attacker.Attack(
-			rr.HttpTarget.Attack(rr),
+			rr.HTTPTarget.Attack(rr),
 			rr.Target.Opts.ratePerSecond,
 			rr.Target.Opts.Duration,
-			rr.HttpTarget.ID,
+			rr.HTTPTarget.ID,
 		) {
 			err = rr.result.add(res)
 			if err != nil {
@@ -500,7 +502,7 @@ func (trunks *Trunks) workerAttackQueue() {
 				mlog.Errf(`%s %s: %s`, logp, rr.result.Name, err)
 			}
 
-			trunks.addHttpAttackResult(rr)
+			trunks.addHTTPAttackResult(rr)
 
 			mlog.Outf(`%s: %s finished.`, logp, rr.result.Name)
 		}

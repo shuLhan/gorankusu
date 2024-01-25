@@ -16,7 +16,7 @@ type RunRequest struct {
 
 	Target          Target
 	WebSocketTarget WebSocketTarget
-	HttpTarget      HttpTarget
+	HTTPTarget      HTTPTarget
 }
 
 // generateRunRequest merge the run request with original target and HTTP
@@ -25,7 +25,7 @@ func generateRunRequest(
 	env *Environment,
 	req *RunRequest,
 	origTarget *Target,
-	origHttpTarget *HttpTarget,
+	origHTTPTarget *HTTPTarget,
 ) (outrr *RunRequest) {
 	if req.Target.Opts.Duration > 0 && req.Target.Opts.Duration <= env.MaxAttackDuration {
 		origTarget.Opts.Duration = req.Target.Opts.Duration
@@ -40,22 +40,22 @@ func generateRunRequest(
 	if req.Target.Opts.Timeout > 0 && req.Target.Opts.Timeout <= DefaultAttackTimeout {
 		origTarget.Opts.Timeout = req.Target.Opts.Timeout
 	}
-	if origHttpTarget.IsCustomizable {
-		origHttpTarget.Method = req.HttpTarget.Method
-		origHttpTarget.Path = req.HttpTarget.Path
-		origHttpTarget.RequestType = req.HttpTarget.RequestType
+	if origHTTPTarget.IsCustomizable {
+		origHTTPTarget.Method = req.HTTPTarget.Method
+		origHTTPTarget.Path = req.HTTPTarget.Path
+		origHTTPTarget.RequestType = req.HTTPTarget.RequestType
 	}
 
 	outrr = &RunRequest{
 		Target: *origTarget,
 	}
 
-	outrr.HttpTarget.clone(origHttpTarget)
+	outrr.HTTPTarget.clone(origHTTPTarget)
 
 	outrr.Target.Vars = req.Target.Vars
-	outrr.HttpTarget.Headers = req.HttpTarget.Headers
-	outrr.HttpTarget.Params = req.HttpTarget.Params
-	outrr.HttpTarget.paramsToPath()
+	outrr.HTTPTarget.Headers = req.HTTPTarget.Headers
+	outrr.HTTPTarget.Params = req.HTTPTarget.Params
+	outrr.HTTPTarget.paramsToPath()
 
 	return outrr
 }
@@ -94,5 +94,5 @@ func generateWebSocketTarget(
 }
 
 func (rr *RunRequest) String() string {
-	return fmt.Sprintf("Target:%v HttpTarget:%s\n", rr.Target, rr.HttpTarget.String())
+	return fmt.Sprintf(`Target:%v HTTPTarget:%s`, rr.Target, rr.HTTPTarget.String())
 }

@@ -9,7 +9,7 @@ import {
   CLASS_INPUT_LABEL,
   FormInput,
   FormInputKindNumber,
-  HttpTargetInterface,
+  HTTPTargetInterface,
   TargetInterface,
   WebSocketTargetInterface,
 } from "./interface.js";
@@ -70,7 +70,7 @@ export function generateFormInput(parent: HTMLElement, fi: FormInput) {
   }
 }
 
-export function HttpMethodToString(m: number): string {
+export function HTTPMethodToString(m: number): string {
   switch (m) {
     case 0:
       return "GET";
@@ -95,12 +95,12 @@ export function HttpMethodToString(m: number): string {
 }
 
 //
-// loadHttpTargetHeader get HttpTarget header from local storage by key.
-// If no header exist in storage return the one from HttpTarget itself.
+// loadHTTPTargetHeader get HTTPTarget header from local storage by key.
+// If no header exist in storage return the one from HTTPTarget itself.
 //
-export function loadHttpTargetHeader(
+export function loadHTTPTargetHeader(
   target: TargetInterface,
-  httpTarget: HttpTargetInterface,
+  httpTarget: HTTPTargetInterface,
   key: string,
 ): string {
   const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
@@ -115,9 +115,9 @@ export function loadHttpTargetHeader(
   return "";
 }
 
-function saveHttpTargetHeader(
+function saveHTTPTargetHeader(
   target: TargetInterface,
-  httpTarget: HttpTargetInterface,
+  httpTarget: HTTPTargetInterface,
   key: string,
   value: string,
 ) {
@@ -126,12 +126,12 @@ function saveHttpTargetHeader(
 }
 
 //
-// loadHttpTargetParam get HttpTarget parameter from local storage by key.
-// If no parameter exist in storage return the one from HttpTarget itself.
+// loadHTTPTargetParam get HTTPTarget parameter from local storage by key.
+// If no parameter exist in storage return the one from HTTPTarget itself.
 //
-export function loadHttpTargetParam(
+export function loadHTTPTargetParam(
   target: TargetInterface,
-  httpTarget: HttpTargetInterface,
+  httpTarget: HTTPTargetInterface,
   key: string,
 ): string {
   const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
@@ -146,9 +146,9 @@ export function loadHttpTargetParam(
   return "";
 }
 
-function saveHttpTargetParam(
+function saveHTTPTargetParam(
   target: TargetInterface,
-  httpTarget: HttpTargetInterface,
+  httpTarget: HTTPTargetInterface,
   key: string,
   value: string,
 ) {
@@ -282,12 +282,12 @@ function saveWsTargetParam(
 }
 
 //
-// save the variables on the Target, Params and Headers on HttpTarget or
+// save the variables on the Target, Params and Headers on HTTPTarget or
 // WebSocket to local storage.
 //
 export function save(
   target: TargetInterface,
-  httpTarget: HttpTargetInterface | null,
+  httpTarget: HTTPTargetInterface | null,
   wsTarget: WebSocketTargetInterface | null,
 ) {
   saveTargetOptDuration(target);
@@ -299,10 +299,10 @@ export function save(
   }
   if (httpTarget) {
     for (const [k, fi] of Object.entries(httpTarget.Headers)) {
-      saveHttpTargetHeader(target, httpTarget, k, fi.value);
+      saveHTTPTargetHeader(target, httpTarget, k, fi.value);
     }
     for (const [k, fi] of Object.entries(httpTarget.Params)) {
-      saveHttpTargetParam(target, httpTarget, k, fi.value);
+      saveHTTPTargetParam(target, httpTarget, k, fi.value);
     }
   }
   if (wsTarget) {

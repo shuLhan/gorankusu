@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import { WuiInputSelect } from "./wui/input/select.js";
 import { WuiInputString } from "./wui/input/string.js";
-import { generateFormInput, loadHttpTargetHeader, loadHttpTargetParam, } from "./functions.js";
+import { generateFormInput, loadHTTPTargetHeader, loadHTTPTargetParam, } from "./functions.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, } from "./interface.js";
 const CLASS_HTTP_TARGET = "http_target";
 const CLASS_HTTP_TARGET_ACTIONS = "http_target_actions";
@@ -15,7 +15,7 @@ const CLASS_HTTP_TARGET_OUT_ATTACK = "http_target_out_attack";
 const CLASS_HTTP_TARGET_OUT_MONO = "http_target_out_mono";
 const CLASS_HTTP_TARGET_OUT_RUN = "http_target_out_run";
 const CONTENT_TYPE_JSON = "application/json";
-export class HttpTarget {
+export class HTTPTarget {
     constructor(trunks, target, opts) {
         this.trunks = trunks;
         this.target = target;
@@ -185,7 +185,7 @@ export class HttpTarget {
         legend.innerText = "Headers";
         wrapper.appendChild(legend);
         for (const [key, fi] of Object.entries(this.opts.Headers)) {
-            fi.value = loadHttpTargetHeader(this.target, this.opts, key);
+            fi.value = loadHTTPTargetHeader(this.target, this.opts, key);
             generateFormInput(wrapper, fi);
         }
         parent.appendChild(wrapper);
@@ -203,7 +203,7 @@ export class HttpTarget {
         title.innerText = "Parameters";
         wrapper.appendChild(title);
         for (const [key, fi] of Object.entries(this.opts.Params)) {
-            fi.value = loadHttpTargetParam(this.target, this.opts, key);
+            fi.value = loadHTTPTargetParam(this.target, this.opts, key);
             generateFormInput(wrapper, fi);
         }
         parent.appendChild(wrapper);
@@ -279,10 +279,10 @@ export class HttpTarget {
         }
     }
     async onClickAttack() {
-        await this.trunks.attackHttp(this.target, this.opts);
+        await this.trunks.attackHTTP(this.target, this.opts);
     }
     async onClickAttackDelete(result) {
-        const res = await this.trunks.attackHttpDelete(result.Name);
+        const res = await this.trunks.attackHTTPDelete(result.Name);
         if (!res) {
             return;
         }
@@ -301,7 +301,7 @@ export class HttpTarget {
             elReportHist.style.display = "none";
             return;
         }
-        const resJSON = await this.trunks.attackHttpGet(resultName);
+        const resJSON = await this.trunks.attackHTTPGet(resultName);
         if (resJSON.code != 200) {
             return;
         }
@@ -318,7 +318,7 @@ export class HttpTarget {
         this.elOutResponseBody.innerText = "JSON formatted response body";
     }
     async onClickRun() {
-        const res = await this.trunks.runHttp(this.target, this.opts);
+        const res = await this.trunks.runHTTP(this.target, this.opts);
         if (!res) {
             return;
         }

@@ -16,7 +16,7 @@ func errAttackConflict(rr *RunRequest) error {
 		E: liberrors.E{
 			Code: http.StatusConflict,
 			Message: fmt.Sprintf(`Another attack is already running: "%s/%s`,
-				rr.Target.Name, rr.HttpTarget.Name),
+				rr.Target.Name, rr.HTTPTarget.Name),
 			Name: "ERR_ATTACK_CONFLICT",
 		},
 		Data: rr,
@@ -76,11 +76,11 @@ func errInvalidTarget(id string) error {
 	return res
 }
 
-func errInvalidHttpTarget(id string) error {
+func errInvalidHTTPTarget(id string) error {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
 			Code:    http.StatusBadRequest,
-			Message: fmt.Sprintf("invalid or emtpy HttpTarget.ID: %q", id),
+			Message: fmt.Sprintf("invalid or emtpy HTTPTarget.ID: %q", id),
 			Name:    "ERR_INVALID_HTTP_TARGET",
 		},
 	}

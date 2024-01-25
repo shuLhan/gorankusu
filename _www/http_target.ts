@@ -6,14 +6,14 @@ import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js";
 
 import {
   generateFormInput,
-  loadHttpTargetHeader,
-  loadHttpTargetParam,
+  loadHTTPTargetHeader,
+  loadHTTPTargetParam,
 } from "./functions.js";
 import {
   CLASS_INPUT,
   CLASS_INPUT_LABEL,
   AttackResult,
-  HttpTargetInterface,
+  HTTPTargetInterface,
   TargetInterface,
   TrunksInterface,
 } from "./interface.js";
@@ -32,7 +32,7 @@ const CLASS_HTTP_TARGET_OUT_RUN = "http_target_out_run";
 
 const CONTENT_TYPE_JSON = "application/json";
 
-export class HttpTarget {
+export class HTTPTarget {
   el: HTMLElement = document.createElement("div");
   elButtonRun: HTMLButtonElement = document.createElement("button");
   elButtonAttack: HTMLButtonElement = document.createElement("button");
@@ -46,7 +46,7 @@ export class HttpTarget {
   constructor(
     public trunks: TrunksInterface,
     public target: TargetInterface,
-    public opts: HttpTargetInterface,
+    public opts: HTTPTargetInterface,
   ) {
     this.el.id = opts.ID;
     this.el.classList.add(CLASS_HTTP_TARGET);
@@ -223,7 +223,7 @@ export class HttpTarget {
     wrapper.appendChild(legend);
 
     for (const [key, fi] of Object.entries(this.opts.Headers)) {
-      fi.value = loadHttpTargetHeader(this.target, this.opts, key);
+      fi.value = loadHTTPTargetHeader(this.target, this.opts, key);
       generateFormInput(wrapper, fi);
     }
 
@@ -246,7 +246,7 @@ export class HttpTarget {
     wrapper.appendChild(title);
 
     for (const [key, fi] of Object.entries(this.opts.Params)) {
-      fi.value = loadHttpTargetParam(this.target, this.opts, key);
+      fi.value = loadHTTPTargetParam(this.target, this.opts, key);
       generateFormInput(wrapper, fi);
     }
 
@@ -352,11 +352,11 @@ export class HttpTarget {
   }
 
   private async onClickAttack() {
-    await this.trunks.attackHttp(this.target, this.opts);
+    await this.trunks.attackHTTP(this.target, this.opts);
   }
 
   private async onClickAttackDelete(result: AttackResult) {
-    const res = await this.trunks.attackHttpDelete(result.Name);
+    const res = await this.trunks.attackHTTPDelete(result.Name);
     if (!res) {
       return;
     }
@@ -382,7 +382,7 @@ export class HttpTarget {
       return;
     }
 
-    const resJSON = await this.trunks.attackHttpGet(resultName);
+    const resJSON = await this.trunks.attackHTTPGet(resultName);
     if (resJSON.code != 200) {
       return;
     }
@@ -405,7 +405,7 @@ export class HttpTarget {
   }
 
   private async onClickRun() {
-    const res = await this.trunks.runHttp(this.target, this.opts);
+    const res = await this.trunks.runHTTP(this.target, this.opts);
     if (!res) {
       return;
     }

@@ -32,7 +32,7 @@ type AttackResult struct {
 	hist    *vegeta.Histogram
 
 	TargetID     string // ID of Target.
-	HttpTargetID string // ID of HTTP target which own the result.
+	HTTPTargetID string // ID of HTTP target which own the result.
 	Name         string // Name of output file without path.
 	fullpath     string
 
@@ -49,13 +49,13 @@ func newAttackResult(env *Environment, rr *RunRequest) (
 	logp := "newAttackResult"
 	ar = &AttackResult{
 		TargetID:     rr.Target.ID,
-		HttpTargetID: rr.HttpTarget.ID,
+		HTTPTargetID: rr.HTTPTarget.ID,
 		metrics:      &vegeta.Metrics{},
 		hist:         &vegeta.Histogram{},
 	}
 
 	ar.Name = fmt.Sprintf("%s.%s.%s.%dx%s.%s.bin",
-		rr.Target.ID, rr.HttpTarget.ID,
+		rr.Target.ID, rr.HTTPTarget.ID,
 		time.Now().Format(outputSuffixDate),
 		rr.Target.Opts.RatePerSecond, rr.Target.Opts.Duration,
 		env.ResultsSuffix)
@@ -99,14 +99,14 @@ func (ar *AttackResult) cancel() {
 	if ar.fout != nil {
 		err := ar.fout.Close()
 		if err != nil {
-			mlog.Errf(`AttackResult.cancel %s: %s`, ar.HttpTargetID, err)
+			mlog.Errf(`AttackResult.cancel %s: %s`, ar.HTTPTargetID, err)
 		}
 		ar.fout = nil
 
 		if len(ar.fullpath) > 0 {
 			err = os.Remove(ar.fullpath)
 			if err != nil {
-				mlog.Errf(`AttackResult.cancel %s: %s`, ar.HttpTargetID, err)
+				mlog.Errf(`AttackResult.cancel %s: %s`, ar.HTTPTargetID, err)
 			}
 		}
 	}
@@ -126,7 +126,7 @@ func (ar *AttackResult) finish() (err error) {
 	if ar.fout != nil {
 		err = ar.fout.Close()
 		if err != nil {
-			return fmt.Errorf("%s: %w", ar.HttpTargetID, err)
+			return fmt.Errorf(`%s: %w`, ar.HTTPTargetID, err)
 		}
 		ar.fout = nil
 	}

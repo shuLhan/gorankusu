@@ -9,10 +9,10 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-// Target contains group of HttpTarget that can be tested by Trunks.
+// Target contains group of HTTPTarget that can be tested by Trunks.
 type Target struct {
-	// HttpClient that can be used for running HttpTarget.
-	HttpClient *libhttp.Client `json:"-"`
+	// HTTPClient that can be used for running HTTPTarget.
+	HTTPClient *libhttp.Client `json:"-"`
 
 	Opts *AttackOptions
 	Vars KeyFormInput
@@ -20,14 +20,14 @@ type Target struct {
 	ID   string
 	Name string
 
-	// BaseUrl contains the target address that serve the service to
+	// BaseURL contains the target address that serve the service to
 	// be tested.
 	// This field is required.
-	BaseUrl string
+	BaseURL string
 
 	Hint string
 
-	HttpTargets      []*HttpTarget
+	HTTPTargets      []*HTTPTarget
 	WebSocketTargets []*WebSocketTarget
 }
 
@@ -35,8 +35,8 @@ func (target *Target) init() (err error) {
 	if len(target.Name) == 0 {
 		return fmt.Errorf("Target.Name is empty")
 	}
-	if len(target.BaseUrl) == 0 {
-		return fmt.Errorf("Target.BaseUrl is not defined")
+	if len(target.BaseURL) == 0 {
+		return fmt.Errorf("Target.BaseURL is not defined")
 	}
 
 	target.ID = generateID(target.Name)
@@ -51,13 +51,16 @@ func (target *Target) init() (err error) {
 		target.Vars = KeyFormInput{}
 	}
 
-	for _, ht := range target.HttpTargets {
+	var ht *HTTPTarget
+	for _, ht = range target.HTTPTargets {
 		err = ht.init()
 		if err != nil {
 			return fmt.Errorf("Target.init %s: %w", target.Name, err)
 		}
 	}
-	for _, wst := range target.WebSocketTargets {
+
+	var wst *WebSocketTarget
+	for _, wst = range target.WebSocketTargets {
 		err = wst.init()
 		if err != nil {
 			return fmt.Errorf("Target.init %s: %w", target.Name, err)
@@ -67,8 +70,8 @@ func (target *Target) init() (err error) {
 	return nil
 }
 
-func (target *Target) getHttpTargetByID(id string) *HttpTarget {
-	for _, ht := range target.HttpTargets {
+func (target *Target) getHTTPTarget(id string) *HTTPTarget {
+	for _, ht := range target.HTTPTargets {
 		if ht.ID == id {
 			return ht
 		}

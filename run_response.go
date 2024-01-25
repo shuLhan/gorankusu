@@ -25,20 +25,20 @@ type RunResponse struct {
 	ResponseStatusCode int
 }
 
-// SetHttpRequest dump the HTTP request including body into the DumpRequest
+// SetHTTPRequest dump the HTTP request including body into the DumpRequest
 // field.
-func (rres *RunResponse) SetHttpRequest(req *http.Request) (err error) {
+func (rres *RunResponse) SetHTTPRequest(req *http.Request) (err error) {
 	rres.DumpRequest, err = httputil.DumpRequest(req, true)
 	if err != nil {
-		return fmt.Errorf("SetHttpRequest: %w", err)
+		return fmt.Errorf(`SetHTTPRequest: %w`, err)
 	}
 	return nil
 }
 
-// SetHttpResponse dump the HTTP response including body into the DumpResponse
+// SetHTTPResponse dump the HTTP response including body into the DumpResponse
 // field.
-func (rres *RunResponse) SetHttpResponse(res *http.Response) (err error) {
-	logp := "SetHttpResponse"
+func (rres *RunResponse) SetHTTPResponse(res *http.Response) (err error) {
+	var logp = `SetHTTPResponse`
 
 	rres.ResponseStatus = res.Status
 	rres.ResponseStatusCode = res.StatusCode

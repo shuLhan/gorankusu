@@ -20,7 +20,7 @@ export interface AttackOptionsInterface {
 
 export interface AttackResult {
   TargetID: string;
-  HttpTargetID: string;
+  HTTPTargetID: string;
   Name: string;
   TextReport: string;
   HistReport: string;
@@ -44,13 +44,13 @@ export interface FormInput {
   min?: number;
 }
 
-export interface HttpResponseInterface {
+export interface HTTPResponseInterface {
   code: number;
   message: string;
   data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-export interface HttpTargetInterface {
+export interface HTTPTargetInterface {
   Name: string;
   Hint?: string;
   ID: string;
@@ -85,7 +85,7 @@ export interface NavLinkInterface {
 
 export interface RunRequestInterface {
   Target: TargetInterface;
-  HttpTarget: HttpTargetInterface | null;
+  HTTPTarget: HTTPTargetInterface | null;
   WebSocketTarget: WebSocketTargetInterface | null;
   Result?: AttackResult | null;
 }
@@ -103,26 +103,26 @@ export interface TargetInterface {
   ID: string;
   Name: string;
   Hint?: string;
-  BaseUrl: string;
+  BaseURL: string;
   Opts: AttackOptionsInterface;
   Vars: KeyFormInput;
-  HttpTargets: HttpTargetInterface[];
+  HTTPTargets: HTTPTargetInterface[];
   WebSocketTargets: WebSocketTargetInterface[];
 }
 
 export interface TrunksInterface {
-  attackHttp(
+  attackHTTP(
     target: TargetInterface,
-    http_target: HttpTargetInterface,
-  ): Promise<HttpResponseInterface | null>;
+    http_target: HTTPTargetInterface,
+  ): Promise<HTTPResponseInterface | null>;
 
-  attackHttpDelete(name: string): Promise<HttpResponseInterface | null>;
+  attackHTTPDelete(name: string): Promise<HTTPResponseInterface | null>;
 
-  attackHttpGet(name: string): Promise<HttpResponseInterface>;
+  attackHTTPGet(name: string): Promise<HTTPResponseInterface>;
 
   contentRenderer(
     target: TargetInterface,
-    http_target: HttpTargetInterface | null,
+    http_target: HTTPTargetInterface | null,
     ws_target: WebSocketTargetInterface | null,
     nav_link: NavLinkInterface | null,
     el: HTMLElement,
@@ -130,15 +130,15 @@ export interface TrunksInterface {
 
   setContent(path: string, el: HTMLElement | null): void;
 
-  runHttp(
+  runHTTP(
     target: TargetInterface,
-    http_target: HttpTargetInterface,
+    http_target: HTTPTargetInterface,
   ): Promise<RunResponseInterface | null>;
 
   runWebSocket(
     target: TargetInterface,
     WebSocketTargetInterface: WebSocketTargetInterface,
-  ): Promise<HttpResponseInterface | null>;
+  ): Promise<HTTPResponseInterface | null>;
 }
 
 export interface WebSocketTargetInterface {

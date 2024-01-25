@@ -12,6 +12,12 @@ import (
 	"github.com/shuLhan/share/lib/memfs"
 )
 
+// List of HTTP APIs.
+const (
+	pathAPIAttackHTTP   = `/_trunks/api/attack/http`
+	pathAPIAttackResult = `/_trunks/api/attack/result`
+)
+
 // List of HTTP APIs provided by Trunks HTTP server.
 var (
 	apiEnvironmentGet = &libhttp.Endpoint{
@@ -21,13 +27,13 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiAttackHttp = libhttp.Endpoint{
+	apiAttackHTTP = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         `/_trunks/api/attack/http`,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
-	apiAttackHttpCancel = libhttp.Endpoint{
+	apiAttackHTTPCancel = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
 		Path:         `/_trunks/api/attack/http`,
 		RequestType:  libhttp.RequestTypeJSON,
@@ -36,13 +42,13 @@ var (
 
 	apiAttackResultDelete = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
-		Path:         pathApiAttackResult,
+		Path:         pathAPIAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 	apiAttackResultGet = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         pathApiAttackResult,
+		Path:         pathAPIAttackResult,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
@@ -54,7 +60,7 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiTargetRunHttp = &libhttp.Endpoint{
+	apiTargetRunHTTP = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         "/_trunks/api/target/run/http",
 		RequestType:  libhttp.RequestTypeJSON,
@@ -75,8 +81,8 @@ var (
 	}
 )
 
-func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
-	logp := "initHttpServer"
+func (trunks *Trunks) initHTTPServer(isDevelopment bool) (err error) {
+	var logp = `initHTTPServer`
 
 	if memfsWWW == nil {
 		mfsOptions := memfs.Options{
@@ -110,14 +116,14 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiAttackHttp.Call = trunks.apiAttackHttp
-	err = trunks.Httpd.RegisterEndpoint(&apiAttackHttp)
+	apiAttackHTTP.Call = trunks.apiAttackHTTP
+	err = trunks.Httpd.RegisterEndpoint(&apiAttackHTTP)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	apiAttackHttpCancel.Call = trunks.apiAttackHttpCancel
-	err = trunks.Httpd.RegisterEndpoint(&apiAttackHttpCancel)
+	apiAttackHTTPCancel.Call = trunks.apiAttackHTTPCancel
+	err = trunks.Httpd.RegisterEndpoint(&apiAttackHTTPCancel)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -139,8 +145,8 @@ func (trunks *Trunks) initHttpServer(isDevelopment bool) (err error) {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiTargetRunHttp.Call = trunks.apiTargetRunHttp
-	err = trunks.Httpd.RegisterEndpoint(apiTargetRunHttp)
+	apiTargetRunHTTP.Call = trunks.apiTargetRunHTTP
+	err = trunks.Httpd.RegisterEndpoint(apiTargetRunHTTP)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -167,7 +173,7 @@ func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []b
 	return json.Marshal(&res)
 }
 
-// apiAttackHttp request to attack HTTP target.
+// apiAttackHTTP request to attack HTTP target.
 //
 // Request format,
 //
@@ -185,9 +191,9 @@ func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []b
 // Response codes,
 //   - 200 OK: success.
 //   - 500 ERR_INTERNAL: internal server error.
-func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	var (
-		logp       = `apiAttackHttp`
+		logp       = `apiAttackHTTP`
 		runRequest = &RunRequest{}
 	)
 
@@ -196,7 +202,7 @@ func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byt
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = trunks.AttackHttp(runRequest)
+	err = trunks.AttackHTTP(runRequest)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -213,7 +219,7 @@ func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byt
 	return resbody, nil
 }
 
-// apiAttackHttpCancel request to cancel the running attack on HTTP target.
+// apiAttackHTTPCancel request to cancel the running attack on HTTP target.
 //
 // Request format,
 //
@@ -228,13 +234,13 @@ func (trunks *Trunks) apiAttackHttp(epr *libhttp.EndpointRequest) (resbody []byt
 // Response codes,
 //   - 200 OK: success, return the RunRequest object that has been cancelled.
 //   - 500 ERR_INTERNAL: internal server error.
-func (trunks *Trunks) apiAttackHttpCancel(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (trunks *Trunks) apiAttackHTTPCancel(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	var (
-		logp       = `apiAttackHttpCancel`
+		logp       = `apiAttackHTTPCancel`
 		runRequest *RunRequest
 	)
 
-	runRequest, err = trunks.AttackHttpCancel()
+	runRequest, err = trunks.AttackHTTPCancel()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -243,7 +249,7 @@ func (trunks *Trunks) apiAttackHttpCancel(_ *libhttp.EndpointRequest) (resbody [
 	res.Code = http.StatusOK
 	res.Name = `OK_ATTACK_HTTP_CANCEL`
 	res.Message = fmt.Sprintf(`Attack on target "%s/%s" has been canceled`,
-		runRequest.Target.Name, runRequest.HttpTarget.Name)
+		runRequest.Target.Name, runRequest.HTTPTarget.Name)
 	res.Data = runRequest
 
 	resbody, err = json.Marshal(res)
@@ -305,14 +311,14 @@ func (trunks *Trunks) apiNavLinks(_ *libhttp.EndpointRequest) (resbody []byte, e
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetRunHttp(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (trunks *Trunks) apiTargetRunHTTP(epr *libhttp.EndpointRequest) ([]byte, error) {
 	req := &RunRequest{}
 	err := json.Unmarshal(epr.RequestBody, req)
 	if err != nil {
 		return nil, errInternal(err)
 	}
 
-	res, err := trunks.RunHttp(req)
+	res, err := trunks.RunHTTP(req)
 	if err != nil {
 		return nil, errInternal(err)
 	}

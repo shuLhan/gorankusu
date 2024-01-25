@@ -51,7 +51,7 @@ export function generateFormInput(parent, fi) {
             break;
     }
 }
-export function HttpMethodToString(m) {
+export function HTTPMethodToString(m) {
     switch (m) {
         case 0:
             return "GET";
@@ -75,10 +75,10 @@ export function HttpMethodToString(m) {
     return "???";
 }
 //
-// loadHttpTargetHeader get HttpTarget header from local storage by key.
-// If no header exist in storage return the one from HttpTarget itself.
+// loadHTTPTargetHeader get HTTPTarget header from local storage by key.
+// If no header exist in storage return the one from HTTPTarget itself.
 //
-export function loadHttpTargetHeader(target, httpTarget, key) {
+export function loadHTTPTargetHeader(target, httpTarget, key) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -90,15 +90,15 @@ export function loadHttpTargetHeader(target, httpTarget, key) {
     }
     return "";
 }
-function saveHttpTargetHeader(target, httpTarget, key, value) {
+function saveHTTPTargetHeader(target, httpTarget, key, value) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.header.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
 //
-// loadHttpTargetParam get HttpTarget parameter from local storage by key.
-// If no parameter exist in storage return the one from HttpTarget itself.
+// loadHTTPTargetParam get HTTPTarget parameter from local storage by key.
+// If no parameter exist in storage return the one from HTTPTarget itself.
 //
-export function loadHttpTargetParam(target, httpTarget, key) {
+export function loadHTTPTargetParam(target, httpTarget, key) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     const val = window.localStorage.getItem(storageKey);
     if (val) {
@@ -110,7 +110,7 @@ export function loadHttpTargetParam(target, httpTarget, key) {
     }
     return "";
 }
-function saveHttpTargetParam(target, httpTarget, key, value) {
+function saveHTTPTargetParam(target, httpTarget, key, value) {
     const storageKey = `${target.ID}.http.${httpTarget.ID}.param.${key}`;
     window.localStorage.setItem(storageKey, value);
 }
@@ -210,7 +210,7 @@ function saveWsTargetParam(target, wsTarget, key, value) {
     window.localStorage.setItem(storageKey, value);
 }
 //
-// save the variables on the Target, Params and Headers on HttpTarget or
+// save the variables on the Target, Params and Headers on HTTPTarget or
 // WebSocket to local storage.
 //
 export function save(target, httpTarget, wsTarget) {
@@ -222,10 +222,10 @@ export function save(target, httpTarget, wsTarget) {
     }
     if (httpTarget) {
         for (const [k, fi] of Object.entries(httpTarget.Headers)) {
-            saveHttpTargetHeader(target, httpTarget, k, fi.value);
+            saveHTTPTargetHeader(target, httpTarget, k, fi.value);
         }
         for (const [k, fi] of Object.entries(httpTarget.Params)) {
-            saveHttpTargetParam(target, httpTarget, k, fi.value);
+            saveHTTPTargetParam(target, httpTarget, k, fi.value);
         }
     }
     if (wsTarget) {

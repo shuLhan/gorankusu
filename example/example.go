@@ -42,7 +42,7 @@ const (
 
 type requestResponse struct {
 	Method        string
-	Url           string
+	URL           string
 	Headers       http.Header
 	Form          url.Values
 	MultipartForm *multipart.Form
@@ -175,10 +175,10 @@ func (ex *Example) registerWebSocketEndpoints() (err error) {
 }
 
 func (ex *Example) registerTargets() (err error) {
-	targetHttp := &trunks.Target{
+	var targetHTTP = &trunks.Target{
 		Name:    "Example HTTP",
 		Hint:    "This section provide an example of HTTP endpoints that can be tested and attacked.",
-		BaseUrl: fmt.Sprintf("http://%s", ex.trunks.Env.ListenAddress),
+		BaseURL: fmt.Sprintf(`http://%s`, ex.trunks.Env.ListenAddress),
 		Opts: &trunks.AttackOptions{
 			Duration:      300 * time.Second,
 			RatePerSecond: 1,
@@ -191,7 +191,7 @@ func (ex *Example) registerTargets() (err error) {
 				Value: "1",
 			},
 		},
-		HttpTargets: []*trunks.HttpTarget{{
+		HTTPTargets: []*trunks.HTTPTarget{{
 			Name:        "HTTP Get",
 			Hint:        fmt.Sprintf("Test or attack endpoint %q using HTTP GET.", pathExample),
 			Method:      libhttp.RequestMethodGet,
@@ -319,7 +319,7 @@ func (ex *Example) registerTargets() (err error) {
 		}},
 	}
 
-	err = ex.trunks.RegisterTarget(targetHttp)
+	err = ex.trunks.RegisterTarget(targetHTTP)
 	if err != nil {
 		return err
 	}
@@ -327,7 +327,7 @@ func (ex *Example) registerTargets() (err error) {
 	targetWebSocket := &trunks.Target{
 		Name:    "Example WebSocket",
 		Hint:    "This section provide an example of WebSocket endpoints that can be tested.",
-		BaseUrl: fmt.Sprintf("ws://%s", websocketAddress),
+		BaseURL: fmt.Sprintf(`ws://%s`, websocketAddress),
 		Opts:    &trunks.AttackOptions{},
 		Vars: trunks.KeyFormInput{
 			"WebSocketVar": trunks.FormInput{
@@ -385,7 +385,7 @@ func (ex *Example) registerNavLinks() (err error) {
 func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) {
 	data := &requestResponse{
 		Method:        epr.HttpRequest.Method,
-		Url:           epr.HttpRequest.URL.String(),
+		URL:           epr.HttpRequest.URL.String(),
 		Headers:       epr.HttpRequest.Header,
 		Form:          epr.HttpRequest.Form,
 		MultipartForm: epr.HttpRequest.MultipartForm,
@@ -407,7 +407,7 @@ func (ex *Example) pathExampleErrorGet(_ *libhttp.EndpointRequest) ([]byte, erro
 func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, err error) {
 	data := &requestResponse{
 		Method:        epr.HttpRequest.Method,
-		Url:           epr.HttpRequest.URL.String(),
+		URL:           epr.HttpRequest.URL.String(),
 		Headers:       epr.HttpRequest.Header,
 		Form:          epr.HttpRequest.Form,
 		MultipartForm: epr.HttpRequest.MultipartForm,
@@ -423,23 +423,27 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, e
 }
 
 func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
-	if req.Target.HttpClient == nil {
-		httpcOpts := &libhttp.ClientOptions{
-			ServerUrl:     req.Target.BaseUrl,
+	if req.Target.HTTPClient == nil {
+		var httpcOpts = &libhttp.ClientOptions{
+			ServerUrl:     req.Target.BaseURL,
 			AllowInsecure: true,
 		}
-		req.Target.HttpClient = libhttp.NewClient(httpcOpts)
+		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
 	}
 
 	res = &trunks.RunResponse{}
 
-	headers := req.HttpTarget.Headers.ToHttpHeader()
-	params := req.HttpTarget.Params.ToUrlValues()
+	var (
+		headers = req.HTTPTarget.Headers.ToHTTPHeader()
+		params  = req.HTTPTarget.Params.ToURLValues()
 
-	httpRequest, err := req.Target.HttpClient.GenerateHttpRequest(
-		req.HttpTarget.Method,
-		req.HttpTarget.Path,
-		req.HttpTarget.RequestType,
+		httpRequest *http.Request
+	)
+
+	httpRequest, err = req.Target.HTTPClient.GenerateHttpRequest(
+		req.HTTPTarget.Method,
+		req.HTTPTarget.Path,
+		req.HTTPTarget.RequestType,
 		headers,
 		params,
 	)
@@ -447,17 +451,19 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 		return nil, err
 	}
 
-	err = res.SetHttpRequest(httpRequest)
+	err = res.SetHTTPRequest(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	httpResponse, _, err := req.Target.HttpClient.Do(httpRequest)
+	var httpResponse *http.Response
+
+	httpResponse, _, err = req.Target.HTTPClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	err = res.SetHttpResponse(httpResponse)
+	err = res.SetHTTPResponse(httpResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -467,12 +473,12 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 
 func (ex *Example) preattackExampleErrorGet(rr *trunks.RunRequest) {
 	ex.targetExampleErrorGet = vegeta.Target{
-		Method: rr.HttpTarget.Method.String(),
-		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
-		Header: rr.HttpTarget.Headers.ToHttpHeader(),
+		Method: rr.HTTPTarget.Method.String(),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
+		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
 	}
 
-	q := rr.HttpTarget.Params.ToUrlValues().Encode()
+	q := rr.HTTPTarget.Params.ToURLValues().Encode()
 	if len(q) > 0 {
 		ex.targetExampleErrorGet.URL += "?" + q
 	}
@@ -482,12 +488,12 @@ func (ex *Example) preattackExampleErrorGet(rr *trunks.RunRequest) {
 
 func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 	ex.targetExampleGet = vegeta.Target{
-		Method: rr.HttpTarget.Method.String(),
-		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
-		Header: rr.HttpTarget.Headers.ToHttpHeader(),
+		Method: rr.HTTPTarget.Method.String(),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
+		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
 	}
 
-	q := rr.HttpTarget.Params.ToUrlValues().Encode()
+	q := rr.HTTPTarget.Params.ToURLValues().Encode()
 	if len(q) > 0 {
 		ex.targetExampleGet.URL += "?" + q
 	}
@@ -497,40 +503,40 @@ func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 
 func (ex *Example) attackExampleErrorGet(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.Lock()
+		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExampleErrorGet
-		rr.HttpTarget.Unlock()
+		rr.HTTPTarget.Unlock()
 		return nil
 	}
 }
 
 func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.Lock()
+		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExampleGet
-		rr.HttpTarget.Unlock()
+		rr.HTTPTarget.Unlock()
 		return nil
 	}
 }
 
 func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
-	if req.Target.HttpClient == nil {
+	if req.Target.HTTPClient == nil {
 		httpcOpts := &libhttp.ClientOptions{
-			ServerUrl:     req.Target.BaseUrl,
+			ServerUrl:     req.Target.BaseURL,
 			AllowInsecure: true,
 		}
-		req.Target.HttpClient = libhttp.NewClient(httpcOpts)
+		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
 	}
 
 	res = &trunks.RunResponse{}
 
-	headers := req.HttpTarget.Headers.ToHttpHeader()
-	params := req.HttpTarget.Params.ToUrlValues()
+	headers := req.HTTPTarget.Headers.ToHTTPHeader()
+	params := req.HTTPTarget.Params.ToURLValues()
 
-	httpRequest, err := req.Target.HttpClient.GenerateHttpRequest(
-		req.HttpTarget.Method,
-		req.HttpTarget.Path,
-		req.HttpTarget.RequestType,
+	httpRequest, err := req.Target.HTTPClient.GenerateHttpRequest(
+		req.HTTPTarget.Method,
+		req.HTTPTarget.Path,
+		req.HTTPTarget.RequestType,
 		headers,
 		params,
 	)
@@ -538,17 +544,17 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 		return nil, err
 	}
 
-	err = res.SetHttpRequest(httpRequest)
+	err = res.SetHTTPRequest(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	httpResponse, _, err := req.Target.HttpClient.Do(httpRequest)
+	httpResponse, _, err := req.Target.HTTPClient.Do(httpRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	err = res.SetHttpResponse(httpResponse)
+	err = res.SetHTTPResponse(httpResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -558,12 +564,12 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 
 func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
 	ex.targetExamplePostForm = vegeta.Target{
-		Method: rr.HttpTarget.Method.String(),
-		URL:    fmt.Sprintf("%s%s", rr.Target.BaseUrl, rr.HttpTarget.Path),
-		Header: rr.HttpTarget.Headers.ToHttpHeader(),
+		Method: rr.HTTPTarget.Method.String(),
+		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
+		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
 	}
 
-	q := rr.HttpTarget.Params.ToUrlValues().Encode()
+	q := rr.HTTPTarget.Params.ToURLValues().Encode()
 	if len(q) > 0 {
 		ex.targetExamplePostForm.Body = []byte(q)
 	}
@@ -573,9 +579,9 @@ func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
 
 func (ex *Example) attackExamplePostForm(rr *trunks.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
-		rr.HttpTarget.Lock()
+		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExamplePostForm
-		rr.HttpTarget.Unlock()
+		rr.HTTPTarget.Unlock()
 		return nil
 	}
 }

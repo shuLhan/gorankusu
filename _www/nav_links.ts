@@ -65,10 +65,10 @@ export class NavLinks {
       const target: TargetInterface = {
         ID: "nav",
         Name: "",
-        BaseUrl: "",
+        BaseURL: "",
         Opts: {} as AttackOptionsInterface,
         Vars: {} as KeyFormInput,
-        HttpTargets: [],
+        HTTPTargets: [],
         WebSocketTargets: [],
       };
       this.trunks.contentRenderer(target, null, null, nav, this.elContent);

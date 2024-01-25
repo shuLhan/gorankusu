@@ -15,8 +15,8 @@ import (
 // and request parameters (either in query or in the parameter body).
 type KeyFormInput map[string]FormInput
 
-// ToHttpHeader convert the KeyFormInputs to the standard http.Header.
-func (kfi KeyFormInput) ToHttpHeader() (headers http.Header) {
+// ToHTTPHeader convert the KeyFormInputs to the standard http.Header.
+func (kfi KeyFormInput) ToHTTPHeader() (headers http.Header) {
 	headers = http.Header{}
 	if len(kfi) == 0 {
 		return headers
@@ -27,10 +27,10 @@ func (kfi KeyFormInput) ToHttpHeader() (headers http.Header) {
 	return headers
 }
 
-// ToJsonObject convert the KeyFormInput into JSON object.
+// ToJSONObject convert the KeyFormInput into JSON object.
 // FormInput with Kind is FormInputKindBoolean will be converted to true if
 // the Value is either "true", "yes", or "1".
-func (kfi KeyFormInput) ToJsonObject() (data map[string]interface{}) {
+func (kfi KeyFormInput) ToJSONObject() (data map[string]interface{}) {
 	var (
 		k    string
 		fi   FormInput
@@ -69,8 +69,8 @@ func (kfi KeyFormInput) ToMultipartFormData() (data map[string][]byte) {
 	return data
 }
 
-// ToUrlValues convert the KeyFormInput to the standard url.Values.
-func (kfi KeyFormInput) ToUrlValues() (vals url.Values) {
+// ToURLValues convert the KeyFormInput to the standard url.Values.
+func (kfi KeyFormInput) ToURLValues() (vals url.Values) {
 	vals = url.Values{}
 	if len(kfi) == 0 {
 		return vals
