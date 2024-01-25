@@ -247,7 +247,7 @@ export class Trunks {
             body: JSON.stringify(attackReq),
         });
         const jsonRes = await httpRes.json();
-        if (jsonRes.code != 200) {
+        if (jsonRes.code >= 400) {
             wuiNotif.error(jsonRes.message);
             return null;
         }
@@ -265,7 +265,7 @@ export class Trunks {
             method: "DELETE",
         });
         const jsonRes = await fres.json();
-        if (jsonRes.code != 200) {
+        if (jsonRes.code >= 400) {
             wuiNotif.error(jsonRes.message);
             return null;
         }
@@ -275,7 +275,7 @@ export class Trunks {
         const url = API_ATTACK_RESULT + "?name=" + name;
         const fres = await fetch(url);
         const res = await fres.json();
-        if (res.code != 200) {
+        if (res.code >= 400) {
             wuiNotif.error(res.message);
         }
         return res;
@@ -318,12 +318,12 @@ export class Trunks {
             body: JSON.stringify(req),
         });
         const jsonRes = await httpRes.json();
-        if (jsonRes.code != 200) {
+        if (jsonRes.code >= 400) {
             wuiNotif.error(jsonRes.message);
             return null;
         }
         const res = jsonRes.data;
-        if (res.ResponseStatusCode != 200) {
+        if (res.ResponseStatusCode >= 400) {
             wuiNotif.error(`${httpTarget.Name}: ${res.ResponseStatus}`);
         }
         else {
@@ -354,7 +354,7 @@ export class Trunks {
             body: JSON.stringify(req),
         });
         const jsonRes = await fres.json();
-        if (jsonRes.code != 200) {
+        if (jsonRes.code >= 400) {
             wuiNotif.error(jsonRes.message);
             return null;
         }
