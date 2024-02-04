@@ -190,6 +190,9 @@ func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
 		req.Target.BaseURL = origTarget.BaseURL
 		req.Target.Name = origTarget.Name
 		req.HTTPTarget.ConvertParams = origHTTPTarget.ConvertParams
+		req.HTTPTarget.RequestDumper = origHTTPTarget.RequestDumper
+		req.HTTPTarget.ResponseDumper = origHTTPTarget.ResponseDumper
+
 		res, err = trunks.runHTTPTarget(req)
 	} else {
 		req = generateRunRequest(trunks.Env, req, origTarget, origHTTPTarget)
@@ -371,7 +374,7 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = res.SetHTTPRequest(httpRequest)
+	err = res.SetHTTPRequest(rr.HTTPTarget.RequestDumper, httpRequest)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
@@ -381,7 +384,7 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = res.SetHTTPResponse(httpResponse)
+	err = res.SetHTTPResponse(rr.HTTPTarget.ResponseDumper, httpResponse)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

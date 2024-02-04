@@ -45,6 +45,16 @@ type HTTPTarget struct {
 	PreAttack HTTPPreAttackHandler `json:"-"`
 	Attack    HTTPAttackHandler    `json:"-"`
 
+	// RequestDumper define the handler to store [http.Request] after
+	// Run into [RunRequest] DumpRequest.
+	// Default to [DumpHTTPRequest] if its nil.
+	RequestDumper HTTPRequestDumper `json:"-"`
+
+	// ResponseDumper define the handler to store [http.Response] after
+	// Run into [RunRequest] DumpResponse.
+	// Default to [DumpHTTPResponse] if its nil.
+	ResponseDumper HTTPResponseDumper `json:"-"`
+
 	// ID of target, optional.
 	// If its empty, it will generated using value from Name.
 	ID string
@@ -78,6 +88,8 @@ func (ht *HTTPTarget) clone(src *HTTPTarget) {
 	ht.Run = src.Run
 	ht.PreAttack = src.PreAttack
 	ht.Attack = src.Attack
+	ht.RequestDumper = src.RequestDumper
+	ht.ResponseDumper = src.ResponseDumper
 	ht.ID = src.ID
 	ht.Name = src.Name
 	ht.Hint = src.Hint
@@ -92,7 +104,6 @@ func (ht *HTTPTarget) clone(src *HTTPTarget) {
 func (ht *HTTPTarget) init() (err error) {
 	if len(ht.Name) == 0 {
 		return fmt.Errorf(`HTTPTarget.Name is empty`)
-
 	}
 	if len(ht.ID) == 0 {
 		ht.ID = generateID(ht.Name)
@@ -105,6 +116,12 @@ func (ht *HTTPTarget) init() (err error) {
 	}
 	if len(ht.Path) == 0 {
 		ht.Path = "/"
+	}
+	if ht.RequestDumper == nil {
+		ht.RequestDumper = DumpHTTPRequest
+	}
+	if ht.ResponseDumper == nil {
+		ht.ResponseDumper = DumpHTTPResponse
 	}
 	return nil
 }

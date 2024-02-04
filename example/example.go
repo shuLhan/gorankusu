@@ -460,7 +460,7 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 		return nil, err
 	}
 
-	err = res.SetHTTPRequest(httpRequest)
+	err = res.SetHTTPRequest(req.HTTPTarget.RequestDumper, httpRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -472,7 +472,7 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 		return nil, err
 	}
 
-	err = res.SetHTTPResponse(httpResponse)
+	err = res.SetHTTPResponse(req.HTTPTarget.ResponseDumper, httpResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -553,7 +553,7 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 		return nil, err
 	}
 
-	err = res.SetHTTPRequest(httpRequest)
+	err = res.SetHTTPRequest(req.HTTPTarget.RequestDumper, httpRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -563,7 +563,7 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 		return nil, err
 	}
 
-	err = res.SetHTTPResponse(httpResponse)
+	err = res.SetHTTPResponse(req.HTTPTarget.ResponseDumper, httpResponse)
 	if err != nil {
 		return nil, err
 	}
