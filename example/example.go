@@ -90,8 +90,14 @@ func New() (ex *Example, err error) {
 		return nil, fmt.Errorf("example: New: %w", err)
 	}
 
-	// Register targets for testing HTTP and WebSocket endpoints.
-	err = ex.registerTargets()
+	// Register target for testing HTTP endpoints.
+	err = ex.registerTargetHTTP()
+	if err != nil {
+		return nil, fmt.Errorf("example: New: %w", err)
+	}
+
+	// Register target for testing WebSocket endpoints.
+	err = ex.registerTargetWebSocket()
 	if err != nil {
 		return nil, fmt.Errorf("example: New: %w", err)
 	}
@@ -174,7 +180,7 @@ func (ex *Example) registerWebSocketEndpoints() (err error) {
 	return nil
 }
 
-func (ex *Example) registerTargets() (err error) {
+func (ex *Example) registerTargetHTTP() (err error) {
 	var targetHTTP = &trunks.Target{
 		Name:    "Example HTTP",
 		Hint:    "This section provide an example of HTTP endpoints that can be tested and attacked.",
@@ -323,7 +329,10 @@ func (ex *Example) registerTargets() (err error) {
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
+func (ex *Example) registerTargetWebSocket() (err error) {
 	targetWebSocket := &trunks.Target{
 		Name:    "Example WebSocket",
 		Hint:    "This section provide an example of WebSocket endpoints that can be tested.",
@@ -598,7 +607,7 @@ func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (res interface{}, err 
 
 	wsc := &websocket.Client{
 		Endpoint: "ws://" + websocketAddress,
-		HandleText: func(cl *websocket.Client, frame *websocket.Frame) error {
+		HandleText: func(_ *websocket.Client, frame *websocket.Frame) error {
 			res = frame.Payload()
 			wg.Done()
 			return nil
