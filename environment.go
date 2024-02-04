@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"fmt"
@@ -16,27 +16,27 @@ type Environment struct {
 	// testing currently running.
 	AttackRunning *RunRequest
 
-	// ListenAddress is the address and port where Trunks HTTP web
+	// ListenAddress is the address and port where Gorankusu HTTP web
 	// will run.
 	// If its emtpy, it will set to DefaultListenAddress.
-	ListenAddress string `ini:"trunks::listen_address"`
+	ListenAddress string `ini:"gorankusu::listen_address"`
 
 	// ResultsDir is the path where the output of load testing will be
 	// stored.
 	// This field is optional, if its empty it will be set to the working
 	// directory where the program is running.
-	ResultsDir string `ini:"trunks:results:dir"`
+	ResultsDir string `ini:"gorankusu:results:dir"`
 
 	// ResultsSuffix define custom string to add to the file name to
 	// uniquely identify results on each run.
-	ResultsSuffix string `ini:"trunks:result:suffix"`
+	ResultsSuffix string `ini:"gorankusu:result:suffix"`
 
 	// MaxAttackRate define the maximum AttackRate can be set by client.
 	// The purpose of this option is to prevent client to set attack rate
 	// which may bring down the service to be tested.
 	// This field is optional, default to DefaultMaxAttackRate if its
 	// zero.
-	MaxAttackRate int `ini:"trunks::max_attack_rate"`
+	MaxAttackRate int `ini:"gorankusu::max_attack_rate"`
 
 	// MaxAttackDuration define the maximum duration for an attack to be
 	// run on each target.
@@ -44,7 +44,7 @@ type Environment struct {
 	// and bringing it down.
 	// This field is optional, default to DefaultMaxAttackDuration if its
 	// zero.
-	MaxAttackDuration time.Duration `ini:"trunks::max_attack_duration"`
+	MaxAttackDuration time.Duration `ini:"gorankusu::max_attack_duration"`
 
 	mtx sync.Mutex
 }

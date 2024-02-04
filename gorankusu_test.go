@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"crypto/rand"
@@ -15,11 +15,11 @@ import (
 	"github.com/shuLhan/share/lib/test/mock"
 )
 
-// dummyHttpd dummy HTTP as target for Trunks.
+// dummyHttpd dummy HTTP as target for Gorankusu.
 var dummyHttpd *httpdDummy
 
-// dummyTrunks the Trunks instance that contains [Target] to be tested.
-var dummyTrunks *Trunks
+// dummyGorankusu the Gorankusu instance that contains [Target] to be tested.
+var dummyGorankusu *Gorankusu
 
 func TestMain(m *testing.M) {
 	var err error
@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 
 	var env = Environment{}
 
-	dummyTrunks, err = New(&env)
+	dummyGorankusu, err = New(&env)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func registerTargetHTTP() {
 	}
 	target.HTTPTargets = append(target.HTTPTargets, targetHTTPUpload)
 
-	var err = dummyTrunks.RegisterTarget(target)
+	var err = dummyGorankusu.RegisterTarget(target)
 	if err != nil {
 		log.Fatalf(`%s: %s`, logp, err)
 	}

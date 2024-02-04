@@ -6,7 +6,7 @@ COVER_HTML:=cover.html
 
 .PHONY: all
 all: lint test
-	go run ./internal/cmd/trunks build
+	go run ./internal/cmd/gorankusu build
 
 .PHONY: lint
 lint: lint-www
@@ -25,4 +25,4 @@ test:
 
 .PHONY: dev
 dev:
-	go run ./internal/cmd/trunks
+	go run ./internal/cmd/gorankusu

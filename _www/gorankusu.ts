@@ -18,19 +18,19 @@ import { NavLinks } from "./nav_links.js";
 import { Target } from "./target.js";
 import { wuiNotif } from "./vars.js";
 
-const API_ATTACK_HTTP = "/_trunks/api/attack/http";
-const API_ATTACK_RESULT = "/_trunks/api/attack/result";
-const API_ENVIRONMENT = "/_trunks/api/environment";
-const API_NAVLINKS = "/_trunks/api/navlinks";
-const API_TARGETS = "/_trunks/api/targets";
+const API_ATTACK_HTTP = "/_gorankusu/api/attack/http";
+const API_ATTACK_RESULT = "/_gorankusu/api/attack/result";
+const API_ENVIRONMENT = "/_gorankusu/api/environment";
+const API_NAVLINKS = "/_gorankusu/api/navlinks";
+const API_TARGETS = "/_gorankusu/api/targets";
 
-const API_TARGET_RUN_HTTP = "/_trunks/api/target/run/http";
-const API_TARGET_RUN_WEBSOCKET = "/_trunks/api/target/run/websocket";
+const API_TARGET_RUN_HTTP = "/_gorankusu/api/target/run/http";
+const API_TARGET_RUN_WEBSOCKET = "/_gorankusu/api/target/run/websocket";
 
-const CLASS_ATTACK_RUNNING = "trunks_attack_running";
-const CLASS_FOOTER = "trunks_footer";
-const CLASS_MAIN = "trunks_main";
-const CLASS_NAV = "trunks_nav";
+const CLASS_ATTACK_RUNNING = "gorankusu_attack_running";
+const CLASS_FOOTER = "gorankusu_footer";
+const CLASS_MAIN = "gorankusu_main";
+const CLASS_NAV = "gorankusu_nav";
 
 interface MapIDTarget {
   [key: string]: Target;
@@ -40,7 +40,7 @@ interface MapIDNavLink {
   [key: string]: NavLinkInterface;
 }
 
-export class Trunks {
+export class Gorankusu {
   el!: HTMLDivElement;
   elAttackRunning!: HTMLElement;
   elAttackCancel!: HTMLButtonElement;
@@ -93,7 +93,7 @@ export class Trunks {
     elNavFooter.classList.add(CLASS_FOOTER);
     elNavFooter.innerHTML = `
 			<div>
-				<div>Powered by <a href="https://sr.ht/~shulhan/trunks" target="_blank">Trunks</a></div>
+				<div>Powered by <a href="https://sr.ht/~shulhan/gorankusu" target="_blank">Gorankusu</a></div>
 				<div><a href="/doc/" target="_blank">Documentation</a></div>
 			</div>
 		`;

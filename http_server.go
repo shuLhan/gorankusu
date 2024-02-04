@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"encoding/json"
@@ -14,18 +14,18 @@ import (
 
 // List of HTTP APIs.
 const (
-	pathAPIAttackHTTP   = `/_trunks/api/attack/http`
-	pathAPIAttackResult = `/_trunks/api/attack/result`
+	pathAPIAttackHTTP   = `/_gorankusu/api/attack/http`
+	pathAPIAttackResult = `/_gorankusu/api/attack/result`
 
-	pathAPIEnvironment = `/_trunks/api/environment`
-	pathAPINavlinks    = `/_trunks/api/navlinks`
+	pathAPIEnvironment = `/_gorankusu/api/environment`
+	pathAPINavlinks    = `/_gorankusu/api/navlinks`
 
-	pathAPITargetRunHTTP      = `/_trunks/api/target/run/http`
-	pathAPITargetRunWebSocket = `/_trunks/api/target/run/websocket`
-	pathAPITargets            = `/_trunks/api/targets`
+	pathAPITargetRunHTTP      = `/_gorankusu/api/target/run/http`
+	pathAPITargetRunWebSocket = `/_gorankusu/api/target/run/websocket`
+	pathAPITargets            = `/_gorankusu/api/targets`
 )
 
-// List of HTTP APIs provided by Trunks HTTP server.
+// List of HTTP APIs provided by Gorankusu HTTP server.
 var (
 	apiEnvironmentGet = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
@@ -88,7 +88,7 @@ var (
 	}
 )
 
-func (trunks *Trunks) initHTTPServer(isDevelopment bool) (err error) {
+func (gorankusu *Gorankusu) initHTTPServer(isDevelopment bool) (err error) {
 	var logp = `initHTTPServer`
 
 	if memfsWWW == nil {
@@ -109,62 +109,62 @@ func (trunks *Trunks) initHTTPServer(isDevelopment bool) (err error) {
 
 	httpdOpts := &libhttp.ServerOptions{
 		Memfs:   memfsWWW,
-		Address: trunks.Env.ListenAddress,
+		Address: gorankusu.Env.ListenAddress,
 	}
 
-	trunks.Httpd, err = libhttp.NewServer(httpdOpts)
+	gorankusu.Httpd, err = libhttp.NewServer(httpdOpts)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiEnvironmentGet.Call = trunks.apiEnvironmentGet
-	err = trunks.Httpd.RegisterEndpoint(apiEnvironmentGet)
+	apiEnvironmentGet.Call = gorankusu.apiEnvironmentGet
+	err = gorankusu.Httpd.RegisterEndpoint(apiEnvironmentGet)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiAttackHTTP.Call = trunks.apiAttackHTTP
-	err = trunks.Httpd.RegisterEndpoint(&apiAttackHTTP)
+	apiAttackHTTP.Call = gorankusu.apiAttackHTTP
+	err = gorankusu.Httpd.RegisterEndpoint(&apiAttackHTTP)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	apiAttackHTTPCancel.Call = trunks.apiAttackHTTPCancel
-	err = trunks.Httpd.RegisterEndpoint(&apiAttackHTTPCancel)
+	apiAttackHTTPCancel.Call = gorankusu.apiAttackHTTPCancel
+	err = gorankusu.Httpd.RegisterEndpoint(&apiAttackHTTPCancel)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	apiAttackResultDelete.Call = trunks.apiAttackResultDelete
-	err = trunks.Httpd.RegisterEndpoint(apiAttackResultDelete)
+	apiAttackResultDelete.Call = gorankusu.apiAttackResultDelete
+	err = gorankusu.Httpd.RegisterEndpoint(apiAttackResultDelete)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
-	apiAttackResultGet.Call = trunks.apiAttackResultGet
-	err = trunks.Httpd.RegisterEndpoint(apiAttackResultGet)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
-	}
-
-	apiNavLinks.Call = trunks.apiNavLinks
-	err = trunks.Httpd.RegisterEndpoint(apiNavLinks)
+	apiAttackResultGet.Call = gorankusu.apiAttackResultGet
+	err = gorankusu.Httpd.RegisterEndpoint(apiAttackResultGet)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiTargetRunHTTP.Call = trunks.apiTargetRunHTTP
-	err = trunks.Httpd.RegisterEndpoint(apiTargetRunHTTP)
-	if err != nil {
-		return fmt.Errorf("%s: %w", logp, err)
-	}
-	apiTargetRunWebSocket.Call = trunks.apiTargetRunWebSocket
-	err = trunks.Httpd.RegisterEndpoint(apiTargetRunWebSocket)
+	apiNavLinks.Call = gorankusu.apiNavLinks
+	err = gorankusu.Httpd.RegisterEndpoint(apiNavLinks)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	apiTargets.Call = trunks.apiTargets
-	err = trunks.Httpd.RegisterEndpoint(apiTargets)
+	apiTargetRunHTTP.Call = gorankusu.apiTargetRunHTTP
+	err = gorankusu.Httpd.RegisterEndpoint(apiTargetRunHTTP)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+	apiTargetRunWebSocket.Call = gorankusu.apiTargetRunWebSocket
+	err = gorankusu.Httpd.RegisterEndpoint(apiTargetRunWebSocket)
+	if err != nil {
+		return fmt.Errorf("%s: %w", logp, err)
+	}
+
+	apiTargets.Call = gorankusu.apiTargets
+	err = gorankusu.Httpd.RegisterEndpoint(apiTargets)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
@@ -172,11 +172,11 @@ func (trunks *Trunks) initHTTPServer(isDevelopment bool) (err error) {
 	return nil
 }
 
-// apiEnvironmentGet get the Trunks environment including its state.
-func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
+// apiEnvironmentGet get the Gorankusu environment including its state.
+func (gorankusu *Gorankusu) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Data = trunks.Env
+	res.Data = gorankusu.Env
 	return json.Marshal(&res)
 }
 
@@ -184,7 +184,7 @@ func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []b
 //
 // Request format,
 //
-//	POST /_trunks/api/attack/http
+//	POST /_gorankusu/api/attack/http
 //	Content-Type: application/json
 //
 //	<RunRequest>
@@ -198,7 +198,7 @@ func (trunks *Trunks) apiEnvironmentGet(_ *libhttp.EndpointRequest) (resbody []b
 // Response codes,
 //   - 200 OK: success.
 //   - 500 ERR_INTERNAL: internal server error.
-func (trunks *Trunks) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	var (
 		logp       = `apiAttackHTTP`
 		runRequest = &RunRequest{}
@@ -209,7 +209,7 @@ func (trunks *Trunks) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byt
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
-	err = trunks.AttackHTTP(runRequest)
+	err = gorankusu.AttackHTTP(runRequest)
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -230,7 +230,7 @@ func (trunks *Trunks) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byt
 //
 // Request format,
 //
-//	DELETE /_trunks/api/attack/http
+//	DELETE /_gorankusu/api/attack/http
 //
 // Response format,
 //
@@ -241,13 +241,13 @@ func (trunks *Trunks) apiAttackHTTP(epr *libhttp.EndpointRequest) (resbody []byt
 // Response codes,
 //   - 200 OK: success, return the RunRequest object that has been cancelled.
 //   - 500 ERR_INTERNAL: internal server error.
-func (trunks *Trunks) apiAttackHTTPCancel(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiAttackHTTPCancel(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	var (
 		logp       = `apiAttackHTTPCancel`
 		runRequest *RunRequest
 	)
 
-	runRequest, err = trunks.AttackHTTPCancel()
+	runRequest, err = gorankusu.AttackHTTPCancel()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
@@ -266,13 +266,13 @@ func (trunks *Trunks) apiAttackHTTPCancel(_ *libhttp.EndpointRequest) (resbody [
 	return resbody, nil
 }
 
-func (trunks *Trunks) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	name := epr.HttpRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
 	}
 
-	_, ht, result, err := trunks.getAttackResultByName(name)
+	_, ht, result, err := gorankusu.getAttackResultByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -287,13 +287,13 @@ func (trunks *Trunks) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbo
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
 	name := epr.HttpRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
 	}
 
-	_, _, result, err := trunks.getAttackResultByName(name)
+	_, _, result, err := gorankusu.getAttackResultByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -311,21 +311,21 @@ func (trunks *Trunks) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody 
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiNavLinks(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiNavLinks(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Data = trunks.navLinks
+	res.Data = gorankusu.navLinks
 	return json.Marshal(&res)
 }
 
-func (trunks *Trunks) apiTargetRunHTTP(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (gorankusu *Gorankusu) apiTargetRunHTTP(epr *libhttp.EndpointRequest) ([]byte, error) {
 	req := &RunRequest{}
 	err := json.Unmarshal(epr.RequestBody, req)
 	if err != nil {
 		return nil, errInternal(err)
 	}
 
-	res, err := trunks.RunHTTP(req)
+	res, err := gorankusu.RunHTTP(req)
 	if err != nil {
 		return nil, errInternal(err)
 	}
@@ -337,14 +337,14 @@ func (trunks *Trunks) apiTargetRunHTTP(epr *libhttp.EndpointRequest) ([]byte, er
 	return json.Marshal(&epres)
 }
 
-func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byte, error) {
+func (gorankusu *Gorankusu) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byte, error) {
 	req := &RunRequest{}
 	err := json.Unmarshal(epr.RequestBody, req)
 	if err != nil {
 		return nil, errInternal(err)
 	}
 
-	origTarget := trunks.getTargetByID(req.Target.ID)
+	origTarget := gorankusu.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
 	}
@@ -354,7 +354,7 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 		return nil, errInvalidWebSocketTarget(req.WebSocketTarget.ID)
 	}
 
-	req = generateWebSocketTarget(trunks.Env, req, origTarget, origWsTarget)
+	req = generateWebSocketTarget(gorankusu.Env, req, origTarget, origWsTarget)
 
 	res, err := req.WebSocketTarget.Run(req)
 	if err != nil {
@@ -368,9 +368,9 @@ func (trunks *Trunks) apiTargetRunWebSocket(epr *libhttp.EndpointRequest) ([]byt
 	return json.Marshal(&epres)
 }
 
-func (trunks *Trunks) apiTargets(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
+func (gorankusu *Gorankusu) apiTargets(_ *libhttp.EndpointRequest) (resbody []byte, err error) {
 	res := libhttp.EndpointResponse{}
 	res.Code = http.StatusOK
-	res.Data = trunks.targets
+	res.Data = gorankusu.targets
 	return json.Marshal(&res)
 }

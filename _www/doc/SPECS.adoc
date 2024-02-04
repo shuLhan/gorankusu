@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
-= Trunks
+= Gorankusu
 :toc:
 :sectanchors:
 :sectlinks:
 
-Trunks is a Go library that provide HTTP service with web user interface
+Gorankusu is a Go library that provide HTTP service with web user interface
 to test HTTP and/or WebSocket endpoints and for load testing HTTP endpoints.
 
 For testing HTTP endpoints it use the
@@ -18,7 +18,7 @@ For the load testing we use
 https://github.com/tsenart/vegeta[vegeta^]
 as the backend.
 
-This documentation provide the development of Trunks.
+This documentation provide the development of Gorankusu.
 
 [#schemas]
 ==  Schemas
@@ -57,12 +57,12 @@ All of HTTP APIs return a JSON object using the following response schema
 
 ===  Get environment
 
-HTTP API to get the current Trunks environment.
+HTTP API to get the current Gorankusu environment.
 
 *Request*
 
 ----
-GET /_trunks/api/environment
+GET /_gorankusu/api/environment
 ----
 
 *Response*

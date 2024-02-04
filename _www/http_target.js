@@ -16,8 +16,8 @@ const CLASS_HTTP_TARGET_OUT_MONO = "http_target_out_mono";
 const CLASS_HTTP_TARGET_OUT_RUN = "http_target_out_run";
 const CONTENT_TYPE_JSON = "application/json";
 export class HTTPTarget {
-    constructor(trunks, target, opts) {
-        this.trunks = trunks;
+    constructor(gorankusu, target, opts) {
+        this.gorankusu = gorankusu;
         this.target = target;
         this.opts = opts;
         this.el = document.createElement("div");
@@ -279,10 +279,10 @@ export class HTTPTarget {
         }
     }
     async onClickAttack() {
-        await this.trunks.attackHTTP(this.target, this.opts);
+        await this.gorankusu.attackHTTP(this.target, this.opts);
     }
     async onClickAttackDelete(result) {
-        const res = await this.trunks.attackHTTPDelete(result.Name);
+        const res = await this.gorankusu.attackHTTPDelete(result.Name);
         if (!res) {
             return;
         }
@@ -301,7 +301,7 @@ export class HTTPTarget {
             elReportHist.style.display = "none";
             return;
         }
-        const resJSON = await this.trunks.attackHTTPGet(resultName);
+        const resJSON = await this.gorankusu.attackHTTPGet(resultName);
         if (resJSON.code != 200) {
             return;
         }
@@ -318,7 +318,7 @@ export class HTTPTarget {
         this.elOutResponseBody.innerText = "JSON formatted response body";
     }
     async onClickRun() {
-        const res = await this.trunks.runHTTP(this.target, this.opts);
+        const res = await this.gorankusu.runHTTP(this.target, this.opts);
         if (!res) {
             return;
         }

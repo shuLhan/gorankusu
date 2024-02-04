@@ -9,7 +9,7 @@ import {
   KeyFormInput,
   NavLinkInterface,
   TargetInterface,
-  TrunksInterface,
+  GorankusuInterface,
 } from "./interface.js";
 
 import { getDocumentHeight } from "./functions.js";
@@ -21,13 +21,13 @@ export class NavLinks {
   elIframe: HTMLIFrameElement = document.createElement("iframe");
 
   constructor(
-    public trunks: TrunksInterface,
+    public gorankusu: GorankusuInterface,
     public navs: NavLinkInterface[],
   ) {
     const hdr = document.createElement("h3");
     hdr.innerText = "Links";
     hdr.onclick = () => {
-      trunks.setContent(HASH_LINKS, null);
+      gorankusu.setContent(HASH_LINKS, null);
     };
 
     this.elNav.classList.add(CLASS_NAV_TARGET);
@@ -71,7 +71,7 @@ export class NavLinks {
         HTTPTargets: [],
         WebSocketTargets: [],
       };
-      this.trunks.contentRenderer(target, null, null, nav, this.elContent);
+      this.gorankusu.contentRenderer(target, null, null, nav, this.elContent);
     } else {
       window.open(nav.Href, "_blank");
     }

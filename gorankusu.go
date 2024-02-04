@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ import (
 	"github.com/shuLhan/share/lib/mlog"
 )
 
-// Version of trunks module.
+// Version of gorankusu module.
 const Version = `0.4.1`
 
 // List of default values.
@@ -31,7 +31,7 @@ const (
 	DefaultListenAddress = `127.0.0.1:8217`
 )
 
-// EnvDevelopment setting this environment variable will enable trunks
+// EnvDevelopment setting this environment variable will enable gorankusu
 // development mode.
 const EnvDevelopment = "TRUNKS_DEV"
 
@@ -40,9 +40,9 @@ const (
 	paramNameName = "name"
 )
 
-// Trunks is the HTTP server with web user interface and APIs for running and
+// Gorankusu is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
-type Trunks struct {
+type Gorankusu struct {
 	Env   *Environment
 	Httpd *libhttp.Server
 
@@ -54,10 +54,10 @@ type Trunks struct {
 	navLinks []*NavLink
 }
 
-// New create and initialize new Trunks service.
-func New(env *Environment) (trunks *Trunks, err error) {
+// New create and initialize new Gorankusu service.
+func New(env *Environment) (gorankusu *Gorankusu, err error) {
 	var (
-		logp          = "trunks.New"
+		logp          = "gorankusu.New"
 		isDevelopment = len(os.Getenv(EnvDevelopment)) > 0
 	)
 
@@ -66,30 +66,30 @@ func New(env *Environment) (trunks *Trunks, err error) {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	trunks = &Trunks{
+	gorankusu = &Gorankusu{
 		Env:     env,
 		attackq: make(chan *RunRequest, 1),
 		cancelq: make(chan bool, 1),
 		errq:    make(chan error, 1),
 	}
 
-	err = trunks.initHTTPServer(isDevelopment)
+	err = gorankusu.initHTTPServer(isDevelopment)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}
 
-	return trunks, nil
+	return gorankusu, nil
 }
 
 // AttackHTTP start attacking the HTTP target defined in req.
-func (trunks *Trunks) AttackHTTP(req *RunRequest) (err error) {
+func (gorankusu *Gorankusu) AttackHTTP(req *RunRequest) (err error) {
 	var logp = `AttackHTTP`
 
-	if trunks.Env.isAttackRunning() {
-		return errAttackConflict(trunks.Env.getRunningAttack())
+	if gorankusu.Env.isAttackRunning() {
+		return errAttackConflict(gorankusu.Env.getRunningAttack())
 	}
 
-	var origTarget = trunks.getTargetByID(req.Target.ID)
+	var origTarget = gorankusu.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return errInvalidTarget(req.Target.ID)
 	}
@@ -105,14 +105,14 @@ func (trunks *Trunks) AttackHTTP(req *RunRequest) (err error) {
 		return fmt.Errorf(`%s: %w`, logp, &errAttackHandlerNotSet)
 	}
 
-	req = generateRunRequest(trunks.Env, req, origTarget, origHTTPTarget)
+	req = generateRunRequest(gorankusu.Env, req, origTarget, origHTTPTarget)
 
-	req.result, err = newAttackResult(trunks.Env, req)
+	req.result, err = newAttackResult(gorankusu.Env, req)
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	trunks.attackq <- req
+	gorankusu.attackq <- req
 
 	msg := fmt.Sprintf("Attacking %s%s with %d RPS for %s seconds",
 		req.Target.BaseURL, req.HTTPTarget.Path,
@@ -125,8 +125,8 @@ func (trunks *Trunks) AttackHTTP(req *RunRequest) (err error) {
 
 // AttackHTTPCancel cancel any running attack.
 // It will return an error if no attack is running.
-func (trunks *Trunks) AttackHTTPCancel() (rr *RunRequest, err error) {
-	rr = trunks.Env.getRunningAttack()
+func (gorankusu *Gorankusu) AttackHTTPCancel() (rr *RunRequest, err error) {
+	rr = gorankusu.Env.getRunningAttack()
 	if rr == nil {
 		e := &liberrors.E{
 			Code:    http.StatusNotFound,
@@ -136,13 +136,13 @@ func (trunks *Trunks) AttackHTTPCancel() (rr *RunRequest, err error) {
 		return nil, e
 	}
 
-	trunks.cancelq <- true
+	gorankusu.cancelq <- true
 
 	return rr, nil
 }
 
 // RegisterNavLink register custom navigation link.
-func (trunks *Trunks) RegisterNavLink(nav *NavLink) (err error) {
+func (gorankusu *Gorankusu) RegisterNavLink(nav *NavLink) (err error) {
 	if nav == nil {
 		return
 	}
@@ -152,13 +152,13 @@ func (trunks *Trunks) RegisterNavLink(nav *NavLink) (err error) {
 		return fmt.Errorf("RegisterNavLink: %w", err)
 	}
 
-	trunks.navLinks = append(trunks.navLinks, nav)
+	gorankusu.navLinks = append(gorankusu.navLinks, nav)
 
 	return nil
 }
 
-// RegisterTarget register Target to be attached to Trunks.
-func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
+// RegisterTarget register Target to be attached to Gorankusu.
+func (gorankusu *Gorankusu) RegisterTarget(target *Target) (err error) {
 	if target == nil {
 		return
 	}
@@ -168,15 +168,15 @@ func (trunks *Trunks) RegisterTarget(target *Target) (err error) {
 		return fmt.Errorf("RegisterTarget: %w", err)
 	}
 
-	trunks.targets = append(trunks.targets, target)
+	gorankusu.targets = append(gorankusu.targets, target)
 
 	return nil
 }
 
 // RunHTTP send the HTTP request to the HTTP target defined in RunRequest with
 // optional Headers and Parameters.
-func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
-	var origTarget = trunks.getTargetByID(req.Target.ID)
+func (gorankusu *Gorankusu) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
+	var origTarget = gorankusu.getTargetByID(req.Target.ID)
 	if origTarget == nil {
 		return nil, errInvalidTarget(req.Target.ID)
 	}
@@ -192,9 +192,9 @@ func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
 
 		req.HTTPTarget.refCopy(origHTTPTarget)
 
-		res, err = trunks.runHTTPTarget(req)
+		res, err = gorankusu.runHTTPTarget(req)
 	} else {
-		req = generateRunRequest(trunks.Env, req, origTarget, origHTTPTarget)
+		req = generateRunRequest(gorankusu.Env, req, origTarget, origHTTPTarget)
 		res, err = req.HTTPTarget.Run(req)
 	}
 	if err != nil {
@@ -203,53 +203,53 @@ func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
 	return res, nil
 }
 
-// Start the Trunks HTTP server that provide user interface for running and
+// Start the Gorankusu HTTP server that provide user interface for running and
 // load testing registered Targets.
-func (trunks *Trunks) Start() (err error) {
-	mlog.Outf(`trunks: scanning previous attack results...`)
+func (gorankusu *Gorankusu) Start() (err error) {
+	mlog.Outf(`gorankusu: scanning previous attack results...`)
 
-	trunks.scanResultsDir()
+	gorankusu.scanResultsDir()
 
-	mlog.Outf(`trunks: starting attack worker...`)
-	go trunks.workerAttackQueue()
+	mlog.Outf(`gorankusu: starting attack worker...`)
+	go gorankusu.workerAttackQueue()
 
-	mlog.Outf(`trunks: starting HTTP server at http://%s`, trunks.Env.ListenAddress)
+	mlog.Outf(`gorankusu: starting HTTP server at http://%s`, gorankusu.Env.ListenAddress)
 	go func() {
-		var errStart = trunks.Httpd.Start()
+		var errStart = gorankusu.Httpd.Start()
 		if errStart != nil {
-			trunks.errq <- errStart
+			gorankusu.errq <- errStart
 		}
 	}()
 
-	err = <-trunks.errq
+	err = <-gorankusu.errq
 
 	return err
 }
 
-// Stop the Trunks HTTP server.
-func (trunks *Trunks) Stop() {
-	logp := "trunks.Stop"
-	mlog.Outf(`=== Stopping the Trunks service ...`)
+// Stop the Gorankusu HTTP server.
+func (gorankusu *Gorankusu) Stop() {
+	logp := "gorankusu.Stop"
+	mlog.Outf(`=== Stopping the Gorankusu service ...`)
 
-	err := trunks.Httpd.Stop(0)
+	err := gorankusu.Httpd.Stop(0)
 	if err != nil {
 		mlog.Errf(`!!! %s: %s`, logp, err)
 	}
 
-	if trunks.isLoadTesting() {
-		trunks.cancelq <- true
-		<-trunks.cancelq
+	if gorankusu.isLoadTesting() {
+		gorankusu.cancelq <- true
+		<-gorankusu.cancelq
 	}
 
-	trunks.errq <- nil
+	gorankusu.errq <- nil
 }
 
-func (trunks *Trunks) addHTTPAttackResult(rr *RunRequest) (ok bool) {
+func (gorankusu *Gorankusu) addHTTPAttackResult(rr *RunRequest) (ok bool) {
 	var (
 		target     *Target
 		httpTarget *HTTPTarget
 	)
-	for _, target = range trunks.targets {
+	for _, target = range gorankusu.targets {
 		if target.ID != rr.Target.ID {
 			continue
 		}
@@ -266,17 +266,17 @@ func (trunks *Trunks) addHTTPAttackResult(rr *RunRequest) (ok bool) {
 	return false
 }
 
-func (trunks *Trunks) isLoadTesting() (b bool) {
-	trunks.Env.mtx.Lock()
-	if trunks.Env.AttackRunning != nil {
+func (gorankusu *Gorankusu) isLoadTesting() (b bool) {
+	gorankusu.Env.mtx.Lock()
+	if gorankusu.Env.AttackRunning != nil {
 		b = true
 	}
-	trunks.Env.mtx.Unlock()
+	gorankusu.Env.mtx.Unlock()
 	return b
 }
 
-func (trunks *Trunks) getTargetByID(id string) *Target {
-	for _, target := range trunks.targets {
+func (gorankusu *Gorankusu) getTargetByID(id string) *Target {
+	for _, target := range gorankusu.targets {
 		if target.ID == id {
 			return target
 		}
@@ -284,7 +284,7 @@ func (trunks *Trunks) getTargetByID(id string) *Target {
 	return nil
 }
 
-func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HTTPTarget, result *AttackResult, err error) {
+func (gorankusu *Gorankusu) getAttackResultByName(name string) (t *Target, ht *HTTPTarget, result *AttackResult, err error) {
 	res := &libhttp.EndpointResponse{
 		E: liberrors.E{
 			Code: http.StatusNotFound,
@@ -292,7 +292,7 @@ func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HTTPTar
 		},
 	}
 
-	t, ht = trunks.getTargetByResultFilename(name)
+	t, ht = gorankusu.getTargetByResultFilename(name)
 	if t == nil {
 		res.Message = "Target ID not found"
 		return nil, nil, nil, res
@@ -311,10 +311,10 @@ func (trunks *Trunks) getAttackResultByName(name string) (t *Target, ht *HTTPTar
 	return t, ht, result, nil
 }
 
-func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HTTPTarget) {
+func (gorankusu *Gorankusu) getTargetByResultFilename(name string) (t *Target, ht *HTTPTarget) {
 	names := strings.Split(name, ".")
 
-	t = trunks.getTargetByID(names[0])
+	t = gorankusu.getTargetByID(names[0])
 	if t == nil {
 		return t, nil
 	}
@@ -328,7 +328,7 @@ func (trunks *Trunks) getTargetByResultFilename(name string) (t *Target, ht *HTT
 
 // runHTTPTarget default [HTTPTarget.Run] handler that generate HTTP request
 // and send it to the target.
-func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error) {
+func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error) {
 	var (
 		logp    = `runHTTPTarget`
 		headers = rr.HTTPTarget.Headers.ToHTTPHeader()
@@ -396,10 +396,10 @@ func (trunks *Trunks) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error
 //
 // Due to size of file can be big (maybe more than 5000 records), this
 // function only parse the file name and append it to Results field.
-func (trunks *Trunks) scanResultsDir() {
+func (gorankusu *Gorankusu) scanResultsDir() {
 	logp := "scanResultsDir"
 
-	dir, err := os.Open(trunks.Env.ResultsDir)
+	dir, err := os.Open(gorankusu.Env.ResultsDir)
 	if err != nil {
 		mlog.Errf(`%s: %s`, logp, err)
 		return
@@ -422,7 +422,7 @@ func (trunks *Trunks) scanResultsDir() {
 			continue
 		}
 
-		t, ht := trunks.getTargetByResultFilename(name)
+		t, ht := gorankusu.getTargetByResultFilename(name)
 		if t == nil {
 			mlog.Outf(`--- %s %d/%d: Target ID not found for %q`, logp, x+1, len(fis), name)
 			continue
@@ -434,7 +434,7 @@ func (trunks *Trunks) scanResultsDir() {
 
 		mlog.Outf(`--- %s %d/%d: loading %q with size %d Kb`, logp, x+1, len(fis), name, fi.Size()/1024)
 
-		ht.addResult(trunks.Env.ResultsDir, name)
+		ht.addResult(gorankusu.Env.ResultsDir, name)
 	}
 
 	mlog.Outf(`--- %s: all pass results has been loaded ...`, logp)
@@ -443,19 +443,19 @@ func (trunks *Trunks) scanResultsDir() {
 		target     *Target
 		httpTarget *HTTPTarget
 	)
-	for _, target = range trunks.targets {
+	for _, target = range gorankusu.targets {
 		for _, httpTarget = range target.HTTPTargets {
 			httpTarget.sortResults()
 		}
 	}
 }
 
-func (trunks *Trunks) workerAttackQueue() {
+func (gorankusu *Gorankusu) workerAttackQueue() {
 	logp := "workerAttackQueue"
 
-	for rr := range trunks.attackq {
+	for rr := range gorankusu.attackq {
 		var err error
-		trunks.Env.AttackRunning = rr
+		gorankusu.Env.AttackRunning = rr
 
 		if rr.HTTPTarget.PreAttack != nil {
 			rr.HTTPTarget.PreAttack(rr)
@@ -478,7 +478,7 @@ func (trunks *Trunks) workerAttackQueue() {
 			}
 
 			select {
-			case <-trunks.cancelq:
+			case <-gorankusu.cancelq:
 				isCancelled = true
 			default:
 			}
@@ -496,7 +496,7 @@ func (trunks *Trunks) workerAttackQueue() {
 			} else {
 				mlog.Outf(`%s: %s canceled.`, logp, rr.result.Name)
 				// Inform the caller that the attack has been canceled.
-				trunks.cancelq <- true
+				gorankusu.cancelq <- true
 			}
 		} else {
 			err = rr.result.finish()
@@ -504,12 +504,12 @@ func (trunks *Trunks) workerAttackQueue() {
 				mlog.Errf(`%s %s: %s`, logp, rr.result.Name, err)
 			}
 
-			trunks.addHTTPAttackResult(rr)
+			gorankusu.addHTTPAttackResult(rr)
 
 			mlog.Outf(`%s: %s finished.`, logp, rr.result.Name)
 		}
 
 		rr.result = nil
-		trunks.Env.AttackRunning = nil
+		gorankusu.Env.AttackRunning = nil
 	}
 }

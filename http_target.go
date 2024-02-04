@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ type HTTPAttackHandler func(rr *RunRequest) vegeta.Targeter
 // the actual Attack being called.
 type HTTPPreAttackHandler func(rr *RunRequest)
 
-// HTTPTarget define the HTTP endpoint that can be attached to Trunks.
+// HTTPTarget define the HTTP endpoint that can be attached to Gorankusu.
 type HTTPTarget struct {
 	Params        KeyFormInput
 	ConvertParams HTTPConvertParams `json:"-"`

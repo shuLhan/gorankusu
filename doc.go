@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 /*
-Package trunks is a library and HTTP service that provide web user interface
+Package gorankusu is a library and HTTP service that provide web user interface
 to test HTTP service, similar to Postman, and for load testing.
 
 For the load testing we use vegeta [1] as the backend.
@@ -21,16 +21,16 @@ using this module, or
 The following screenshot display the main interface to Run or Attack the
 registered HTTP service,
 
-https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_example.png
+https://git.sr.ht/~shulhan/gorankusu/blob/main/_screenshots/gorankusu_example.png
 
 The following screenshot display the result of attack in two forms, vegeta
 metrics and vegeta histogram,
 
-https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_attack_result.png
+https://git.sr.ht/~shulhan/gorankusu/blob/main/_screenshots/gorankusu_attack_result.png
 
 # Web user interface
 
-By default, the Trunks user interface can be viewed by opening in browser at
+By default, the Gorankusu user interface can be viewed by opening in browser at
 http://127.0.0.1:8217.
 One can change address through Environment's ListenAddress.
 
@@ -57,4 +57,4 @@ Use of this source code is governed by a BSD-style license that can be found in 
 
 [1] https://github.com/tsenart/vegeta
 */
-package trunks
+package gorankusu

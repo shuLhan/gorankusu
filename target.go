@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 )
 
-// Target contains group of HTTPTarget that can be tested by Trunks.
+// Target contains group of HTTPTarget that can be tested by Gorankusu.
 type Target struct {
 	// HTTPClient that can be used for running HTTPTarget.
 	HTTPClient *libhttp.Client `json:"-"`

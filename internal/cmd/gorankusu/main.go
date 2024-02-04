@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Program trunks provide an example how to use the Trunks module.
+// Program gorankusu provide an example how to use the Gorankusu module.
 package main
 
 import (
@@ -17,8 +17,8 @@ import (
 	"github.com/shuLhan/share/lib/os/exec"
 
 	"git.sr.ht/~shulhan/ciigo"
-	"git.sr.ht/~shulhan/trunks"
-	"git.sr.ht/~shulhan/trunks/example"
+	"git.sr.ht/~shulhan/gorankusu"
+	"git.sr.ht/~shulhan/gorankusu/example"
 )
 
 const (
@@ -35,7 +35,7 @@ func main() {
 		return
 	}
 
-	err := os.Setenv(trunks.EnvDevelopment, "1")
+	err := os.Setenv(gorankusu.EnvDevelopment, "1")
 	if err != nil {
 		mlog.Fatalf(`%s`, err)
 	}
@@ -97,7 +97,7 @@ func workerBuild(oneTime bool) {
 			CommentHeader: `// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 `,
-			PackageName: "trunks",
+			PackageName: "gorankusu",
 			VarName:     "memfsWWW",
 			GoFileName:  "memfs_www_embed.go",
 		},

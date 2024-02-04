@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: trunks
+Upstream-Name: gorankusu
 Upstream-Contact: Shulhan <ms@kilabit.info>
-Source: https://git.sr.ht/~shulhan/trunks
+Source: https://git.sr.ht/~shulhan/gorankusu
 
 Files: _www/*
 Copyright: 2021 Shulhan <ms@kilabit.info>

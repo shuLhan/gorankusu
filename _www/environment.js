@@ -4,15 +4,15 @@ import { WuiInputString } from "./wui/input/string.js";
 import { WuiInputNumber } from "./wui/input/number.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, CLASS_NAV_TARGET, HASH_ENVIRONMENT, } from "./interface.js";
 export class Environment {
-    constructor(trunks, opts) {
-        this.trunks = trunks;
+    constructor(gorankusu, opts) {
+        this.gorankusu = gorankusu;
         this.opts = opts;
         this.elNav = document.createElement("h3");
         this.elContent = document.createElement("div");
         this.elNav.classList.add(CLASS_NAV_TARGET);
         this.elNav.innerText = "Environment";
         this.elNav.onclick = () => {
-            trunks.setContent(HASH_ENVIRONMENT, this.elContent);
+            gorankusu.setContent(HASH_ENVIRONMENT, this.elContent);
         };
         this.generateContent();
     }
@@ -21,7 +21,7 @@ export class Environment {
         elTitle.innerText = "Environment";
         const optsListenAddress = {
             label: "Listen address",
-            hint: "The address and port where Trunks is running.",
+            hint: "The address and port where Gorankusu is running.",
             value: this.opts.ListenAddress,
             is_disabled: true,
             class_input: CLASS_INPUT,

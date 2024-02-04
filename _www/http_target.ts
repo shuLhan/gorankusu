@@ -15,7 +15,7 @@ import {
   AttackResult,
   HTTPTargetInterface,
   TargetInterface,
-  TrunksInterface,
+  GorankusuInterface,
 } from "./interface.js";
 
 const CLASS_HTTP_TARGET = "http_target";
@@ -44,7 +44,7 @@ export class HTTPTarget {
   elOutAttackResults: HTMLElement = document.createElement("div");
 
   constructor(
-    public trunks: TrunksInterface,
+    public gorankusu: GorankusuInterface,
     public target: TargetInterface,
     public opts: HTTPTargetInterface,
   ) {
@@ -352,11 +352,11 @@ export class HTTPTarget {
   }
 
   private async onClickAttack() {
-    await this.trunks.attackHTTP(this.target, this.opts);
+    await this.gorankusu.attackHTTP(this.target, this.opts);
   }
 
   private async onClickAttackDelete(result: AttackResult) {
-    const res = await this.trunks.attackHTTPDelete(result.Name);
+    const res = await this.gorankusu.attackHTTPDelete(result.Name);
     if (!res) {
       return;
     }
@@ -382,7 +382,7 @@ export class HTTPTarget {
       return;
     }
 
-    const resJSON = await this.trunks.attackHTTPGet(resultName);
+    const resJSON = await this.gorankusu.attackHTTPGet(resultName);
     if (resJSON.code != 200) {
       return;
     }
@@ -405,7 +405,7 @@ export class HTTPTarget {
   }
 
   private async onClickRun() {
-    const res = await this.trunks.runHTTP(this.target, this.opts);
+    const res = await this.gorankusu.runHTTP(this.target, this.opts);
     if (!res) {
       return;
     }

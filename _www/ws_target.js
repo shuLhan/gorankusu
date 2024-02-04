@@ -9,8 +9,8 @@ const CLASS_WS_TARGET_INPUT_PARAM = "ws_target_input_param";
 const CLASS_WS_TARGET_OUT_MONO = "ws_target_out_mono";
 const CLASS_WS_TARGET_OUT_RUN = "ws_target_out_run";
 export class WebSocketTarget {
-    constructor(trunks, target, opts) {
-        this.trunks = trunks;
+    constructor(gorankusu, target, opts) {
+        this.gorankusu = gorankusu;
         this.target = target;
         this.opts = opts;
         this.el = document.createElement("div");
@@ -107,7 +107,7 @@ export class WebSocketTarget {
         this.el_out_response.innerText = "";
     }
     async onClickRun() {
-        const res = await this.trunks.runWebSocket(this.target, this.opts);
+        const res = await this.gorankusu.runWebSocket(this.target, this.opts);
         if (!res) {
             return;
         }

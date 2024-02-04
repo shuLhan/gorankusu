@@ -8,7 +8,7 @@ import {
 } from "./functions.js";
 import {
   TargetInterface,
-  TrunksInterface,
+  GorankusuInterface,
   WebSocketTargetInterface,
 } from "./interface.js";
 
@@ -27,7 +27,7 @@ export class WebSocketTarget {
   el_out_response: HTMLElement = document.createElement("pre");
 
   constructor(
-    public trunks: TrunksInterface,
+    public gorankusu: GorankusuInterface,
     public target: TargetInterface,
     public opts: WebSocketTargetInterface,
   ) {
@@ -148,7 +148,7 @@ export class WebSocketTarget {
   }
 
   private async onClickRun() {
-    const res = await this.trunks.runWebSocket(this.target, this.opts);
+    const res = await this.gorankusu.runWebSocket(this.target, this.opts);
     if (!res) {
       return;
     }

@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package trunks
+package gorankusu
 
 import (
 	"bytes"
@@ -20,7 +20,7 @@ type httpRequestParams struct {
 	body   []byte
 }
 
-func TestTrunksAPITargetRunHTTP_formInputFile(t *testing.T) {
+func TestGorankusuAPITargetRunHTTP_formInputFile(t *testing.T) {
 	type testCase struct {
 		tag string
 	}
@@ -52,7 +52,7 @@ func TestTrunksAPITargetRunHTTP_formInputFile(t *testing.T) {
 			body:   tdata.Input[c.tag+`:http_request_body`],
 		}
 
-		_, runResp = dummyTrunksServe(t, reqparams)
+		_, runResp = dummyGorankusuServe(t, reqparams)
 
 		tag = c.tag + `:RunResponse.DumpResponse`
 		exp = string(tdata.Output[tag])
@@ -60,7 +60,7 @@ func TestTrunksAPITargetRunHTTP_formInputFile(t *testing.T) {
 	}
 }
 
-func dummyTrunksServe(t *testing.T, reqparams httpRequestParams) (rawResp []byte, runResp RunResponse) {
+func dummyGorankusuServe(t *testing.T, reqparams httpRequestParams) (rawResp []byte, runResp RunResponse) {
 	var body bytes.Buffer
 	var recorder = httptest.NewRecorder()
 
@@ -71,7 +71,7 @@ func dummyTrunksServe(t *testing.T, reqparams httpRequestParams) (rawResp []byte
 		reqparams.path,
 		&body)
 
-	dummyTrunks.Httpd.ServeHTTP(recorder, httpreq)
+	dummyGorankusu.Httpd.ServeHTTP(recorder, httpreq)
 
 	var (
 		httpres = recorder.Result()

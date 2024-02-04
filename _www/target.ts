@@ -17,7 +17,7 @@ import {
   CLASS_NAV_TARGET,
   HTTPTargetInterface,
   TargetInterface,
-  TrunksInterface,
+  GorankusuInterface,
   WebSocketTargetInterface,
 } from "./interface.js";
 import { HTTPTarget } from "./http_target.js";
@@ -42,20 +42,20 @@ export class Target {
   ws_targets: MapWebSocketTarget = {};
 
   constructor(
-    public trunks: TrunksInterface,
+    public gorankusu: GorankusuInterface,
     public opts: TargetInterface,
   ) {
-    this.generateNav(trunks);
-    this.generateContent(trunks);
+    this.generateNav(gorankusu);
+    this.generateContent(gorankusu);
   }
 
-  private generateNav(trunks: TrunksInterface) {
+  private generateNav(gorankusu: GorankusuInterface) {
     this.elNav.classList.add(CLASS_NAV_TARGET);
 
     const elTargetMenu = document.createElement("h3");
     elTargetMenu.innerHTML = this.opts.Name;
     elTargetMenu.onclick = () => {
-      trunks.contentRenderer(this.opts, null, null, null, this.elContent);
+      gorankusu.contentRenderer(this.opts, null, null, null, this.elContent);
     };
 
     this.elNav.appendChild(elTargetMenu);
@@ -67,7 +67,7 @@ export class Target {
         elTargetHTTP.id = `/http/${this.opts.ID}/${ht.ID}`;
         elTargetHTTP.classList.add(CLASS_NAV_TARGET_HTTP);
         elTargetHTTP.onclick = () => {
-          trunks.contentRenderer(this.opts, ht, null, null, this.elContent);
+          gorankusu.contentRenderer(this.opts, ht, null, null, this.elContent);
         };
         this.elNav.appendChild(elTargetHTTP);
       }
@@ -80,19 +80,19 @@ export class Target {
         elTargetWS.id = `/ws/${this.opts.ID}/${wst.ID}`;
         elTargetWS.classList.add(CLASS_NAV_TARGET_WS);
         elTargetWS.onclick = () => {
-          trunks.contentRenderer(this.opts, null, wst, null, this.elContent);
+          gorankusu.contentRenderer(this.opts, null, wst, null, this.elContent);
         };
         this.elNav.appendChild(elTargetWS);
       }
     }
   }
 
-  private generateContent(trunks: TrunksInterface) {
+  private generateContent(gorankusu: GorankusuInterface) {
     this.generateContentBaseURL();
     this.generateContentAttackOptions();
     this.generateContentVars();
-    this.generateHTTPTargets(trunks);
-    this.generateWebSocketTargets(trunks);
+    this.generateHTTPTargets(gorankusu);
+    this.generateWebSocketTargets(gorankusu);
   }
 
   private generateContentBaseURL() {
@@ -198,26 +198,26 @@ export class Target {
     this.elContent.appendChild(wrapper);
   }
 
-  private generateHTTPTargets(trunks: TrunksInterface) {
+  private generateHTTPTargets(gorankusu: GorankusuInterface) {
     if (!this.opts.HTTPTargets) {
       return;
     }
 
     this.opts.HTTPTargets.forEach((httpTarget: HTTPTargetInterface) => {
-      const comHTTPTarget = new HTTPTarget(trunks, this.opts, httpTarget);
+      const comHTTPTarget = new HTTPTarget(gorankusu, this.opts, httpTarget);
       this.http_targets[httpTarget.ID] = comHTTPTarget;
 
       this.elContent.appendChild(comHTTPTarget.el);
     });
   }
 
-  private generateWebSocketTargets(trunks: TrunksInterface) {
+  private generateWebSocketTargets(gorankusu: GorankusuInterface) {
     if (!this.opts.WebSocketTargets) {
       return;
     }
 
     this.opts.WebSocketTargets.forEach((wsTarget: WebSocketTargetInterface) => {
-      const comWSTarget = new WebSocketTarget(trunks, this.opts, wsTarget);
+      const comWSTarget = new WebSocketTarget(gorankusu, this.opts, wsTarget);
       this.ws_targets[wsTarget.ID] = comWSTarget;
 
       this.elContent.appendChild(comWSTarget.el);

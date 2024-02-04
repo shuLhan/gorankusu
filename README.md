@@ -1,6 +1,6 @@
-# Trunks
+# Gorankusu
 
-Trunks is a Go library that provide HTTP service with web user interface
+Gorankusu is a Go library that provide HTTP service with web user interface
 to test HTTP and/or WebSocket endpoints and for load testing HTTP endpoints.
 
 For testing HTTP endpoints it use the
@@ -13,12 +13,12 @@ For the load testing we use
 [vegeta](https://github.com/tsenart/vegeta)
 as the backend.
 
-[Go documentation](https://pkg.go.dev/git.sr.ht/~shulhan/trunks)
+[Go documentation](https://pkg.go.dev/git.sr.ht/~shulhan/gorankusu)
 
 ## Usage
 
 See the
-[example](https://git.sr.ht/~shulhan/trunks/tree/main/item/example/)
+[example](https://git.sr.ht/~shulhan/gorankusu/tree/main/item/example/)
 package on how to programmatically use and create service using this module,
 or,
 
@@ -32,17 +32,17 @@ or,
 The following screenshot display the main interface to Run or Attack the
 registered HTTP service,
 
-![Main interface](https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_example.png "Main interface")
+![Main interface](https://git.sr.ht/~shulhan/gorankusu/blob/main/_screenshots/gorankusu_example.png "Main interface")
 
 The following screenshot display the result of attack in two forms, vegeta
 metrics and vegeta histogram,
 
-![Attack result](https://git.sr.ht/~shulhan/trunks/blob/main/_screenshots/trunks_attack_result.png "Attack result")
+![Attack result](https://git.sr.ht/~shulhan/gorankusu/blob/main/_screenshots/gorankusu_attack_result.png "Attack result")
 
 
 ## Web user interface (WUI)
 
-By default, the Trunks user interface can be viewed by opening in browser at
+By default, the Gorankusu user interface can be viewed by opening in browser at
 <http://127.0.0.1:8217>.
 One can change address through Environment's ListenAddress.
 
@@ -67,18 +67,18 @@ The "ResultsSuffix" is the one that defined in Environment.
 
 ## Development
 
-[Repository](https://git.sr.ht/~shulhan/trunks):: Link to the source code.
+[Repository](https://git.sr.ht/~shulhan/gorankusu):: Link to the source code.
 
-[Mailing list](https://lists.sr.ht/~shulhan/trunks):: Link to discussion and
+[Mailing list](https://lists.sr.ht/~shulhan/gorankusu):: Link to discussion and
 where to send patches.
 
-[Issues](https://todo.sr.ht/~shulhan/trunks):: Link to report for bug or
+[Issues](https://todo.sr.ht/~shulhan/gorankusu):: Link to report for bug or
 feature.
 
 
 ## Credits
 
-The Trunks icon and image is provided by <https://www.spriters-resource.com/>.
+The Gorankusu icon and image is provided by <https://www.spriters-resource.com/>.
 
 ## License
 

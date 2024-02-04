@@ -1,11 +1,11 @@
-= trunks CHANGELOG
+= gorankusu CHANGELOG
 Shulhan <ms@kilabit.info>
 :toc:
 :sectanchors:
 :sectlinks:
 
 [#v0_4_1]
-== trunks v0.4.1 (2023-11-11)
+== gorankusu v0.4.1 (2023-11-11)
 
 This release only have chores, it should not break anything.
 
@@ -41,7 +41,7 @@ and fix all of their recommendations.
 
 
 [#v0_4_0]
-== trunks v0.4.0 (2023-05-16)
+== gorankusu v0.4.0 (2023-05-16)
 
 [#v0_4_0__bug_fixes]
 ===  Bug fixes
@@ -85,14 +85,14 @@ all: remove WebSocket server::
 +
 Using WebSocket for communication in client require additional
 setup, especially if its behind proxy.
-For example, if we serve the trunks server under domain testing.local
+For example, if we serve the gorankusu server under domain testing.local
 behind proxy, we need to setup route for the WebSocket too.
 
 go.mod: set Go version to 1.19 and update all dependencies::
 
 
 [#v0_3_0]
-== trunks v0.3.0 (2022-08-25)
+== gorankusu v0.3.0 (2022-08-25)
 
 This release set the minimum Go version to 1.18 and update all modules.
 
@@ -118,17 +118,17 @@ To fix this we implement method clone and Stringer on HttpRequest.
 
 
 [#v0_2_0]
-== trunks v0.2.0 (2022-03-13)
+== gorankusu v0.2.0 (2022-03-13)
 
-Release trunks under GPL 3.0 or later license.
+Release gorankusu under GPL 3.0 or later license.
 
 See https://kilabit.info/journal/2022/gpl for more information.
 
 
 [#v0_1_0]
-== trunks v0.1.0 (2022-02-05)
+== gorankusu v0.1.0 (2022-02-05)
 
-Module trunks is a library and HTTP service that provide web user interface
+Module gorankusu is a library and HTTP service that provide web user interface
 to test HTTP service, similar to Postman, and for load testing.
 
 For the load testing we use vegeta [1] as the backend.

@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Package example provide an example how to use the Trunks library from
+// Package example provide an example how to use the Gorankusu library from
 // setting it up to creating targets.
 //
 // To run the example, execute
 //
-//	$ go run ./internal/cmd/trunks
+//	$ go run ./internal/cmd/gorankusu
 //
 // It will run a web user interface at http://127.0.0.1:8217 .
 package example
@@ -27,7 +27,7 @@ import (
 	"github.com/shuLhan/share/lib/websocket"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
-	"git.sr.ht/~shulhan/trunks"
+	"git.sr.ht/~shulhan/gorankusu"
 )
 
 const (
@@ -50,9 +50,9 @@ type requestResponse struct {
 	Body          string
 }
 
-// Example contains an example how to use Trunks programmatically.
+// Example contains an example how to use Gorankusu programmatically.
 type Example struct {
-	trunks   *trunks.Trunks
+	gorankusu   *gorankusu.Gorankusu
 	wsServer *websocket.Server
 
 	targetExampleErrorGet vegeta.Target
@@ -62,14 +62,14 @@ type Example struct {
 
 // New create, initialize, and setup an example service.
 func New() (ex *Example, err error) {
-	env := &trunks.Environment{
+	env := &gorankusu.Environment{
 		ResultsDir:    "example/testdata/",
 		ResultsSuffix: "example",
 	}
 
 	ex = &Example{}
 
-	ex.trunks, err = trunks.New(env)
+	ex.gorankusu, err = gorankusu.New(env)
 	if err != nil {
 		return nil, fmt.Errorf("example: New: %w", err)
 	}
@@ -120,18 +120,18 @@ func (ex *Example) Start() (err error) {
 		}
 	}()
 
-	return ex.trunks.Start()
+	return ex.gorankusu.Start()
 }
 
 // Stop the Example servers.
 func (ex *Example) Stop() {
 	ex.wsServer.Stop()
-	ex.trunks.Stop()
+	ex.gorankusu.Stop()
 }
 
 // registerEndpoints register HTTP endpoints for testing.
 func (ex *Example) registerEndpoints() (err error) {
-	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -142,7 +142,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExampleError,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -153,7 +153,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
@@ -161,7 +161,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		Call:         ex.pathExamplePost,
 	})
 
-	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExampleNamePage,
 		RequestType:  libhttp.RequestTypeJSON,
@@ -169,7 +169,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		Call:         ex.pathExamplePost,
 	})
 
-	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExampleUpload,
 		RequestType:  libhttp.RequestTypeMultipartForm,
@@ -190,41 +190,41 @@ func (ex *Example) registerWebSocketEndpoints() (err error) {
 }
 
 func (ex *Example) registerTargetHTTP() (err error) {
-	var targetHTTP = &trunks.Target{
+	var targetHTTP = &gorankusu.Target{
 		Name:    "Example HTTP",
 		Hint:    "This section provide an example of HTTP endpoints that can be tested and attacked.",
-		BaseURL: fmt.Sprintf(`http://%s`, ex.trunks.Env.ListenAddress),
-		Opts: &trunks.AttackOptions{
+		BaseURL: fmt.Sprintf(`http://%s`, ex.gorankusu.Env.ListenAddress),
+		Opts: &gorankusu.AttackOptions{
 			Duration:      300 * time.Second,
 			RatePerSecond: 1,
 		},
-		Vars: trunks.KeyFormInput{
-			"A": trunks.FormInput{
+		Vars: gorankusu.KeyFormInput{
+			"A": gorankusu.FormInput{
 				Label: "A",
 				Hint:  "This is the global variabel for all HTTP targets below.",
-				Kind:  trunks.FormInputKindNumber,
+				Kind:  gorankusu.FormInputKindNumber,
 				Value: "1",
 			},
 		},
-		HTTPTargets: []*trunks.HTTPTarget{{
+		HTTPTargets: []*gorankusu.HTTPTarget{{
 			Name:        "HTTP Get",
 			Hint:        fmt.Sprintf("Test or attack endpoint %q using HTTP GET.", pathExample),
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeQuery,
-			Headers: trunks.KeyFormInput{
-				"X-Get": trunks.FormInput{
+			Headers: gorankusu.KeyFormInput{
+				"X-Get": gorankusu.FormInput{
 					Label: "X-Get",
 					Hint:  "Custom HTTP header to be send.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1.1",
 				},
 			},
-			Params: trunks.KeyFormInput{
-				"Param1": trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				"Param1": gorankusu.FormInput{
 					Label: "Param1",
 					Hint:  "Parameter with number.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1",
 				},
 			},
@@ -238,19 +238,19 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExampleError,
 			RequestType: libhttp.RequestTypeQuery,
-			Headers: trunks.KeyFormInput{
-				"X-Get": trunks.FormInput{
+			Headers: gorankusu.KeyFormInput{
+				"X-Get": gorankusu.FormInput{
 					Label: "X-Get",
 					Hint:  "Custom HTTP header to be send.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1.1",
 				},
 			},
-			Params: trunks.KeyFormInput{
-				"Param1": trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				"Param1": gorankusu.FormInput{
 					Label: "Param1",
 					Hint:  "Parameter with number.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1",
 				},
 			},
@@ -264,25 +264,25 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Method:      libhttp.RequestMethodPost,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
-			Headers: trunks.KeyFormInput{
-				"X-PostForm": trunks.FormInput{
+			Headers: gorankusu.KeyFormInput{
+				"X-PostForm": gorankusu.FormInput{
 					Label: "X-PostForm",
 					Hint:  "Custom HTTP header to be send.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1",
 				},
 			},
-			Params: trunks.KeyFormInput{
-				"Param1": trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				"Param1": gorankusu.FormInput{
 					Label: "Param1",
 					Hint:  "Parameter with number.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "1",
 				},
-				"Param2": trunks.FormInput{
+				"Param2": gorankusu.FormInput{
 					Label: "Param2",
 					Hint:  "Parameter with string.",
-					Kind:  trunks.FormInputKindString,
+					Kind:  gorankusu.FormInputKindString,
 					Value: "a string",
 				},
 			},
@@ -296,19 +296,19 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
-			Headers: trunks.KeyFormInput{
-				"X-FreeForm": trunks.FormInput{
+			Headers: gorankusu.KeyFormInput{
+				"X-FreeForm": gorankusu.FormInput{
 					Label: "X-FreeForm",
 					Hint:  "Custom HTTP header to be send.",
-					Kind:  trunks.FormInputKindString,
+					Kind:  gorankusu.FormInputKindString,
 					Value: "1",
 				},
 			},
-			Params: trunks.KeyFormInput{
-				"Param1": trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				"Param1": gorankusu.FormInput{
 					Label: "Param1",
 					Hint:  "Parameter with number.",
-					Kind:  trunks.FormInputKindNumber,
+					Kind:  gorankusu.FormInputKindNumber,
 					Value: "123",
 				},
 			},
@@ -319,13 +319,13 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Method:      libhttp.RequestMethodPost,
 			Path:        pathExampleNamePage,
 			RequestType: libhttp.RequestTypeJSON,
-			Params: trunks.KeyFormInput{
-				`name`: trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				`name`: gorankusu.FormInput{
 					Label: `Name`,
 					Hint:  `This parameter send in path.`,
 					Value: `testname`,
 				},
-				`id`: trunks.FormInput{
+				`id`: gorankusu.FormInput{
 					Label: `ID`,
 					Hint:  `This parameter send in body as JSON.`,
 					Value: `123`,
@@ -337,28 +337,28 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Method:      libhttp.RequestMethodPost,
 			Path:        pathExampleUpload,
 			RequestType: libhttp.RequestTypeMultipartForm,
-			Params: trunks.KeyFormInput{
-				`file`: trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				`file`: gorankusu.FormInput{
 					Label: `File`,
 					Hint:  `File to be uploaded.`,
-					Kind:  trunks.FormInputKindFile,
+					Kind:  gorankusu.FormInputKindFile,
 					FormDataName: func(key string) string {
-						if key == trunks.FormDataFilename {
+						if key == gorankusu.FormDataFilename {
 							return `name`
 						}
 						return key
 					},
 				},
-				`agree`: trunks.FormInput{
+				`agree`: gorankusu.FormInput{
 					Label: `Agree`,
 					Hint:  `Additional parameter along file.`,
-					Kind:  trunks.FormInputKindBoolean,
+					Kind:  gorankusu.FormInputKindBoolean,
 				},
 			},
 		}},
 	}
 
-	err = ex.trunks.RegisterTarget(targetHTTP)
+	err = ex.gorankusu.RegisterTarget(targetHTTP)
 	if err != nil {
 		return err
 	}
@@ -366,23 +366,23 @@ func (ex *Example) registerTargetHTTP() (err error) {
 }
 
 func (ex *Example) registerTargetWebSocket() (err error) {
-	targetWebSocket := &trunks.Target{
+	targetWebSocket := &gorankusu.Target{
 		Name:    "Example WebSocket",
 		Hint:    "This section provide an example of WebSocket endpoints that can be tested.",
 		BaseURL: fmt.Sprintf(`ws://%s`, websocketAddress),
-		Opts:    &trunks.AttackOptions{},
-		Vars: trunks.KeyFormInput{
-			"WebSocketVar": trunks.FormInput{
+		Opts:    &gorankusu.AttackOptions{},
+		Vars: gorankusu.KeyFormInput{
+			"WebSocketVar": gorankusu.FormInput{
 				Label: "WebSocketVar",
-				Kind:  trunks.FormInputKindString,
+				Kind:  gorankusu.FormInputKindString,
 				Value: "hello",
 			},
 		},
-		WebSocketTargets: []*trunks.WebSocketTarget{{
+		WebSocketTargets: []*gorankusu.WebSocketTarget{{
 			Name: "Similar to HTTP GET",
 			Hint: "Test WebSocket endpoint with parameters.",
-			Params: trunks.KeyFormInput{
-				"Param1": trunks.FormInput{
+			Params: gorankusu.KeyFormInput{
+				"Param1": gorankusu.FormInput{
 					Label: "Param1",
 					Hint:  "Parameter with kind is number.",
 					Kind:  "number",
@@ -393,7 +393,7 @@ func (ex *Example) registerTargetWebSocket() (err error) {
 		}},
 	}
 
-	err = ex.trunks.RegisterTarget(targetWebSocket)
+	err = ex.gorankusu.RegisterTarget(targetWebSocket)
 	if err != nil {
 		return err
 	}
@@ -404,18 +404,18 @@ func (ex *Example) registerTargetWebSocket() (err error) {
 func (ex *Example) registerNavLinks() (err error) {
 	logp := "registerNavLinks"
 
-	err = ex.trunks.RegisterNavLink(&trunks.NavLink{
+	err = ex.gorankusu.RegisterNavLink(&gorankusu.NavLink{
 		Text:         "Link in IFrame",
-		Href:         "https://git.sr.ht/~shulhan/trunks",
+		Href:         "https://git.sr.ht/~shulhan/gorankusu",
 		OpenInIFrame: true,
 	})
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
 	}
 
-	err = ex.trunks.RegisterNavLink(&trunks.NavLink{
+	err = ex.gorankusu.RegisterNavLink(&gorankusu.NavLink{
 		Text: "Link in new window",
-		Href: "https://git.sr.ht/~shulhan/trunks",
+		Href: "https://git.sr.ht/~shulhan/gorankusu",
 	})
 	if err != nil {
 		return fmt.Errorf("%s: %w", logp, err)
@@ -480,7 +480,7 @@ func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte,
 	return resb, nil
 }
 
-func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
+func (ex *Example) runExampleGet(req *gorankusu.RunRequest) (res *gorankusu.RunResponse, err error) {
 	if req.Target.HTTPClient == nil {
 		var httpcOpts = &libhttp.ClientOptions{
 			ServerUrl:     req.Target.BaseURL,
@@ -489,7 +489,7 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
 	}
 
-	res = &trunks.RunResponse{}
+	res = &gorankusu.RunResponse{}
 
 	var (
 		headers = req.HTTPTarget.Headers.ToHTTPHeader()
@@ -529,7 +529,7 @@ func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunRespons
 	return res, nil
 }
 
-func (ex *Example) preattackExampleErrorGet(rr *trunks.RunRequest) {
+func (ex *Example) preattackExampleErrorGet(rr *gorankusu.RunRequest) {
 	ex.targetExampleErrorGet = vegeta.Target{
 		Method: rr.HTTPTarget.Method.String(),
 		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
@@ -544,7 +544,7 @@ func (ex *Example) preattackExampleErrorGet(rr *trunks.RunRequest) {
 	fmt.Printf("preattackExampleErrorGet: %+v\n", ex.targetExampleErrorGet)
 }
 
-func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
+func (ex *Example) preattackExampleGet(rr *gorankusu.RunRequest) {
 	ex.targetExampleGet = vegeta.Target{
 		Method: rr.HTTPTarget.Method.String(),
 		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
@@ -559,7 +559,7 @@ func (ex *Example) preattackExampleGet(rr *trunks.RunRequest) {
 	fmt.Printf("preattackExampleGet: %+v\n", ex.targetExampleGet)
 }
 
-func (ex *Example) attackExampleErrorGet(rr *trunks.RunRequest) vegeta.Targeter {
+func (ex *Example) attackExampleErrorGet(rr *gorankusu.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
 		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExampleErrorGet
@@ -568,7 +568,7 @@ func (ex *Example) attackExampleErrorGet(rr *trunks.RunRequest) vegeta.Targeter 
 	}
 }
 
-func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
+func (ex *Example) attackExampleGet(rr *gorankusu.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
 		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExampleGet
@@ -577,7 +577,7 @@ func (ex *Example) attackExampleGet(rr *trunks.RunRequest) vegeta.Targeter {
 	}
 }
 
-func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {
+func (ex *Example) runExamplePostForm(req *gorankusu.RunRequest) (res *gorankusu.RunResponse, err error) {
 	if req.Target.HTTPClient == nil {
 		httpcOpts := &libhttp.ClientOptions{
 			ServerUrl:     req.Target.BaseURL,
@@ -586,7 +586,7 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
 	}
 
-	res = &trunks.RunResponse{}
+	res = &gorankusu.RunResponse{}
 
 	headers := req.HTTPTarget.Headers.ToHTTPHeader()
 	params := req.HTTPTarget.Params.ToURLValues()
@@ -620,7 +620,7 @@ func (ex *Example) runExamplePostForm(req *trunks.RunRequest) (res *trunks.RunRe
 	return res, nil
 }
 
-func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
+func (ex *Example) preattackExamplePostForm(rr *gorankusu.RunRequest) {
 	ex.targetExamplePostForm = vegeta.Target{
 		Method: rr.HTTPTarget.Method.String(),
 		URL:    fmt.Sprintf("%s%s", rr.Target.BaseURL, rr.HTTPTarget.Path),
@@ -635,7 +635,7 @@ func (ex *Example) preattackExamplePostForm(rr *trunks.RunRequest) {
 	fmt.Printf("preattackExamplePostForm: %+v\n", ex.targetExamplePostForm)
 }
 
-func (ex *Example) attackExamplePostForm(rr *trunks.RunRequest) vegeta.Targeter {
+func (ex *Example) attackExamplePostForm(rr *gorankusu.RunRequest) vegeta.Targeter {
 	return func(tgt *vegeta.Target) error {
 		rr.HTTPTarget.Lock()
 		*tgt = ex.targetExamplePostForm
@@ -651,7 +651,7 @@ func (ex *Example) handleWSExampleGet(_ context.Context, req *websocket.Request)
 	return res
 }
 
-func (ex *Example) runWebSocketGet(rr *trunks.RunRequest) (res interface{}, err error) {
+func (ex *Example) runWebSocketGet(rr *gorankusu.RunRequest) (res interface{}, err error) {
 	var wg sync.WaitGroup
 
 	wsc := &websocket.Client{

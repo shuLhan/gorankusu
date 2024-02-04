@@ -10,7 +10,7 @@ import {
   CLASS_NAV_TARGET,
   HASH_ENVIRONMENT,
   EnvironmentInterface,
-  TrunksInterface,
+  GorankusuInterface,
 } from "./interface.js";
 
 export class Environment {
@@ -24,13 +24,13 @@ export class Environment {
   comResultsSuffix!: WuiInputString;
 
   constructor(
-    public trunks: TrunksInterface,
+    public gorankusu: GorankusuInterface,
     public opts: EnvironmentInterface,
   ) {
     this.elNav.classList.add(CLASS_NAV_TARGET);
     this.elNav.innerText = "Environment";
     this.elNav.onclick = () => {
-      trunks.setContent(HASH_ENVIRONMENT, this.elContent);
+      gorankusu.setContent(HASH_ENVIRONMENT, this.elContent);
     };
 
     this.generateContent();
@@ -42,7 +42,7 @@ export class Environment {
 
     const optsListenAddress: WuiInputStringOpts = {
       label: "Listen address",
-      hint: "The address and port where Trunks is running.",
+      hint: "The address and port where Gorankusu is running.",
       value: this.opts.ListenAddress,
       is_disabled: true,
       class_input: CLASS_INPUT,
