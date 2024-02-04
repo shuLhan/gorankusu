@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { WuiInputFile } from "./wui/input/file.js";
 import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js";
 import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js";
 
@@ -8,6 +9,7 @@ import {
   CLASS_INPUT,
   CLASS_INPUT_LABEL,
   FormInput,
+  FormInputKindFile,
   FormInputKindNumber,
   HTTPTargetInterface,
   TargetInterface,
@@ -28,8 +30,34 @@ export function generateFormInput(parent: HTMLElement, fi: FormInput) {
   let wuiInputStringOpts: WuiInputStringOpts;
   let wuiInputNumber: WuiInputNumber;
   let wuiInputString: WuiInputString;
+  let wuiInputFile: WuiInputFile;
+  let reader: FileReader;
 
   switch (fi.kind) {
+    case FormInputKindFile:
+      wuiInputFile = new WuiInputFile();
+      wuiInputFile.label = fi.label;
+      wuiInputFile.hint = fi.hint;
+      wuiInputFile.classInput = CLASS_INPUT;
+      wuiInputFile.classLabel = CLASS_INPUT_LABEL;
+      wuiInputFile.onChange = (file: File) => {
+        fi.filename = file.name;
+        fi.filetype = file.type;
+        fi.filesize = file.size;
+        fi.filemodms = file.lastModified;
+        fi.value = "";
+
+        reader = new FileReader();
+        reader.onload = (e) => {
+          if (e) {
+            fi.value = btoa(reader.result as string);
+          }
+        };
+        reader.readAsText(file);
+      };
+      parent.appendChild(wuiInputFile.element());
+      break;
+
     case FormInputKindNumber:
       wuiInputNumberOpts = {
         label: fi.label,

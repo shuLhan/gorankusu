@@ -57,8 +57,7 @@ func generateRunRequest(
 	outrr.HTTPTarget.Params = req.HTTPTarget.Params
 	outrr.HTTPTarget.paramsToPath()
 
-	outrr.HTTPTarget.RequestDumper = origHTTPTarget.RequestDumper
-	outrr.HTTPTarget.ResponseDumper = origHTTPTarget.ResponseDumper
+	outrr.HTTPTarget.refCopy(origHTTPTarget)
 
 	return outrr
 }

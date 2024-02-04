@@ -189,9 +189,8 @@ func (trunks *Trunks) RunHTTP(req *RunRequest) (res *RunResponse, err error) {
 	if origHTTPTarget.Run == nil {
 		req.Target.BaseURL = origTarget.BaseURL
 		req.Target.Name = origTarget.Name
-		req.HTTPTarget.ConvertParams = origHTTPTarget.ConvertParams
-		req.HTTPTarget.RequestDumper = origHTTPTarget.RequestDumper
-		req.HTTPTarget.ResponseDumper = origHTTPTarget.ResponseDumper
+
+		req.HTTPTarget.refCopy(origHTTPTarget)
 
 		res, err = trunks.runHTTPTarget(req)
 	} else {

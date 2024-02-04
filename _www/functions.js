@@ -1,8 +1,9 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
+import { WuiInputFile } from "./wui/input/file.js";
 import { WuiInputNumber } from "./wui/input/number.js";
 import { WuiInputString } from "./wui/input/string.js";
-import { CLASS_INPUT, CLASS_INPUT_LABEL, FormInputKindNumber, } from "./interface.js";
+import { CLASS_INPUT, CLASS_INPUT_LABEL, FormInputKindFile, FormInputKindNumber, } from "./interface.js";
 export function getDocumentHeight() {
     const D = document;
     return Math.max(Math.max(D.body.scrollHeight, D.documentElement.scrollHeight), Math.max(D.body.offsetHeight, D.documentElement.offsetHeight), Math.max(D.body.clientHeight, D.documentElement.clientHeight));
@@ -12,7 +13,31 @@ export function generateFormInput(parent, fi) {
     let wuiInputStringOpts;
     let wuiInputNumber;
     let wuiInputString;
+    let wuiInputFile;
+    let reader;
     switch (fi.kind) {
+        case FormInputKindFile:
+            wuiInputFile = new WuiInputFile();
+            wuiInputFile.label = fi.label;
+            wuiInputFile.hint = fi.hint;
+            wuiInputFile.classInput = CLASS_INPUT;
+            wuiInputFile.classLabel = CLASS_INPUT_LABEL;
+            wuiInputFile.onChange = (file) => {
+                fi.filename = file.name;
+                fi.filetype = file.type;
+                fi.filesize = file.size;
+                fi.filemodms = file.lastModified;
+                fi.value = "";
+                reader = new FileReader();
+                reader.onload = (e) => {
+                    if (e) {
+                        fi.value = btoa(reader.result);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            parent.appendChild(wuiInputFile.element());
+            break;
         case FormInputKindNumber:
             wuiInputNumberOpts = {
                 label: fi.label,

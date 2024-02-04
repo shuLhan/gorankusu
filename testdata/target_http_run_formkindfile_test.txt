@@ -1,0 +1,49 @@
+Test data for testing running HTTP with form kind is file (uploading file).
+
+>>> valid:http_request_body
+{
+  "Target": {
+    "id": "target_http"
+  },
+  "HTTPTarget": {
+    "id": "upload",
+    "Method": 6,
+    "RequestType": 3,
+    "Path": "/upload",
+    "Params": {
+      "file": {
+        "kind": "file",
+        "value": "Q29udGVudCBvZiBmaWxlIHVwbG9hZA==",
+        "filename": "test.txt",
+        "filetype": "text/plain",
+        "filesize": 22
+      }
+    }
+  }
+}
+
+<<< valid:RunResponse.DumpResponse
+HTTP/1.1 200 OK
+Content-Length: 260
+Content-Type: application/json
+
+{
+  "data": {
+    "filecontent": [
+      "Q29udGVudCBvZiBmaWxlIHVwbG9hZA=="
+    ],
+    "filemodms": [
+      "0"
+    ],
+    "filename": [
+      "test.txt"
+    ],
+    "filesize": [
+      "22"
+    ],
+    "filetype": [
+      "text/plain"
+    ]
+  },
+  "code": 200
+}

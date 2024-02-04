@@ -113,6 +113,15 @@ func (ht *HTTPTarget) init() (err error) {
 	}
 	if ht.Params == nil {
 		ht.Params = KeyFormInput{}
+	} else {
+		var (
+			key       string
+			formInput FormInput
+		)
+		for key, formInput = range ht.Params {
+			formInput.init()
+			ht.Params[key] = formInput
+		}
 	}
 	if len(ht.Path) == 0 {
 		ht.Path = "/"
@@ -204,6 +213,29 @@ func (ht *HTTPTarget) paramsToPath() {
 	}
 
 	ht.Path = rute.String()
+}
+
+// refCopy copy methods and handlers from orig to ht.
+func (ht *HTTPTarget) refCopy(orig *HTTPTarget) {
+	ht.ConvertParams = orig.ConvertParams
+	ht.RequestDumper = orig.RequestDumper
+	ht.ResponseDumper = orig.ResponseDumper
+
+	var (
+		key    string
+		fin    FormInput
+		orgfin FormInput
+		ok     bool
+	)
+	for key, fin = range ht.Params {
+		if fin.Kind == FormInputKindFile {
+			orgfin, ok = orig.Params[key]
+			if ok {
+				fin.FormDataName = orgfin.FormDataName
+				ht.Params[key] = fin
+			}
+		}
+	}
 }
 
 func (ht *HTTPTarget) sortResults() {

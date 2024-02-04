@@ -34,6 +34,7 @@ const (
 	pathExample         = `/example`
 	pathExampleError    = `/example/error`
 	pathExampleNamePage = `/example/:name/page`
+	pathExampleUpload   = `/example/upload`
 )
 
 const (
@@ -166,6 +167,14 @@ func (ex *Example) registerEndpoints() (err error) {
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePost,
+	})
+
+	err = ex.trunks.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         pathExampleUpload,
+		RequestType:  libhttp.RequestTypeMultipartForm,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         ex.pathExampleUpload,
 	})
 
 	return err
@@ -322,6 +331,30 @@ func (ex *Example) registerTargetHTTP() (err error) {
 					Value: `123`,
 				},
 			},
+		}, {
+			Name:        `HTTP upload`,
+			Hint:        `Test uploading file`,
+			Method:      libhttp.RequestMethodPost,
+			Path:        pathExampleUpload,
+			RequestType: libhttp.RequestTypeMultipartForm,
+			Params: trunks.KeyFormInput{
+				`file`: trunks.FormInput{
+					Label: `File`,
+					Hint:  `File to be uploaded.`,
+					Kind:  trunks.FormInputKindFile,
+					FormDataName: func(key string) string {
+						if key == trunks.FormDataFilename {
+							return `name`
+						}
+						return key
+					},
+				},
+				`agree`: trunks.FormInput{
+					Label: `Agree`,
+					Hint:  `Additional parameter along file.`,
+					Kind:  trunks.FormInputKindBoolean,
+				},
+			},
 		}},
 	}
 
@@ -429,6 +462,22 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, e
 	res.Data = data
 
 	return json.Marshal(&res)
+}
+
+func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte, err error) {
+	var logp = `pathExampleUpload`
+
+	var res = libhttp.EndpointResponse{}
+
+	res.Code = http.StatusOK
+	res.Data = epr.HttpRequest.MultipartForm.Value
+
+	resb, err = json.Marshal(res)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	return resb, nil
 }
 
 func (ex *Example) runExampleGet(req *trunks.RunRequest) (res *trunks.RunResponse, err error) {

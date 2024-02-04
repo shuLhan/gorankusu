@@ -6,9 +6,22 @@ package trunks
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/shuLhan/share/lib/math/big"
+)
+
+// List of additional parameters to be generated and send if the [FormInput]
+// Kind is [FormInputKindFile].
+//
+// Caller can changes the name by using [FormInput] FormDataName.
+const (
+	FormDataFilecontent = `filecontent`
+	FormDataFilemodms   = `filemodms`
+	FormDataFilename    = `filename`
+	FormDataFilesize    = `filesize`
+	FormDataFiletype    = `filetype`
 )
 
 // KeyFormInput is the simplified type for getting and setting HTTP headers
@@ -64,7 +77,28 @@ func (kfi KeyFormInput) ToMultipartFormData() (data map[string][]byte) {
 		return data
 	}
 	for k, fi := range kfi {
-		data[k] = []byte(fi.Value)
+		if fi.Kind == FormInputKindFile {
+			var name string
+
+			if len(fi.Filename) != 0 {
+				name = fi.FormDataName(FormDataFilename)
+				data[name] = []byte(fi.Filename)
+			}
+			if len(fi.Filetype) != 0 {
+				name = fi.FormDataName(FormDataFiletype)
+				data[name] = []byte(fi.Filetype)
+			}
+			name = fi.FormDataName(FormDataFilesize)
+			data[name] = []byte(strconv.FormatInt(fi.Filesize, 10))
+
+			name = fi.FormDataName(FormDataFilemodms)
+			data[name] = []byte(strconv.FormatInt(fi.Filemodms, 10))
+
+			name = fi.FormDataName(FormDataFilecontent)
+			data[name] = []byte(fi.Value)
+		} else {
+			data[k] = []byte(fi.Value)
+		}
 	}
 	return data
 }
