@@ -16,26 +16,33 @@ import (
 const (
 	pathAPIAttackHTTP   = `/_trunks/api/attack/http`
 	pathAPIAttackResult = `/_trunks/api/attack/result`
+
+	pathAPIEnvironment = `/_trunks/api/environment`
+	pathAPINavlinks    = `/_trunks/api/navlinks`
+
+	pathAPITargetRunHTTP      = `/_trunks/api/target/run/http`
+	pathAPITargetRunWebSocket = `/_trunks/api/target/run/websocket`
+	pathAPITargets            = `/_trunks/api/targets`
 )
 
 // List of HTTP APIs provided by Trunks HTTP server.
 var (
 	apiEnvironmentGet = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         "/_trunks/api/environment",
+		Path:         pathAPIEnvironment,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
 	apiAttackHTTP = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         `/_trunks/api/attack/http`,
+		Path:         pathAPIAttackHTTP,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 	apiAttackHTTPCancel = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
-		Path:         `/_trunks/api/attack/http`,
+		Path:         pathAPIAttackHTTP,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
@@ -55,27 +62,27 @@ var (
 
 	apiNavLinks = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         "/_trunks/api/navlinks",
+		Path:         pathAPINavlinks,
 		RequestType:  libhttp.RequestTypeNone,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
 	apiTargetRunHTTP = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         "/_trunks/api/target/run/http",
+		Path:         pathAPITargetRunHTTP,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 	apiTargetRunWebSocket = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
-		Path:         "/_trunks/api/target/run/websocket",
+		Path:         pathAPITargetRunWebSocket,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
 	apiTargets = &libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
-		Path:         "/_trunks/api/targets",
+		Path:         pathAPITargets,
 		RequestType:  libhttp.RequestTypeNone,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
