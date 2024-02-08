@@ -35,7 +35,7 @@ const (
 
 // EnvDevelopment setting this environment variable will enable gorankusu
 // development mode.
-const EnvDevelopment = "TRUNKS_DEV"
+const EnvDevelopment = "GORANKUSU_DEV"
 
 // List of HTTP parameters.
 const (
