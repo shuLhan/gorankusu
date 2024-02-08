@@ -63,6 +63,11 @@ type HTTPTarget struct {
 	Hint string // Description about what this HTTP target is doing.
 	Path string
 
+	// RawBody contains raw request body that is being read and
+	// forwarded to target.
+	// It will be used only WithRawBody is true.
+	RawBody []byte
+
 	Results     []*AttackResult // Results contains list of load testing output.
 	RequestType libhttp.RequestType
 	Method      libhttp.RequestMethod
@@ -77,6 +82,10 @@ type HTTPTarget struct {
 	// IsCustomizable allow client to modify the Method, Path, and
 	// RequestType.
 	IsCustomizable bool
+
+	// WithRawBody if true the request is read and forwarded from Body
+	// instead of from Params.
+	WithRawBody bool
 }
 
 // clone the source HTTPTarget.
@@ -215,11 +224,13 @@ func (ht *HTTPTarget) paramsToPath() {
 	ht.Path = rute.String()
 }
 
-// refCopy copy methods and handlers from orig to ht.
+// refCopy copy original fields, methods, and handlers that cannot be
+// send or replaced from orig to ht.
 func (ht *HTTPTarget) refCopy(orig *HTTPTarget) {
 	ht.ConvertParams = orig.ConvertParams
 	ht.RequestDumper = orig.RequestDumper
 	ht.ResponseDumper = orig.ResponseDumper
+	ht.WithRawBody = orig.WithRawBody
 
 	var (
 		key    string

@@ -64,9 +64,11 @@ export interface HTTPTargetInterface {
   RequestType: number;
   Headers: KeyFormInput;
   Params: KeyFormInput;
+  RawBody: string;
   Results: AttackResult[];
   AllowAttack: boolean;
   IsCustomizable: boolean;
+  WithRawBody: boolean;
 }
 
 export interface KeyFormInput {

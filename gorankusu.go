@@ -4,7 +4,9 @@
 package gorankusu
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -332,7 +334,6 @@ func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err
 	var (
 		logp    = `runHTTPTarget`
 		headers = rr.HTTPTarget.Headers.ToHTTPHeader()
-		params  interface{}
 	)
 
 	httpcOpts := &libhttp.ClientOptions{
@@ -342,21 +343,25 @@ func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err
 
 	httpc := libhttp.NewClient(httpcOpts)
 
-	rr.HTTPTarget.paramsToPath()
+	var params interface{}
 
-	if rr.HTTPTarget.ConvertParams == nil {
-		switch rr.HTTPTarget.RequestType {
-		case libhttp.RequestTypeJSON:
-			params = rr.HTTPTarget.Params.ToJSONObject()
-		case libhttp.RequestTypeMultipartForm:
-			params = rr.HTTPTarget.Params.ToMultipartFormData()
-		default:
-			params = rr.HTTPTarget.Params.ToURLValues()
-		}
-	} else {
-		params, err = rr.HTTPTarget.ConvertParams(&rr.HTTPTarget)
-		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
+	if !rr.HTTPTarget.WithRawBody {
+		rr.HTTPTarget.paramsToPath()
+
+		if rr.HTTPTarget.ConvertParams == nil {
+			switch rr.HTTPTarget.RequestType {
+			case libhttp.RequestTypeJSON:
+				params = rr.HTTPTarget.Params.ToJSONObject()
+			case libhttp.RequestTypeMultipartForm:
+				params = rr.HTTPTarget.Params.ToMultipartFormData()
+			default:
+				params = rr.HTTPTarget.Params.ToURLValues()
+			}
+		} else {
+			params, err = rr.HTTPTarget.ConvertParams(&rr.HTTPTarget)
+			if err != nil {
+				return nil, fmt.Errorf(`%s: %w`, logp, err)
+			}
 		}
 	}
 
@@ -371,6 +376,11 @@ func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
+	}
+
+	if rr.HTTPTarget.WithRawBody {
+		httpRequest.Body = io.NopCloser(bytes.NewReader(rr.HTTPTarget.RawBody))
+		httpRequest.ContentLength = int64(len(rr.HTTPTarget.RawBody))
 	}
 
 	err = res.SetHTTPRequest(rr.HTTPTarget.RequestDumper, httpRequest)

@@ -70,6 +70,23 @@ func registerTargetHTTP() {
 	}
 	target.HTTPTargets = append(target.HTTPTargets, targetHTTPUpload)
 
+	var targetHTTPRawbodyJSON = &HTTPTarget{
+		ID:          `rawbody_json`,
+		Name:        `Raw body in JSON`,
+		Method:      dummyEndpointRawbodyJSON.Method,
+		Path:        dummyEndpointRawbodyJSON.Path,
+		RequestType: dummyEndpointRawbodyJSON.RequestType,
+		Params: KeyFormInput{
+			`ignored`: FormInput{
+				Label: `Ignored parameter`,
+			},
+		},
+		RequestDumper:  requestDumperWithoutDate,
+		ResponseDumper: responseDumperWithoutDate,
+		WithRawBody:    true,
+	}
+	target.HTTPTargets = append(target.HTTPTargets, targetHTTPRawbodyJSON)
+
 	var err = dummyGorankusu.RegisterTarget(target)
 	if err != nil {
 		log.Fatalf(`%s: %s`, logp, err)

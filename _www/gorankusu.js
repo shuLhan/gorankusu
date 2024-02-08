@@ -233,9 +233,11 @@ export class Gorankusu {
                 RequestType: httpTarget.RequestType,
                 Headers: httpTarget.Headers,
                 Params: httpTarget.Params,
+                RawBody: httpTarget.RawBody,
                 Results: [],
                 AllowAttack: httpTarget.AllowAttack,
                 IsCustomizable: httpTarget.IsCustomizable,
+                WithRawBody: httpTarget.WithRawBody,
             },
             WebSocketTarget: null,
         };

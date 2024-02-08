@@ -31,10 +31,11 @@ import (
 )
 
 const (
-	pathExample         = `/example`
-	pathExampleError    = `/example/error`
-	pathExampleNamePage = `/example/:name/page`
-	pathExampleUpload   = `/example/upload`
+	pathExample            = `/example`
+	pathExampleError       = `/example/error`
+	pathExampleNamePage    = `/example/:name/page`
+	pathExampleRawbodyJSON = `/example/rawbody/json`
+	pathExampleUpload      = `/example/upload`
 )
 
 const (
@@ -52,8 +53,8 @@ type requestResponse struct {
 
 // Example contains an example how to use Gorankusu programmatically.
 type Example struct {
-	gorankusu   *gorankusu.Gorankusu
-	wsServer *websocket.Server
+	gorankusu *gorankusu.Gorankusu
+	wsServer  *websocket.Server
 
 	targetExampleErrorGet vegeta.Target
 	targetExampleGet      vegeta.Target
@@ -167,6 +168,14 @@ func (ex *Example) registerEndpoints() (err error) {
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePost,
+	})
+
+	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+		Method:       libhttp.RequestMethodPost,
+		Path:         pathExampleRawbodyJSON,
+		RequestType:  libhttp.RequestTypeJSON,
+		ResponseType: libhttp.ResponseTypeJSON,
+		Call:         ex.pathExampleRawbodyJSON,
 	})
 
 	err = ex.gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
@@ -332,6 +341,13 @@ func (ex *Example) registerTargetHTTP() (err error) {
 				},
 			},
 		}, {
+			Name:        `HTTP raw body - JSON`,
+			Hint:        `Test POST request with manually input raw JSON.`,
+			Method:      libhttp.RequestMethodPost,
+			Path:        pathExampleRawbodyJSON,
+			RequestType: libhttp.RequestTypeJSON,
+			WithRawBody: true,
+		}, {
 			Name:        `HTTP upload`,
 			Hint:        `Test uploading file`,
 			Method:      libhttp.RequestMethodPost,
@@ -462,6 +478,25 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, e
 	res.Data = data
 
 	return json.Marshal(&res)
+}
+
+func (ex *Example) pathExampleRawbodyJSON(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	var (
+		logp = `pathExampleRawbodyJSON`
+		data map[string]any
+	)
+
+	err = json.Unmarshal(epr.RequestBody, &data)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var res = libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Data = data
+
+	resbody, err = json.Marshal(&res)
+	return resbody, err
 }
 
 func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte, err error) {

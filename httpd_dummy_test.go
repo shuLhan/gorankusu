@@ -15,8 +15,16 @@ import (
 )
 
 const (
-	pathUpload = `/upload`
+	pathRawbodyJSON = `/rawbody/json`
+	pathUpload      = `/upload`
 )
+
+var dummyEndpointRawbodyJSON = libhttp.Endpoint{
+	Method:       libhttp.RequestMethodPost,
+	Path:         pathRawbodyJSON,
+	RequestType:  libhttp.RequestTypeJSON,
+	ResponseType: libhttp.ResponseTypeJSON,
+}
 
 var dummyEndpointUpload = libhttp.Endpoint{
 	Method:       libhttp.RequestMethodPost,
@@ -68,6 +76,13 @@ func newHttpdDummy() (dum *httpdDummy, err error) {
 func (dum *httpdDummy) registerEndpoints() (err error) {
 	var logp = `registerEndpoints`
 
+	dummyEndpointRawbodyJSON.Call = dum.rawbodyJSON
+
+	err = dum.Server.RegisterEndpoint(&dummyEndpointRawbodyJSON)
+	if err != nil {
+		return fmt.Errorf(`%s %s: %w`, logp, dummyEndpointUpload.Path, err)
+	}
+
 	dummyEndpointUpload.Call = dum.upload
 
 	err = dum.Server.RegisterEndpoint(&dummyEndpointUpload)
@@ -76,6 +91,25 @@ func (dum *httpdDummy) registerEndpoints() (err error) {
 	}
 
 	return nil
+}
+
+func (dum *httpdDummy) rawbodyJSON(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
+	var (
+		logp = `rawbodyJSON`
+		data map[string]any
+	)
+
+	err = json.Unmarshal(epr.RequestBody, &data)
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
+	var res = libhttp.EndpointResponse{}
+	res.Code = http.StatusOK
+	res.Data = data
+
+	resbody, err = json.Marshal(&res)
+	return resbody, err
 }
 
 // upload handle HTTP POST with request type "multipart/form-data".

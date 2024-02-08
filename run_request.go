@@ -19,8 +19,8 @@ type RunRequest struct {
 	HTTPTarget      HTTPTarget
 }
 
-// generateRunRequest merge the run request with original target and HTTP
-// target into new RunRequest.
+// generateRunRequest merge the [RunRequest] req from WUI with original
+// Target and HTTPTarget into new RunRequest.
 func generateRunRequest(
 	env *Environment,
 	req *RunRequest,
@@ -56,7 +56,7 @@ func generateRunRequest(
 	outrr.HTTPTarget.Headers = req.HTTPTarget.Headers
 	outrr.HTTPTarget.Params = req.HTTPTarget.Params
 	outrr.HTTPTarget.paramsToPath()
-
+	outrr.HTTPTarget.RawBody = req.HTTPTarget.RawBody
 	outrr.HTTPTarget.refCopy(origHTTPTarget)
 
 	return outrr

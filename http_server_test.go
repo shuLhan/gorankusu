@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -60,6 +61,50 @@ func TestGorankusuAPITargetRunHTTP_formInputFile(t *testing.T) {
 	}
 }
 
+func TestGorankusuAPITargetRunHTTP_withRawBody_JSON(t *testing.T) {
+	type testCase struct {
+		tag string
+	}
+
+	var (
+		tdata *test.Data
+		err   error
+	)
+	tdata, err = test.LoadData(`testdata/target_http_run_withrawbody_json_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []testCase{{
+		tag: `valid`,
+	}}
+
+	var (
+		c       testCase
+		runResp RunResponse
+		tag     string
+		exp     string
+	)
+
+	for _, c = range listCase {
+		var reqparams = httpRequestParams{
+			method: apiTargetRunHTTP.Method.String(),
+			path:   apiTargetRunHTTP.Path,
+			body:   tdata.Input[c.tag+`:http_request_body`],
+		}
+
+		_, runResp = dummyGorankusuServe(t, reqparams)
+
+		tag = c.tag + `:RunResponse.DumpRequest`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(runResp.DumpRequest))
+
+		tag = c.tag + `:RunResponse.DumpResponse`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(runResp.DumpResponse))
+	}
+}
+
 func dummyGorankusuServe(t *testing.T, reqparams httpRequestParams) (rawResp []byte, runResp RunResponse) {
 	var body bytes.Buffer
 	var recorder = httptest.NewRecorder()
@@ -99,6 +144,10 @@ func dummyGorankusuServe(t *testing.T, reqparams httpRequestParams) (rawResp []b
 	err = json.Unmarshal(rawResp, &epres)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if epres.Code != http.StatusOK {
+		t.Fatalf(`dummyGorankusuServe %q: %s`, reqparams.path, got)
 	}
 
 	return rawResp, runResp

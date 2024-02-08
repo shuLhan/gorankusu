@@ -1,0 +1,33 @@
+Test data for testing [HTTPTarget.WithRawBody].
+
+>>> valid:http_request_body
+{
+  "Target": {
+    "id": "target_http"
+  },
+  "HTTPTarget": {
+    "id": "rawbody_json",
+    "Method": 6,
+    "RequestType": 4,
+    "Path": "/rawbody/json",
+    "RawBody": "eyJpZCI6MSwibmFtZSI6ImdvcmFua3VzdSJ9",
+    "WithRawBody": true
+  }
+}
+
+<<< valid:RunResponse.DumpRequest
+POST /rawbody/json HTTP/1.1
+Host: 127.0.0.1:22796
+User-Agent: libhttp/0.53.0
+Content-Length: 27
+Content-Type: application/json
+Accept-Encoding: gzip
+
+{"id":1,"name":"gorankusu"}
+
+<<< valid:RunResponse.DumpResponse
+HTTP/1.1 200 OK
+Content-Length: 47
+Content-Type: application/json
+
+{"data":{"id":1,"name":"gorankusu"},"code":200}

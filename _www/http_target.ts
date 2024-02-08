@@ -99,6 +99,7 @@ export class HTTPTarget {
     this.generateRequestContentType(this.elRequestInput);
     this.generateRequestHeaders(this.elRequestInput);
     this.generateRequestParameters(this.elRequestInput);
+    this.generateRequestRawBody(this.elRequestInput);
 
     parent.appendChild(this.elRequestInput);
   }
@@ -231,7 +232,7 @@ export class HTTPTarget {
   }
 
   private generateRequestParameters(parent: HTMLElement) {
-    if (!this.opts.Params) {
+    if (!this.opts.Params || this.opts.WithRawBody) {
       return;
     }
     if (Object.keys(this.opts.Params).length === 0) {
@@ -249,6 +250,35 @@ export class HTTPTarget {
       fi.value = loadHTTPTargetParam(this.target, this.opts, key);
       generateFormInput(wrapper, fi);
     }
+
+    parent.appendChild(wrapper);
+  }
+
+  private generateRequestRawBody(parent: HTMLElement) {
+    if (!this.opts.WithRawBody) {
+      return;
+    }
+
+    const wrapper = document.createElement("fieldset");
+    wrapper.classList.add(CLASS_HTTP_TARGET_INPUT_PARAMS);
+
+    const title = document.createElement("legend");
+    title.innerText = "Raw request body";
+    wrapper.appendChild(title);
+
+    const elRawbody = document.createElement("textarea");
+    elRawbody.innerText = this.opts.RawBody;
+    elRawbody.style.width = "100%";
+    elRawbody.style.boxSizing = "border-box";
+    elRawbody.style.height = "10em";
+
+    elRawbody.onchange = () => {
+      console.log(`rawbody: ${elRawbody.value}`);
+      this.opts.RawBody = btoa(elRawbody.value);
+      console.log(`opts.RawBody: ${this.opts.RawBody}`);
+    };
+
+    wrapper.appendChild(elRawbody);
 
     parent.appendChild(wrapper);
   }
