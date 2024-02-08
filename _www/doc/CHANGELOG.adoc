@@ -1,8 +1,96 @@
 = gorankusu CHANGELOG
-Shulhan <ms@kilabit.info>
 :toc:
 :sectanchors:
 :sectlinks:
+
+[#v0_5_0]
+== gorankusu v0.5.0 (2022-02-08)
+
+This release rename the project from "trunks" to "gorankusu".
+
+The original idea of "trunks" is because the core library that we
+use for load testing is named
+https://github.com/tsenart/vegeta/["vegeta"]
+(from Dragon Ball), and
+https://en.wikipedia.org/wiki/Vegeta[Vegeta]
+has a son named Trunks.
+In English, trunks also have multiple meanings.
+
+In order to have a unique name, we rename the project to "gorankusu",
+which is a combination of "go" (the main programming language
+that built the application) and "torankusu" the Hepburn of "Trunks".
+
+
+[#v0_5_0__breaking_changes]
+=== Breaking changes
+
+In order for making the code consistent and conform with linters, some
+exported types, fields, methods, and functions has been renamed.
+
+* In AttackResult type, field HttpTargetID renamed to HTTPTargetID
+* HttpConvertParams renamed to HTTPConvertParams
+* HttpRunHandler renamed to HTTPRunHandler
+* HttpAttackHandler renamed to HTTPAttackHandler
+* HttpPreAttackHandler renamed to HTTPPreAttackHandler
+* HttpTarget renamed to HTTPTarget
+
+and many more.
+
+[#v0_5_0__new_features]
+=== New features
+
+all: allow submit free form request body in HTTPTarget::
++
+--
+In HTTPTarget we add fields RawBody and WithRawBody.
+
+The field RawBody can be filled by anything by user.
+Those field can be activated by setting WithRawBody.
+
+Implements: https://todo.sr.ht/~shulhan/gorankusu/3
+--
+
+all: implement form input file::
++
+--
+The FormInput now can be set to FormInputKindFile that will rendered
+as "<input type='file' ...>" on the web user interface.
+
+Once submitted, the file name, type, size, and lastModification will
+be stored under FormInput Filename, Filetype, Filesize, and Filemodms.
+
+Implements: https://todo.sr.ht/~shulhan/trunks/1
+--
+
+
+all: add type to customize how to dump HTTP request and response::
++
+--
+The HTTPRequestDumper define an handler to convert [http.Request] into
+[RunResponse] DumpRequest.
+The HTTPResponseDumper define an handler to convert [http.Response]
+into [RunResponse] DumpResponse.
+
+In HTTPTarget we add fields RequestDumper and ResponseDumper that if its not
+nil it will be used to dump HTTP request and response to raw bytes.
+--
+
+
+all: support parameter binding in HTTP Path::
++
+If HTTP Path contains key, for example "/:book", and the Params contains
+the same key, the Path will be filled with value from Params.
+The same key in Params will be deleted and not send on query parameter
+or body.
+
+
+[#v0_5_0__enhancements]
+=== Enhancements
+
+_www: check HTTP response status greater or equal 400::
++
+Any HTTP status code below 400 are still processable and not an error.
+
 
 [#v0_4_1]
 == gorankusu v0.4.1 (2023-11-11)
