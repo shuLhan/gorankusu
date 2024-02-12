@@ -2,7 +2,7 @@
 *.js
 /_www/wui.bak
 /_www/wui.local
-/example/testdata
 /gorankusu
+/testdata/example/
 cover.html
 cover.out

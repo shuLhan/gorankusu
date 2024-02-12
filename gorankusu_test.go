@@ -6,20 +6,17 @@ package gorankusu
 import (
 	"crypto/rand"
 	"log"
-	"net/http"
 	"os"
 	"testing"
 	"time"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libnet "github.com/shuLhan/share/lib/net"
 	"github.com/shuLhan/share/lib/test/mock"
 )
 
-// dummyHttpd dummy HTTP as target for Gorankusu.
-var dummyHttpd *httpdDummy
-
-// dummyGorankusu the Gorankusu instance that contains [Target] to be tested.
-var dummyGorankusu *Gorankusu
+// exGorankusu the Gorankusu instance that contains [Target] to be
+// tested.
+var exGorankusu *Example
 
 func TestMain(m *testing.M) {
 	var err error
@@ -27,78 +24,23 @@ func TestMain(m *testing.M) {
 	// Mock crypto [rand.Reader] for predictable HTTP boundary.
 	rand.Reader = mock.NewRandReader([]byte(`gorankusu`))
 
-	dummyHttpd, err = newHttpdDummy()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer dummyHttpd.Stop(time.Second)
-
-	var env = Environment{}
-
-	dummyGorankusu, err = New(&env)
+	exGorankusu, err = NewExample()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	registerTargetHTTP()
+	go func() {
+		var err2 = exGorankusu.Start()
+		if err2 != nil {
+			log.Fatal(err2)
+		}
+	}()
 
-	os.Exit(m.Run())
-}
-
-func registerTargetHTTP() {
-	var logp = `registerTargetHTTP`
-
-	var target = &Target{
-		ID:      `target_http`,
-		Name:    `Target HTTP`,
-		BaseURL: `http://` + dummyHttpd.Server.Options.Address,
-	}
-	var targetHTTPUpload = &HTTPTarget{
-		ID:          `upload`,
-		Name:        `Upload`,
-		Method:      dummyEndpointUpload.Method,
-		Path:        dummyEndpointUpload.Path,
-		RequestType: dummyEndpointUpload.RequestType,
-		Params: KeyFormInput{
-			`file`: FormInput{
-				Label: `File`,
-				Kind:  FormInputKindFile,
-			},
-		},
-		RequestDumper:  requestDumperWithoutDate,
-		ResponseDumper: responseDumperWithoutDate,
-	}
-	target.HTTPTargets = append(target.HTTPTargets, targetHTTPUpload)
-
-	var targetHTTPRawbodyJSON = &HTTPTarget{
-		ID:          `rawbody_json`,
-		Name:        `Raw body in JSON`,
-		Method:      dummyEndpointRawbodyJSON.Method,
-		Path:        dummyEndpointRawbodyJSON.Path,
-		RequestType: dummyEndpointRawbodyJSON.RequestType,
-		Params: KeyFormInput{
-			`ignored`: FormInput{
-				Label: `Ignored parameter`,
-			},
-		},
-		RequestDumper:  requestDumperWithoutDate,
-		ResponseDumper: responseDumperWithoutDate,
-		WithRawBody:    true,
-	}
-	target.HTTPTargets = append(target.HTTPTargets, targetHTTPRawbodyJSON)
-
-	var err = dummyGorankusu.RegisterTarget(target)
+	err = libnet.WaitAlive(`tcp`, DefaultListenAddress, 3*time.Second)
 	if err != nil {
-		log.Fatalf(`%s: %s`, logp, err)
+		log.Fatal(err)
 	}
-}
 
-func requestDumperWithoutDate(req *http.Request) ([]byte, error) {
-	req.Header.Del(libhttp.HeaderDate)
-	return DumpHTTPRequest(req)
-}
-
-func responseDumperWithoutDate(resp *http.Response) ([]byte, error) {
-	resp.Header.Del(libhttp.HeaderDate)
-	return DumpHTTPResponse(resp)
+	var status = m.Run()
+	os.Exit(status)
 }

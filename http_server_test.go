@@ -111,12 +111,9 @@ func dummyGorankusuServe(t *testing.T, reqparams httpRequestParams) (rawResp []b
 
 	body.Write(reqparams.body)
 
-	var httpreq = httptest.NewRequest(
-		reqparams.method,
-		reqparams.path,
-		&body)
+	var httpreq = httptest.NewRequest(reqparams.method, reqparams.path, &body)
 
-	dummyGorankusu.Httpd.ServeHTTP(recorder, httpreq)
+	exGorankusu.Httpd.ServeHTTP(recorder, httpreq)
 
 	var (
 		httpres = recorder.Result()

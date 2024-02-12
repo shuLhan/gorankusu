@@ -18,7 +18,6 @@ import (
 
 	"git.sr.ht/~shulhan/ciigo"
 	"git.sr.ht/~shulhan/gorankusu"
-	"git.sr.ht/~shulhan/gorankusu/example"
 )
 
 const (
@@ -28,19 +27,22 @@ const (
 
 func main() {
 	flag.Parse()
-	subcmd := strings.ToLower(flag.Arg(0))
+
+	var subcmd = strings.ToLower(flag.Arg(0))
 
 	if subcmd == subCommandBuild {
 		workerBuild(true)
 		return
 	}
 
-	err := os.Setenv(gorankusu.EnvDevelopment, "1")
+	var err = os.Setenv(gorankusu.EnvDevelopment, `1`)
 	if err != nil {
 		mlog.Fatalf(`%s`, err)
 	}
 
-	ex, err := example.New()
+	var ex *gorankusu.Example
+
+	ex, err = gorankusu.NewExample()
 	if err != nil {
 		mlog.Fatalf(`%s`, err)
 	}
@@ -49,7 +51,7 @@ func main() {
 	go workerDocs()
 
 	go func() {
-		c := make(chan os.Signal, 1)
+		var c = make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 		<-c
 		ex.Stop()
@@ -72,13 +74,13 @@ func main() {
 // files only, without watching updates.
 func workerBuild(oneTime bool) {
 	var (
-		logp       = "workerBuild"
+		logp       = `workerBuild`
 		tsCount    = 0
 		embedCount = 0
 	)
 
-	mfsOpts := &memfs.Options{
-		Root: "_www",
+	var mfsOpts = &memfs.Options{
+		Root: `_www`,
 		Includes: []string{
 			`.*\.(js|ico|png|html)$`,
 		},
@@ -97,13 +99,18 @@ func workerBuild(oneTime bool) {
 			CommentHeader: `// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 `,
-			PackageName: "gorankusu",
-			VarName:     "memfsWWW",
-			GoFileName:  "memfs_www_embed.go",
+			PackageName: `gorankusu`,
+			VarName:     `memfsWWW`,
+			GoFileName:  `memfs_www_embed.go`,
 		},
 	}
 
-	mfsWww, err := memfs.New(mfsOpts)
+	var (
+		mfsWww *memfs.MemFS
+		err    error
+	)
+
+	mfsWww, err = memfs.New(mfsOpts)
 	if err != nil {
 		mlog.Fatalf(`%s: %s`, logp, err)
 	}
@@ -120,9 +127,9 @@ func workerBuild(oneTime bool) {
 		return
 	}
 
-	dirWatchWww := memfs.DirWatcher{
+	var dirWatchWww = memfs.DirWatcher{
 		Options: memfs.Options{
-			Root: "_www",
+			Root: `_www`,
 			Includes: []string{
 				`.*\.(js|ts)$`,
 				`_www/tsconfig.json`,
@@ -149,21 +156,27 @@ func workerBuild(oneTime bool) {
 
 	mlog.Outf(`%s: started ...`, logp)
 
-	ticker := time.NewTicker(5 * time.Second)
+	var (
+		ticker = time.NewTicker(5 * time.Second)
+		ns     memfs.NodeState
+	)
 	for {
 		select {
-		case ns := <-dirWatchWww.C:
-			if strings.HasSuffix(ns.Node.SysPath, ".ts") {
+		case ns = <-dirWatchWww.C:
+			if strings.HasSuffix(ns.Node.SysPath, `.ts`) {
 				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
 				tsCount++
-			} else if strings.HasSuffix(ns.Node.SysPath, ".json") {
+			} else if strings.HasSuffix(ns.Node.SysPath, `.json`) {
 				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
 				tsCount++
-			} else if strings.HasSuffix(ns.Node.SysPath, ".js") ||
-				strings.HasSuffix(ns.Node.SysPath, ".html") {
+			} else if strings.HasSuffix(ns.Node.SysPath, `.js`) ||
+				strings.HasSuffix(ns.Node.SysPath, `.html`) {
 				embedCount++
 				mlog.Outf(`%s: update %s`, logp, ns.Node.Path)
-				node, err := mfsWww.Get(ns.Node.Path)
+
+				var node *memfs.Node
+
+				node, err = mfsWww.Get(ns.Node.Path)
 				if err != nil {
 					mlog.Errf(`%s: %q: %s`, logp, ns.Node.Path, err)
 					continue
@@ -194,14 +207,14 @@ func workerBuild(oneTime bool) {
 // workerDocs a goroutine that watch any changes to .adoc files inside
 // "_www/doc" directory and convert them into HTML files.
 func workerDocs() {
-	logp := "workerDocs"
+	var logp = `workerDocs`
 
 	mlog.Outf(`%s: started ...`, logp)
 
-	opts := &ciigo.ConvertOptions{
+	var opts = &ciigo.ConvertOptions{
 		Root: `_www/doc`,
 	}
-	err := ciigo.Watch(opts)
+	var err = ciigo.Watch(opts)
 	if err != nil {
 		mlog.Errf(`%s: %s`, logp, err)
 	}

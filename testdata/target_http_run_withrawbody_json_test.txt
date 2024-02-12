@@ -3,21 +3,21 @@ Test data for testing [HTTPTarget.WithRawBody].
 >>> valid:http_request_body
 {
   "Target": {
-    "id": "target_http"
+    "id": "example_http"
   },
   "HTTPTarget": {
-    "id": "rawbody_json",
+    "id": "http_rawbody_json",
     "Method": 6,
     "RequestType": 4,
-    "Path": "/rawbody/json",
+    "Path": "/example/rawbody/json",
     "RawBody": "eyJpZCI6MSwibmFtZSI6ImdvcmFua3VzdSJ9",
     "WithRawBody": true
   }
 }
 
 <<< valid:RunResponse.DumpRequest
-POST /rawbody/json HTTP/1.1
-Host: 127.0.0.1:22796
+POST /example/rawbody/json HTTP/1.1
+Host: 127.0.0.1:8217
 User-Agent: libhttp/0.53.0
 Content-Length: 27
 Content-Type: application/json

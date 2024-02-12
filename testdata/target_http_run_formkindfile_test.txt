@@ -3,13 +3,13 @@ Test data for testing running HTTP with form kind is file (uploading file).
 >>> valid:http_request_body
 {
   "Target": {
-    "id": "target_http"
+    "id": "example_http"
   },
   "HTTPTarget": {
-    "id": "upload",
+    "id": "http_upload",
     "Method": 6,
     "RequestType": 3,
-    "Path": "/upload",
+    "Path": "/example/upload",
     "Params": {
       "file": {
         "kind": "file",
@@ -24,7 +24,7 @@ Test data for testing running HTTP with form kind is file (uploading file).
 
 <<< valid:RunResponse.DumpResponse
 HTTP/1.1 200 OK
-Content-Length: 260
+Content-Length: 256
 Content-Type: application/json
 
 {
@@ -35,14 +35,14 @@ Content-Type: application/json
     "filemodms": [
       "0"
     ],
-    "filename": [
-      "test.txt"
-    ],
     "filesize": [
       "22"
     ],
     "filetype": [
       "text/plain"
+    ],
+    "name": [
+      "test.txt"
     ]
   },
   "code": 200
