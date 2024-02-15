@@ -14,9 +14,9 @@ import (
 type RunRequest struct {
 	result *AttackResult
 
-	Target          Target
 	WebSocketTarget WebSocketTarget
 	HTTPTarget      HTTPTarget
+	Target          Target
 }
 
 // generateRunRequest merge the [RunRequest] req from WUI with original

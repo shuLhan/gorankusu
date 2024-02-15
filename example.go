@@ -209,7 +209,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 		Name:    `Example HTTP`,
 		Hint:    `This section provide an example of HTTP endpoints that can be tested and attacked.`,
 		BaseURL: fmt.Sprintf(`http://%s`, ex.Gorankusu.Env.ListenAddress),
-		Opts: &AttackOptions{
+		Opts: AttackOptions{
 			Duration:      10 * time.Second,
 			RatePerSecond: 1,
 		},
@@ -412,7 +412,6 @@ func (ex *Example) registerTargetWebSocket() (err error) {
 		Name:    `Example WebSocket`,
 		Hint:    `This section provide an example of WebSocket endpoints that can be tested.`,
 		BaseURL: fmt.Sprintf(`ws://%s`, websocketAddress),
-		Opts:    &AttackOptions{},
 		Vars: KeyFormInput{
 			`WebSocketVar`: FormInput{
 				Label: `WebSocketVar`,

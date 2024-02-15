@@ -14,7 +14,6 @@ type Target struct {
 	// HTTPClient that can be used for running HTTPTarget.
 	HTTPClient *libhttp.Client `json:"-"`
 
-	Opts *AttackOptions
 	Vars KeyFormInput
 
 	ID   string
@@ -29,6 +28,8 @@ type Target struct {
 
 	HTTPTargets      []*HTTPTarget
 	WebSocketTargets []*WebSocketTarget
+
+	Opts AttackOptions
 }
 
 func (target *Target) init() (err error) {
@@ -40,10 +41,6 @@ func (target *Target) init() (err error) {
 	}
 
 	target.ID = generateID(target.Name)
-
-	if target.Opts == nil {
-		target.Opts = &AttackOptions{}
-	}
 
 	target.Opts.init()
 
