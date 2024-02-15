@@ -340,25 +340,14 @@ func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err
 
 	httpc := libhttp.NewClient(httpcOpts)
 
-	var params interface{}
+	var params any
 
 	if !rr.HTTPTarget.WithRawBody {
 		rr.HTTPTarget.paramsToPath()
 
-		if rr.HTTPTarget.ConvertParams == nil {
-			switch rr.HTTPTarget.RequestType {
-			case libhttp.RequestTypeJSON:
-				params = rr.HTTPTarget.Params.ToJSONObject()
-			case libhttp.RequestTypeMultipartForm:
-				params = rr.HTTPTarget.Params.ToMultipartFormData()
-			default:
-				params = rr.HTTPTarget.Params.ToURLValues()
-			}
-		} else {
-			params, err = rr.HTTPTarget.ConvertParams(&rr.HTTPTarget)
-			if err != nil {
-				return nil, fmt.Errorf(`%s: %w`, logp, err)
-			}
+		params, err = rr.HTTPTarget.ParamsConverter(&rr.HTTPTarget)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 	}
 

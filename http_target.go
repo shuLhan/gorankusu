@@ -17,10 +17,6 @@ import (
 	libpath "github.com/shuLhan/share/lib/path"
 )
 
-// HTTPConvertParams is a handler that will be called inside the Run handler
-// to convert the Params values to type that will be send as request.
-type HTTPConvertParams func(target *HTTPTarget) (interface{}, error)
-
 // HTTPRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
 type HTTPRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
@@ -31,8 +27,12 @@ type HTTPPreAttackHandler func(rr *RunRequest)
 
 // HTTPTarget define the HTTP endpoint that can be attached to Gorankusu.
 type HTTPTarget struct {
-	Params        KeyFormInput
-	ConvertParams HTTPConvertParams `json:"-"`
+	Params KeyFormInput
+
+	// ParamsConverter define the custom function to convert the Params
+	// into HTTP request.
+	// This field is optional default to [DefaultParamsConverter].
+	ParamsConverter HTTPParamsConverter `json:"-"`
 
 	Headers KeyFormInput
 
@@ -90,7 +90,7 @@ type HTTPTarget struct {
 // This method is provided to prevent the sync.Mutex being copied.
 func (ht *HTTPTarget) clone(src *HTTPTarget) {
 	ht.Params = src.Params
-	ht.ConvertParams = src.ConvertParams
+	ht.ParamsConverter = src.ParamsConverter
 	ht.Headers = src.Headers
 	ht.Run = src.Run
 	ht.PreAttack = src.PreAttack
@@ -129,6 +129,9 @@ func (ht *HTTPTarget) init() (err error) {
 			formInput.init()
 			ht.Params[key] = formInput
 		}
+	}
+	if ht.ParamsConverter == nil {
+		ht.ParamsConverter = DefaultParamsConverter()
 	}
 	if len(ht.Path) == 0 {
 		ht.Path = "/"
@@ -230,7 +233,7 @@ func (ht *HTTPTarget) paramsToPath() {
 // refCopy copy original fields, methods, and handlers that cannot be
 // send or replaced from orig to ht.
 func (ht *HTTPTarget) refCopy(orig *HTTPTarget) {
-	ht.ConvertParams = orig.ConvertParams
+	ht.ParamsConverter = orig.ParamsConverter
 	ht.RequestDumper = orig.RequestDumper
 	ht.ResponseDumper = orig.ResponseDumper
 	ht.WithRawBody = orig.WithRawBody
@@ -262,10 +265,10 @@ func (ht *HTTPTarget) String() string {
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, `ID:%s Name:%s Hint:%s Path:%s `+
-		`Params:%v ConvertParams:%v Headers:%v `+
+		`Params:%v ParamsConverter:%v Headers:%v `+
 		`AllowAttack:%t IsCustomizable:%t`,
 		ht.ID, ht.Name, ht.Hint, ht.Path,
-		ht.Params, ht.ConvertParams, ht.Headers,
+		ht.Params, ht.ParamsConverter, ht.Headers,
 		ht.AllowAttack, ht.IsCustomizable)
 
 	return sb.String()
