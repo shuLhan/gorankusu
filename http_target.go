@@ -17,10 +17,6 @@ import (
 	libpath "github.com/shuLhan/share/lib/path"
 )
 
-// HTTPRunHandler define the function type that will be called when client
-// send request to run the HTTP target.
-type HTTPRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
-
 // HTTPPreAttackHandler define the function type that will be called before
 // the actual Attack being called.
 type HTTPPreAttackHandler func(rr *RunRequest)
@@ -36,7 +32,11 @@ type HTTPTarget struct {
 
 	Headers KeyFormInput
 
-	Run       HTTPRunHandler       `json:"-"`
+	// Run define the handler that will be called when request to run
+	// HTTPTarget received from client (web user-interface).
+	// This field is optional, default to [DefaultHTTPRun].
+	Run HTTPRunHandler `json:"-"`
+
 	PreAttack HTTPPreAttackHandler `json:"-"`
 
 	// Attack define custom handler to generate [vegeta.Attacker].
@@ -117,6 +117,9 @@ func (ht *HTTPTarget) init() (err error) {
 	}
 	if ht.Headers == nil {
 		ht.Headers = KeyFormInput{}
+	}
+	if ht.Run == nil {
+		ht.Run = DefaultHTTPRun()
 	}
 	if ht.Params == nil {
 		ht.Params = KeyFormInput{}

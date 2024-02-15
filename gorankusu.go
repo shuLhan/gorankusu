@@ -4,9 +4,7 @@
 package gorankusu
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -185,17 +183,9 @@ func (gorankusu *Gorankusu) RunHTTP(req *RunRequest) (res *RunResponse, err erro
 		return nil, errInvalidHTTPTarget(req.HTTPTarget.ID)
 	}
 
-	if origHTTPTarget.Run == nil {
-		req.Target.BaseURL = origTarget.BaseURL
-		req.Target.Name = origTarget.Name
+	req = generateRunRequest(gorankusu.Env, req, origTarget, origHTTPTarget)
 
-		req.HTTPTarget.refCopy(origHTTPTarget)
-
-		res, err = gorankusu.runHTTPTarget(req)
-	} else {
-		req = generateRunRequest(gorankusu.Env, req, origTarget, origHTTPTarget)
-		res, err = req.HTTPTarget.Run(req)
-	}
+	res, err = req.HTTPTarget.Run(req)
 	if err != nil {
 		return nil, err
 	}
@@ -323,68 +313,6 @@ func (gorankusu *Gorankusu) getTargetByResultFilename(name string) (t *Target, h
 	}
 
 	return t, ht
-}
-
-// runHTTPTarget default [HTTPTarget.Run] handler that generate HTTP request
-// and send it to the target.
-func (gorankusu *Gorankusu) runHTTPTarget(rr *RunRequest) (res *RunResponse, err error) {
-	var (
-		logp    = `runHTTPTarget`
-		headers = rr.HTTPTarget.Headers.ToHTTPHeader()
-	)
-
-	httpcOpts := &libhttp.ClientOptions{
-		ServerUrl:     rr.Target.BaseURL,
-		AllowInsecure: true,
-	}
-
-	httpc := libhttp.NewClient(httpcOpts)
-
-	var params any
-
-	if !rr.HTTPTarget.WithRawBody {
-		rr.HTTPTarget.paramsToPath()
-
-		params, err = rr.HTTPTarget.ParamsConverter(&rr.HTTPTarget)
-		if err != nil {
-			return nil, fmt.Errorf(`%s: %w`, logp, err)
-		}
-	}
-
-	res = &RunResponse{}
-
-	httpRequest, err := httpc.GenerateHttpRequest(
-		rr.HTTPTarget.Method,
-		rr.HTTPTarget.Path,
-		rr.HTTPTarget.RequestType,
-		headers,
-		params,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	if rr.HTTPTarget.WithRawBody {
-		httpRequest.Body = io.NopCloser(bytes.NewReader(rr.HTTPTarget.RawBody))
-		httpRequest.ContentLength = int64(len(rr.HTTPTarget.RawBody))
-	}
-
-	err = res.SetHTTPRequest(rr.HTTPTarget.RequestDumper, httpRequest)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	httpResponse, _, err := httpc.Do(httpRequest)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	err = res.SetHTTPResponse(rr.HTTPTarget.ResponseDumper, httpResponse)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", logp, err)
-	}
-
-	return res, nil
 }
 
 // scanResultsDir scan the environment's ResultsDir for the past attack
