@@ -155,6 +155,9 @@ func (ex *Example) registerEndpoints() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePost,
 	})
+	if err != nil {
+		return err
+	}
 
 	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
@@ -163,6 +166,9 @@ func (ex *Example) registerEndpoints() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExamplePost,
 	})
+	if err != nil {
+		return err
+	}
 
 	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
@@ -171,6 +177,9 @@ func (ex *Example) registerEndpoints() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExampleRawbodyJSON,
 	})
+	if err != nil {
+		return err
+	}
 
 	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
@@ -179,8 +188,11 @@ func (ex *Example) registerEndpoints() (err error) {
 		ResponseType: libhttp.ResponseTypeJSON,
 		Call:         ex.pathExampleUpload,
 	})
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func (ex *Example) registerWebSocketEndpoints() (err error) {
@@ -198,7 +210,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 		Hint:    `This section provide an example of HTTP endpoints that can be tested and attacked.`,
 		BaseURL: fmt.Sprintf(`http://%s`, ex.Gorankusu.Env.ListenAddress),
 		Opts: &AttackOptions{
-			Duration:      300 * time.Second,
+			Duration:      10 * time.Second,
 			RatePerSecond: 1,
 		},
 		Vars: KeyFormInput{
