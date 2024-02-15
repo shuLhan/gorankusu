@@ -44,13 +44,13 @@ type HTTPTarget struct {
 	Attack HTTPAttackHandler `json:"-"`
 
 	// RequestDumper define the handler to store [http.Request] after
-	// Run into [RunRequest] DumpRequest.
-	// Default to [DumpHTTPRequest] if its nil.
+	// Run into [RunRequest.DumpRequest].
+	// Default to [DefaultRequestDumper] if its nil.
 	RequestDumper HTTPRequestDumper `json:"-"`
 
 	// ResponseDumper define the handler to store [http.Response] after
-	// Run into [RunRequest] DumpResponse.
-	// Default to [DumpHTTPResponse] if its nil.
+	// Run into [RunRequest.DumpResponse].
+	// Default to [DefaultResponseDumper] if its nil.
 	ResponseDumper HTTPResponseDumper `json:"-"`
 
 	// ID of target, optional.
@@ -139,10 +139,10 @@ func (ht *HTTPTarget) init() (err error) {
 	}
 
 	if ht.RequestDumper == nil {
-		ht.RequestDumper = DumpHTTPRequest
+		ht.RequestDumper = DefaultRequestDumper()
 	}
 	if ht.ResponseDumper == nil {
-		ht.ResponseDumper = DumpHTTPResponse
+		ht.ResponseDumper = DefaultResponseDumper()
 	}
 	return nil
 }

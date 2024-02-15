@@ -14,16 +14,18 @@ import (
 // [RunResponse] DumpRequest.
 type HTTPRequestDumper func(req *http.Request) ([]byte, error)
 
-// DumpHTTPRequest define default [HTTPRequestDumper] that convert
+// DefaultRequestDumper define default [HTTPRequestDumper] that convert
 // [http.Request] with its body to stream of bytes using
 // [httputil.DumpRequest].
 //
-// The returned dump have CRLF ("\r\n") replaced with single LF ("\n").
-func DumpHTTPRequest(req *http.Request) (raw []byte, err error) {
-	raw, err = httputil.DumpRequestOut(req, true)
-	if err != nil {
-		return nil, fmt.Errorf(`DumpHTTPRequest: %w`, err)
+// The returned bytes have CRLF ("\r\n") replaced with single LF ("\n").
+func DefaultRequestDumper() HTTPRequestDumper {
+	return func(req *http.Request) (raw []byte, err error) {
+		raw, err = httputil.DumpRequestOut(req, true)
+		if err != nil {
+			return nil, fmt.Errorf(`DefaultRequestDumper: %w`, err)
+		}
+		raw = bytes.ReplaceAll(raw, []byte{'\r', '\n'}, []byte{'\n'})
+		return raw, nil
 	}
-	raw = bytes.ReplaceAll(raw, []byte{'\r', '\n'}, []byte{'\n'})
-	return raw, nil
 }

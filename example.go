@@ -699,10 +699,10 @@ func (ex *Example) runWebSocketGet(rr *RunRequest) (res interface{}, err error) 
 
 func requestDumperWithoutDate(req *http.Request) ([]byte, error) {
 	req.Header.Del(libhttp.HeaderDate)
-	return DumpHTTPRequest(req)
+	return DefaultRequestDumper()(req)
 }
 
 func responseDumperWithoutDate(resp *http.Response) ([]byte, error) {
 	resp.Header.Del(libhttp.HeaderDate)
-	return DumpHTTPResponse(resp)
+	return DefaultResponseDumper()(resp)
 }
