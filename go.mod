@@ -7,7 +7,7 @@ go 1.20
 
 require (
 	git.sr.ht/~shulhan/ciigo v0.11.0
-	github.com/shuLhan/share v0.53.0
+	github.com/shuLhan/share v0.53.1-0.20240215151058-c14c0aada881
 	github.com/tsenart/vegeta/v12 v12.11.1
 )
 

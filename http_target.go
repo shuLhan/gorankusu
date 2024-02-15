@@ -15,7 +15,6 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/mlog"
 	libpath "github.com/shuLhan/share/lib/path"
-	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
 // HTTPConvertParams is a handler that will be called inside the Run handler
@@ -25,10 +24,6 @@ type HTTPConvertParams func(target *HTTPTarget) (interface{}, error)
 // HTTPRunHandler define the function type that will be called when client
 // send request to run the HTTP target.
 type HTTPRunHandler func(rr *RunRequest) (runres *RunResponse, err error)
-
-// HTTPAttackHandler define the function type that will be called when client
-// send request to attack HTTP target.
-type HTTPAttackHandler func(rr *RunRequest) vegeta.Targeter
 
 // HTTPPreAttackHandler define the function type that will be called before
 // the actual Attack being called.
@@ -43,7 +38,10 @@ type HTTPTarget struct {
 
 	Run       HTTPRunHandler       `json:"-"`
 	PreAttack HTTPPreAttackHandler `json:"-"`
-	Attack    HTTPAttackHandler    `json:"-"`
+
+	// Attack define custom handler to generate [vegeta.Attacker].
+	// This field is optional default to [DefaultAttack].
+	Attack HTTPAttackHandler `json:"-"`
 
 	// RequestDumper define the handler to store [http.Request] after
 	// Run into [RunRequest] DumpRequest.
@@ -135,6 +133,11 @@ func (ht *HTTPTarget) init() (err error) {
 	if len(ht.Path) == 0 {
 		ht.Path = "/"
 	}
+
+	if ht.AllowAttack && ht.Attack == nil {
+		ht.Attack = DefaultHTTPAttack()
+	}
+
 	if ht.RequestDumper == nil {
 		ht.RequestDumper = DumpHTTPRequest
 	}

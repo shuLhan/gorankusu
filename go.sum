@@ -26,8 +26,8 @@ github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjR
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529 h1:18kd+8ZUlt/ARXhljq+14TwAoKa61q6dX8jtwOf6DH8=
 github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529/go.mod h1:qe5TWALJ8/a1Lqznoc5BDHpYX/8HU60Hm2AwRmqzxqA=
-github.com/shuLhan/share v0.53.0 h1:hxQQbUWKav0pGaVarakEBX7hqJsyfd5jGDG3l6mcAsU=
-github.com/shuLhan/share v0.53.0/go.mod h1:97/BcWdLau8i+xeFvPHdyqph1HgxVBSVhQEUIyCmgRc=
+github.com/shuLhan/share v0.53.1-0.20240215151058-c14c0aada881 h1:SGgdg7934FRJZZ1G+ZZNEdwSL7UgUCFRohtJnwSNrDI=
+github.com/shuLhan/share v0.53.1-0.20240215151058-c14c0aada881/go.mod h1:97/BcWdLau8i+xeFvPHdyqph1HgxVBSVhQEUIyCmgRc=
 github.com/streadway/quantile v0.0.0-20220407130108-4246515d968d h1:X4+kt6zM/OVO6gbJdAfJR60MGPsqCzbtXNnjoGqdfAs=
 github.com/tsenart/vegeta/v12 v12.11.1 h1:Rbwe7Zxr7sJ+BDTReemeQalYPvKiSV+O7nwmUs20B3E=
 github.com/tsenart/vegeta/v12 v12.11.1/go.mod h1:swiFmrgpqj2llHURgHYFRFN0tfrIrlnspg01HjwOnSQ=

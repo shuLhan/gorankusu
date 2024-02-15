@@ -103,9 +103,6 @@ func (gorankusu *Gorankusu) AttackHTTP(req *RunRequest) (err error) {
 	if !origHTTPTarget.AllowAttack {
 		return errAttackNotAllowed()
 	}
-	if origHTTPTarget.Attack == nil {
-		return fmt.Errorf(`%s: %w`, logp, &errAttackHandlerNotSet)
-	}
 
 	req = generateRunRequest(gorankusu.Env, req, origTarget, origHTTPTarget)
 

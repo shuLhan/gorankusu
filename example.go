@@ -17,7 +17,6 @@ import (
 	libhttp "github.com/shuLhan/share/lib/http"
 	"github.com/shuLhan/share/lib/mlog"
 	"github.com/shuLhan/share/lib/websocket"
-	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
 const (
@@ -52,10 +51,6 @@ type requestResponse struct {
 type Example struct {
 	*Gorankusu
 	wsServer *websocket.Server
-
-	targetExampleErrorGet vegeta.Target
-	targetExampleGet      vegeta.Target
-	targetExamplePostForm vegeta.Target
 }
 
 // NewExample create, initialize, and setup an example of Gorankusu.
@@ -239,8 +234,6 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			},
 			Run:            ex.runExampleGet,
 			AllowAttack:    true,
-			Attack:         ex.attackExampleGet,
-			PreAttack:      ex.preattackExampleGet,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
 		}, {
@@ -268,8 +261,6 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			},
 			Run:            ex.runExampleGet,
 			AllowAttack:    true,
-			Attack:         ex.attackExampleErrorGet,
-			PreAttack:      ex.preattackExampleErrorGet,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
 		}, {
@@ -303,13 +294,11 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			},
 			Run:            ex.runExamplePostForm,
 			AllowAttack:    true,
-			PreAttack:      ex.preattackExamplePostForm,
-			Attack:         ex.attackExamplePostForm,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
 		}, {
 			ID:          `http_free_form`,
-			Name:        `HTTP free form`,
+			Name:        `HTTP Free Form`,
 			Hint:        fmt.Sprintf(`Test endpoint %q using custom HTTP method and/or content type.`, pathExample),
 			Method:      libhttp.RequestMethodGet,
 			Path:        pathExample,
@@ -333,6 +322,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
 			IsCustomizable: true,
+			AllowAttack:    true,
 		}, {
 			ID:          `http_post_path_binding`,
 			Name:        `HTTP Post path binding`,
@@ -354,6 +344,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			},
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
+			AllowAttack:    true,
 		}, {
 			ID:             `http_rawbody_json`,
 			Name:           `HTTP raw body - JSON`,
@@ -364,6 +355,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
 			WithRawBody:    true,
+			AllowAttack:    true,
 		}, {
 			ID:          `http_upload`,
 			Name:        `HTTP upload`,
@@ -391,6 +383,7 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			},
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
+			AllowAttack:    true,
 		}},
 	}
 
@@ -586,54 +579,6 @@ func (ex *Example) runExampleGet(req *RunRequest) (res *RunResponse, err error) 
 	return res, nil
 }
 
-func (ex *Example) preattackExampleErrorGet(rr *RunRequest) {
-	ex.targetExampleErrorGet = vegeta.Target{
-		Method: rr.HTTPTarget.Method.String(),
-		URL:    fmt.Sprintf(`%s%s`, rr.Target.BaseURL, rr.HTTPTarget.Path),
-		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
-	}
-
-	var q = rr.HTTPTarget.Params.ToURLValues().Encode()
-	if len(q) > 0 {
-		ex.targetExampleErrorGet.URL += `?` + q
-	}
-
-	fmt.Printf("preattackExampleErrorGet: %+v\n", ex.targetExampleErrorGet)
-}
-
-func (ex *Example) preattackExampleGet(rr *RunRequest) {
-	ex.targetExampleGet = vegeta.Target{
-		Method: rr.HTTPTarget.Method.String(),
-		URL:    fmt.Sprintf(`%s%s`, rr.Target.BaseURL, rr.HTTPTarget.Path),
-		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
-	}
-
-	var q = rr.HTTPTarget.Params.ToURLValues().Encode()
-	if len(q) > 0 {
-		ex.targetExampleGet.URL += `?` + q
-	}
-
-	fmt.Printf("preattackExampleGet: %+v\n", ex.targetExampleGet)
-}
-
-func (ex *Example) attackExampleErrorGet(rr *RunRequest) vegeta.Targeter {
-	return func(tgt *vegeta.Target) error {
-		rr.HTTPTarget.Lock()
-		*tgt = ex.targetExampleErrorGet
-		rr.HTTPTarget.Unlock()
-		return nil
-	}
-}
-
-func (ex *Example) attackExampleGet(rr *RunRequest) vegeta.Targeter {
-	return func(tgt *vegeta.Target) error {
-		rr.HTTPTarget.Lock()
-		*tgt = ex.targetExampleGet
-		rr.HTTPTarget.Unlock()
-		return nil
-	}
-}
-
 func (ex *Example) runExamplePostForm(req *RunRequest) (res *RunResponse, err error) {
 	if req.Target.HTTPClient == nil {
 		var httpcOpts = &libhttp.ClientOptions{
@@ -681,30 +626,6 @@ func (ex *Example) runExamplePostForm(req *RunRequest) (res *RunResponse, err er
 	}
 
 	return res, nil
-}
-
-func (ex *Example) preattackExamplePostForm(rr *RunRequest) {
-	ex.targetExamplePostForm = vegeta.Target{
-		Method: rr.HTTPTarget.Method.String(),
-		URL:    fmt.Sprintf(`%s%s`, rr.Target.BaseURL, rr.HTTPTarget.Path),
-		Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
-	}
-
-	var q = rr.HTTPTarget.Params.ToURLValues().Encode()
-	if len(q) > 0 {
-		ex.targetExamplePostForm.Body = []byte(q)
-	}
-
-	fmt.Printf("preattackExamplePostForm: %+v\n", ex.targetExamplePostForm)
-}
-
-func (ex *Example) attackExamplePostForm(rr *RunRequest) vegeta.Targeter {
-	return func(tgt *vegeta.Target) error {
-		rr.HTTPTarget.Lock()
-		*tgt = ex.targetExamplePostForm
-		rr.HTTPTarget.Unlock()
-		return nil
-	}
 }
 
 func (ex *Example) handleWSExampleGet(_ context.Context, req *websocket.Request) (res websocket.Response) {
