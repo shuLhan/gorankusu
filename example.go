@@ -10,6 +10,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"strconv"
 	"sync"
 	"time"
 
@@ -25,6 +26,11 @@ const (
 	pathExampleNamePage    = `/example/:name/page`
 	pathExampleRawbodyJSON = `/example/rawbody/json`
 	pathExampleUpload      = `/example/upload`
+)
+
+// List of custom headers.
+const (
+	headerNameXResponseCode = `X-Response-Code`
 )
 
 const (
@@ -283,11 +289,9 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeForm,
 			Headers: KeyFormInput{
-				`X-PostForm`: FormInput{
-					Label: `X-PostForm`,
+				headerNameXResponseCode: FormInput{
+					Label: headerNameXResponseCode,
 					Hint:  `Custom HTTP header to be send.`,
-					Kind:  FormInputKindNumber,
-					Value: `1`,
 				},
 			},
 			Params: KeyFormInput{
@@ -498,10 +502,23 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, e
 		Body:          string(epr.RequestBody),
 	}
 
+	var (
+		hdrXResponseCode = epr.HttpRequest.Header.Get(headerNameXResponseCode)
+		expRespCode      int64
+	)
+	expRespCode, err = strconv.ParseInt(hdrXResponseCode, 10, 64)
+	if err != nil {
+		expRespCode = http.StatusOK
+	}
+
 	var res = libhttp.EndpointResponse{}
-	res.Code = http.StatusOK
+
+	res.Code = int(expRespCode)
 	res.Message = pathExample
 	res.Data = data
+
+	epr.HttpWriter.Header().Set(libhttp.HeaderContentType, epr.Endpoint.ResponseType.String())
+	epr.HttpWriter.WriteHeader(res.Code)
 
 	return json.Marshal(&res)
 }
