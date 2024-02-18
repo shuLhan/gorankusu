@@ -250,7 +250,6 @@ func (ex *Example) registerTargetHTTP() (err error) {
 					Value: `1`,
 				},
 			},
-			Run:            ex.runExampleGet,
 			AllowAttack:    true,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
@@ -277,7 +276,6 @@ func (ex *Example) registerTargetHTTP() (err error) {
 					Value: `1`,
 				},
 			},
-			Run:            ex.runExampleGet,
 			AllowAttack:    true,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
@@ -308,7 +306,6 @@ func (ex *Example) registerTargetHTTP() (err error) {
 					Value: `a string`,
 				},
 			},
-			Run:            ex.runExamplePostForm,
 			AllowAttack:    true,
 			RequestDumper:  requestDumperWithoutDate,
 			ResponseDumper: responseDumperWithoutDate,
@@ -556,104 +553,6 @@ func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte,
 	}
 
 	return resb, nil
-}
-
-func (ex *Example) runExampleGet(req *RunRequest) (res *RunResponse, err error) {
-	if req.Target.HTTPClient == nil {
-		var httpcOpts = &libhttp.ClientOptions{
-			ServerUrl:     req.Target.BaseURL,
-			AllowInsecure: true,
-		}
-		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
-	}
-
-	res = &RunResponse{}
-
-	var (
-		headers = req.HTTPTarget.Headers.ToHTTPHeader()
-		params  = req.HTTPTarget.Params.ToURLValues()
-
-		httpRequest *http.Request
-	)
-
-	httpRequest, err = req.Target.HTTPClient.GenerateHttpRequest(
-		req.HTTPTarget.Method,
-		req.HTTPTarget.Path,
-		req.HTTPTarget.RequestType,
-		headers,
-		params,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	err = res.SetHTTPRequest(req.HTTPTarget.RequestDumper, httpRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	var httpResponse *http.Response
-
-	httpResponse, _, err = req.Target.HTTPClient.Do(httpRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	err = res.SetHTTPResponse(req.HTTPTarget.ResponseDumper, httpResponse)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (ex *Example) runExamplePostForm(req *RunRequest) (res *RunResponse, err error) {
-	if req.Target.HTTPClient == nil {
-		var httpcOpts = &libhttp.ClientOptions{
-			ServerUrl:     req.Target.BaseURL,
-			AllowInsecure: true,
-		}
-		req.Target.HTTPClient = libhttp.NewClient(httpcOpts)
-	}
-
-	res = &RunResponse{}
-
-	var (
-		headers = req.HTTPTarget.Headers.ToHTTPHeader()
-		params  = req.HTTPTarget.Params.ToURLValues()
-
-		httpRequest *http.Request
-	)
-
-	httpRequest, err = req.Target.HTTPClient.GenerateHttpRequest(
-		req.HTTPTarget.Method,
-		req.HTTPTarget.Path,
-		req.HTTPTarget.RequestType,
-		headers,
-		params,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	err = res.SetHTTPRequest(req.HTTPTarget.RequestDumper, httpRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	var httpResponse *http.Response
-
-	httpResponse, _, err = req.Target.HTTPClient.Do(httpRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	err = res.SetHTTPResponse(req.HTTPTarget.ResponseDumper, httpResponse)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
 
 func (ex *Example) handleWSExampleGet(_ context.Context, req *websocket.Request) (res websocket.Response) {
