@@ -67,10 +67,11 @@ func New(env *Environment) (gorankusu *Gorankusu, err error) {
 	}
 
 	gorankusu = &Gorankusu{
-		Env:     env,
-		attackq: make(chan *RunRequest, 1),
-		cancelq: make(chan bool, 1),
-		errq:    make(chan error, 1),
+		Env:      env,
+		attackq:  make(chan *RunRequest, 1),
+		cancelq:  make(chan bool, 1),
+		errq:     make(chan error, 1),
+		navLinks: make([]*NavLink, 0, 1),
 	}
 
 	err = gorankusu.initHTTPServer(isDevelopment)

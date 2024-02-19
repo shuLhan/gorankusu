@@ -38,6 +38,9 @@ export class NavLinks {
   }
 
   generateNav() {
+    if (!this.navs) {
+      return;
+    }
     this.navs.forEach((nav: NavLinkInterface) => {
       const el = document.createElement("div");
       el.classList.add(CLASS_NAV_LINK);
