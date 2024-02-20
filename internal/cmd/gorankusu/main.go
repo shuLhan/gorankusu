@@ -40,9 +40,13 @@ func main() {
 		mlog.Fatalf(`%s`, err)
 	}
 
-	var ex *gorankusu.Example
+	var (
+		listenAddress = `127.0.0.1:18217`
 
-	ex, err = gorankusu.NewExample()
+		ex *gorankusu.Example
+	)
+
+	ex, err = gorankusu.NewExample(listenAddress)
 	if err != nil {
 		mlog.Fatalf(`%s`, err)
 	}

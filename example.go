@@ -60,10 +60,11 @@ type Example struct {
 }
 
 // NewExample create, initialize, and setup an example of Gorankusu.
-func NewExample() (ex *Example, err error) {
+func NewExample(listenAddress string) (ex *Example, err error) {
 	var logp = `NewExample`
 
 	var env = &Environment{
+		ListenAddress: listenAddress,
 		ResultsDir:    `testdata/example/`,
 		ResultsSuffix: `example`,
 	}
