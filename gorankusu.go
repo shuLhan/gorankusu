@@ -19,10 +19,6 @@ import (
 // Version of gorankusu module.
 const Version = `0.5.0`
 
-// EnvDevelopment setting this environment variable will enable gorankusu
-// development mode.
-const EnvDevelopment = "GORANKUSU_DEV"
-
 // Gorankusu is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
 type Gorankusu struct {
@@ -39,10 +35,7 @@ type Gorankusu struct {
 
 // New create and initialize new Gorankusu service.
 func New(env *Environment) (gorankusu *Gorankusu, err error) {
-	var (
-		logp          = "gorankusu.New"
-		isDevelopment = len(os.Getenv(EnvDevelopment)) > 0
-	)
+	var logp = `New`
 
 	err = env.init()
 	if err != nil {
@@ -57,7 +50,7 @@ func New(env *Environment) (gorankusu *Gorankusu, err error) {
 		navLinks: make([]*NavLink, 0, 1),
 	}
 
-	err = gorankusu.initHTTPServer(isDevelopment)
+	err = gorankusu.initHTTPServer(env.IsDevelopment)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", logp, err)
 	}

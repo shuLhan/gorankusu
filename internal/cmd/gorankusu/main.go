@@ -35,18 +35,15 @@ func main() {
 		return
 	}
 
-	var err = os.Setenv(gorankusu.EnvDevelopment, `1`)
-	if err != nil {
-		mlog.Fatalf(`%s`, err)
-	}
-
 	var (
 		listenAddress = `127.0.0.1:18217`
+		isDev         = true
 
-		ex *gorankusu.Example
+		ex  *gorankusu.Example
+		err error
 	)
 
-	ex, err = gorankusu.NewExample(listenAddress)
+	ex, err = gorankusu.NewExample(listenAddress, isDev)
 	if err != nil {
 		mlog.Fatalf(`%s`, err)
 	}

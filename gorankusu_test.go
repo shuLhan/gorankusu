@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	// Mock crypto [rand.Reader] for predictable HTTP boundary.
 	rand.Reader = mock.NewRandReader([]byte(`gorankusu`))
 
-	exGorankusu, err = NewExample(``)
+	exGorankusu, err = NewExample(``, false)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -58,6 +58,9 @@ type Environment struct {
 	// zero.
 	MaxAttackDuration time.Duration `ini:"gorankusu::max_attack_duration"`
 
+	// IsDevelopment if true run gorankusu in testing mode.
+	IsDevelopment bool
+
 	mtx sync.Mutex
 }
 
