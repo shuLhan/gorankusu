@@ -25,6 +25,11 @@ const (
 	pathAPITargets            = `/_gorankusu/api/targets`
 )
 
+// List of HTTP parameters.
+const (
+	paramNameName = "name"
+)
+
 // List of HTTP APIs provided by Gorankusu HTTP server.
 var (
 	apiEnvironmentGet = &libhttp.Endpoint{

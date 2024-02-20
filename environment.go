@@ -10,6 +10,18 @@ import (
 	"time"
 )
 
+// DefaultListenAddress define default gorankusu server address.
+const DefaultListenAddress = `127.0.0.1:8217`
+
+// DefaultMaxAttackDuration define maximum duration attack can run on
+// all Target.
+// This is default value for [Environment.MaxAttackDuration].
+const DefaultMaxAttackDuration = 30 * time.Second
+
+// DefaultMaxAttackRate define maximum rate an attack can run.
+// This is default value for [Environment.MaxAttackRate].
+const DefaultMaxAttackRate = 3000
+
 // Environment contains global configuration for load testing.
 type Environment struct {
 	// AttackRunning will be set to non-nil if there is a load

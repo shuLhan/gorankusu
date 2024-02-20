@@ -9,6 +9,19 @@ import (
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 
+// DefaultAttackDuration define default attack duration per Target.
+// This is default value for [AttackOptions.Duration].
+const DefaultAttackDuration = 10 * time.Second
+
+// DefaultAttackRatePerSecond define default attack rate per second per
+// Target.
+// This is default value for [AttackOptions.RatePerSecond].
+const DefaultAttackRatePerSecond = 500
+
+// DefaultAttackTimeout define default timeout for each attack request.
+// This is default value for [AttackOptions.Timeout].
+const DefaultAttackTimeout = 30 * time.Second
+
 // AttackOptions define the options for attacking HTTP endpoint.
 type AttackOptions struct {
 	// Duration define the duration for each attack to be executed,

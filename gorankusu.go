@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
@@ -20,25 +19,9 @@ import (
 // Version of gorankusu module.
 const Version = `0.5.0`
 
-// List of default values.
-const (
-	DefaultAttackDuration      = 10 * time.Second
-	DefaultAttackRatePerSecond = 500
-	DefaultAttackTimeout       = 30 * time.Second
-	DefaultMaxAttackDuration   = 30 * time.Second
-	DefaultMaxAttackRate       = 3000
-
-	DefaultListenAddress = `127.0.0.1:8217`
-)
-
 // EnvDevelopment setting this environment variable will enable gorankusu
 // development mode.
 const EnvDevelopment = "GORANKUSU_DEV"
-
-// List of HTTP parameters.
-const (
-	paramNameName = "name"
-)
 
 // Gorankusu is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
