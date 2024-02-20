@@ -226,6 +226,26 @@ function saveTargetOptTimeout(target: TargetInterface) {
   window.localStorage.setItem(storageKey, "" + target.Opts.Timeout);
 }
 
+// loadTargetHeader get target header from local storage or return the
+// original value.
+export function loadTargetHeader(target: TargetInterface, key: string): string {
+  const storageKey = `${target.ID}.header.${key}`;
+  const val = window.localStorage.getItem(storageKey);
+  if (val) {
+    return val;
+  }
+  const tvar = target.Headers[key];
+  if (tvar) {
+    return tvar.value;
+  }
+  return "";
+}
+
+function saveTargetHeader(target: TargetInterface, key: string, value: string) {
+  const storageKey = `${target.ID}.header.${key}`;
+  window.localStorage.setItem(storageKey, value);
+}
+
 //
 // loadTargetVar get target variable from local storage or return the original
 // value.
@@ -322,6 +342,9 @@ export function save(
   saveTargetOptRatePerSecond(target);
   saveTargetOptTimeout(target);
 
+  for (const [k, fi] of Object.entries(target.Headers)) {
+    saveTargetHeader(target, k, fi.value);
+  }
   for (const [k, fi] of Object.entries(target.Vars)) {
     saveTargetVar(target, k, fi.value);
   }

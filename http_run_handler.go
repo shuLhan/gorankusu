@@ -41,10 +41,22 @@ func DefaultHTTPRun() HTTPRunHandler {
 		}
 
 		var (
-			headers = rr.HTTPTarget.Headers.ToHTTPHeader()
-
-			httpRequest *http.Request
+			headers = http.Header{}
+			key     string
+			fi      FormInput
 		)
+		for key, fi = range rr.Target.Headers {
+			if len(fi.Value) != 0 {
+				headers.Set(key, fi.Value)
+			}
+		}
+		for key, fi = range rr.HTTPTarget.Headers {
+			if len(fi.Value) != 0 {
+				headers.Set(key, fi.Value)
+			}
+		}
+
+		var httpRequest *http.Request
 
 		httpRequest, err = httpc.GenerateHttpRequest(
 			rr.HTTPTarget.Method,

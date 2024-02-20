@@ -52,7 +52,9 @@ func generateRunRequest(
 
 	outrr.HTTPTarget.clone(origHTTPTarget)
 
+	outrr.Target.Headers = req.Target.Headers
 	outrr.Target.Vars = req.Target.Vars
+
 	outrr.HTTPTarget.Headers = req.HTTPTarget.Headers
 	outrr.HTTPTarget.Params = req.HTTPTarget.Params
 	outrr.HTTPTarget.paramsToPath()
@@ -88,6 +90,7 @@ func generateWebSocketTarget(
 		Target:          *origTarget,
 		WebSocketTarget: *origWebSocketTarget,
 	}
+	outrr.Target.Headers = req.Target.Headers
 	outrr.Target.Vars = req.Target.Vars
 	outrr.WebSocketTarget.Headers = req.WebSocketTarget.Headers
 	outrr.WebSocketTarget.Params = req.WebSocketTarget.Params

@@ -14,6 +14,12 @@ type Target struct {
 	// HTTPClient that can be used for running HTTPTarget.
 	HTTPClient *libhttp.Client `json:"-"`
 
+	// Headers define global headers that will send on all HTTPTargets
+	// or WebSocketTargets.
+	// The same header can also be defined on HTTPTarget that override
+	// the value in here.
+	Headers KeyFormInput
+
 	Vars KeyFormInput
 
 	ID   string

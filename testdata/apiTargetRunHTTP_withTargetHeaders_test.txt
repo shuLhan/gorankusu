@@ -1,0 +1,145 @@
+Test data for running HTTP target with global headers.
+
+>>> global:request_body
+{
+  "Target": {
+    "id": "example_http",
+    "headers": {
+      "Authorization": {
+        "kind": "string",
+        "value": "global-auth-value"
+      }
+    }
+  },
+  "HTTPTarget": {
+    "id": "http_get",
+    "Method": 0,
+    "RequestType": 1,
+    "Path": "/example",
+    "Params": {
+      "Param1": {
+        "kind": "string",
+        "value": "value of param1"
+      }
+    }
+  }
+}
+
+<<< global:RunResponse.DumpRequest
+GET /example?Param1=value+of+param1 HTTP/1.1
+Host: 127.0.0.1:8217
+User-Agent: libhttp/0.53.0
+Authorization: global-auth-value
+Accept-Encoding: gzip
+
+
+
+<<< global:RunResponse.DumpResponse
+HTTP/1.1 200 OK
+Content-Length: 275
+Content-Type: application/json
+
+{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["global-auth-value"],"User-Agent":["libhttp/0.53.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
+
+<<< global:RunResponse.ResponseBody
+{
+  "data": {
+    "Method": "GET",
+    "URL": "/example?Param1=value+of+param1",
+    "Headers": {
+      "Accept-Encoding": [
+        "gzip"
+      ],
+      "Authorization": [
+        "global-auth-value"
+      ],
+      "User-Agent": [
+        "libhttp/0.53.0"
+      ]
+    },
+    "Form": {
+      "Param1": [
+        "value of param1"
+      ]
+    },
+    "MultipartForm": null,
+    "Body": ""
+  },
+  "message": "/example",
+  "code": 200
+}
+
+>>> override:request_body
+{
+  "Target": {
+    "id": "example_http",
+    "headers": {
+      "Authorization": {
+        "kind": "string",
+        "value": "global-auth-value"
+      }
+    }
+  },
+  "HTTPTarget": {
+    "id": "http_get",
+    "Method": 0,
+    "RequestType": 1,
+    "Path": "/example",
+    "Headers": {
+      "Authorization": {
+        "kind": "string",
+        "value": "local-auth-value"
+      }
+    },
+    "Params": {
+      "Param1": {
+        "kind": "string",
+        "value": "value of param1"
+      }
+    }
+  }
+}
+
+<<< override:RunResponse.DumpRequest
+GET /example?Param1=value+of+param1 HTTP/1.1
+Host: 127.0.0.1:8217
+User-Agent: libhttp/0.53.0
+Authorization: local-auth-value
+Accept-Encoding: gzip
+
+
+
+<<< override:RunResponse.DumpResponse
+HTTP/1.1 200 OK
+Content-Length: 274
+Content-Type: application/json
+
+{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["local-auth-value"],"User-Agent":["libhttp/0.53.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
+
+<<< override:RunResponse.ResponseBody
+{
+  "data": {
+    "Method": "GET",
+    "URL": "/example?Param1=value+of+param1",
+    "Headers": {
+      "Accept-Encoding": [
+        "gzip"
+      ],
+      "Authorization": [
+        "local-auth-value"
+      ],
+      "User-Agent": [
+        "libhttp/0.53.0"
+      ]
+    },
+    "Form": {
+      "Param1": [
+        "value of param1"
+      ]
+    },
+    "MultipartForm": null,
+    "Body": ""
+  },
+  "message": "/example",
+  "code": 200
+}

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import { WuiInputNumber } from "./wui/input/number.js";
 import { WuiInputString } from "./wui/input/string.js";
-import { generateFormInput, loadTargetOptDuration, loadTargetOptRatePerSecond, loadTargetOptTimeout, loadTargetVar, } from "./functions.js";
+import { generateFormInput, loadTargetOptDuration, loadTargetOptRatePerSecond, loadTargetOptTimeout, loadTargetHeader, loadTargetVar, } from "./functions.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, CLASS_NAV_TARGET, } from "./interface.js";
 import { HTTPTarget } from "./http_target.js";
 import { WebSocketTarget } from "./ws_target.js";
@@ -55,6 +55,7 @@ export class Target {
     generateContent(gorankusu) {
         this.generateContentBaseURL();
         this.generateContentAttackOptions();
+        this.generateContentHeaders();
         this.generateContentVars();
         this.generateHTTPTargets(gorankusu);
         this.generateWebSocketTargets(gorankusu);
@@ -131,6 +132,20 @@ export class Target {
         wrapper.appendChild(comInputDuration.el);
         wrapper.appendChild(comInputRate.el);
         wrapper.appendChild(comInputTimeout.el);
+        this.elContent.appendChild(wrapper);
+    }
+    generateContentHeaders() {
+        if (!this.opts.Headers) {
+            return;
+        }
+        const wrapper = document.createElement("fieldset");
+        const legend = document.createElement("legend");
+        legend.innerText = "Headers";
+        wrapper.appendChild(legend);
+        for (const [key, fi] of Object.entries(this.opts.Headers)) {
+            fi.value = loadTargetHeader(this.opts, key);
+            generateFormInput(wrapper, fi);
+        }
         this.elContent.appendChild(wrapper);
     }
     generateContentVars() {

@@ -210,6 +210,8 @@ func (ex *Example) registerWebSocketEndpoints() (err error) {
 }
 
 func (ex *Example) registerTargetHTTP() (err error) {
+	const headerAuthorization = `Authorization`
+
 	var targetHTTP = &Target{
 		ID:      `example_http`,
 		Name:    `Example HTTP`,
@@ -218,6 +220,12 @@ func (ex *Example) registerTargetHTTP() (err error) {
 		Opts: AttackOptions{
 			Duration:      10 * time.Second,
 			RatePerSecond: 1,
+		},
+		Headers: KeyFormInput{
+			headerAuthorization: FormInput{
+				Label: `Authorization`,
+				Hint:  `Global authorization header.`,
+			},
 		},
 		Vars: KeyFormInput{
 			`A`: FormInput{
@@ -235,6 +243,10 @@ func (ex *Example) registerTargetHTTP() (err error) {
 			Path:        pathExample,
 			RequestType: libhttp.RequestTypeQuery,
 			Headers: KeyFormInput{
+				headerAuthorization: FormInput{
+					Label: `Authorization`,
+					Hint:  `Global authorization header.`,
+				},
 				`X-Get`: FormInput{
 					Label: `X-Get`,
 					Hint:  `Custom HTTP header to be send.`,

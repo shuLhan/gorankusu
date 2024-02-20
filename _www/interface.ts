@@ -112,6 +112,7 @@ export interface TargetInterface {
   Hint?: string;
   BaseURL: string;
   Opts: AttackOptionsInterface;
+  Headers: KeyFormInput;
   Vars: KeyFormInput;
   HTTPTargets: HTTPTargetInterface[];
   WebSocketTargets: WebSocketTargetInterface[];

@@ -295,6 +295,7 @@ export class Gorankusu {
       Target: {
         ID: target.ID,
         Opts: target.Opts,
+        Headers: target.Headers,
         Vars: target.Vars,
         Name: target.Name,
         BaseURL: target.BaseURL,
@@ -396,6 +397,7 @@ export class Gorankusu {
       Target: {
         ID: target.ID,
         Opts: target.Opts,
+        Headers: target.Headers,
         Vars: target.Vars,
         Name: "",
         BaseURL: "",
@@ -441,6 +443,7 @@ export class Gorankusu {
       Target: {
         ID: target.ID,
         Opts: target.Opts,
+        Headers: target.Headers,
         Vars: target.Vars,
         Name: "",
         BaseURL: "",

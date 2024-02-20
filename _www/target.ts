@@ -9,6 +9,7 @@ import {
   loadTargetOptDuration,
   loadTargetOptRatePerSecond,
   loadTargetOptTimeout,
+  loadTargetHeader,
   loadTargetVar,
 } from "./functions.js";
 import {
@@ -90,6 +91,7 @@ export class Target {
   private generateContent(gorankusu: GorankusuInterface) {
     this.generateContentBaseURL();
     this.generateContentAttackOptions();
+    this.generateContentHeaders();
     this.generateContentVars();
     this.generateHTTPTargets(gorankusu);
     this.generateWebSocketTargets(gorankusu);
@@ -176,6 +178,25 @@ export class Target {
     wrapper.appendChild(comInputDuration.el);
     wrapper.appendChild(comInputRate.el);
     wrapper.appendChild(comInputTimeout.el);
+    this.elContent.appendChild(wrapper);
+  }
+
+  private generateContentHeaders() {
+    if (!this.opts.Headers) {
+      return;
+    }
+
+    const wrapper = document.createElement("fieldset");
+
+    const legend = document.createElement("legend");
+    legend.innerText = "Headers";
+    wrapper.appendChild(legend);
+
+    for (const [key, fi] of Object.entries(this.opts.Headers)) {
+      fi.value = loadTargetHeader(this.opts, key);
+      generateFormInput(wrapper, fi);
+    }
+
     this.elContent.appendChild(wrapper);
   }
 

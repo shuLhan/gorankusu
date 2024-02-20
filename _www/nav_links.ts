@@ -70,6 +70,7 @@ export class NavLinks {
         Name: "",
         BaseURL: "",
         Opts: {} as AttackOptionsInterface,
+        Headers: {} as KeyFormInput,
         Vars: {} as KeyFormInput,
         HTTPTargets: [],
         WebSocketTargets: [],

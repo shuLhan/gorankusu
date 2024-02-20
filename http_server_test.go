@@ -85,7 +85,6 @@ func TestGorankusuAPITargetRunHTTP_withRawBody_JSON(t *testing.T) {
 		tag     string
 		exp     string
 	)
-
 	for _, c = range listCase {
 		var reqparams = httpRequestParams{
 			method: apiTargetRunHTTP.Method.String(),
@@ -102,6 +101,62 @@ func TestGorankusuAPITargetRunHTTP_withRawBody_JSON(t *testing.T) {
 		tag = c.tag + `:RunResponse.DumpResponse`
 		exp = string(tdata.Output[tag])
 		test.Assert(t, tag, exp, string(runResp.DumpResponse))
+	}
+}
+
+func TestGorankusuAPITargetRunHTTP_withTargetHeaders(t *testing.T) {
+	type testCase struct {
+		tag string
+	}
+
+	var (
+		tdata *test.Data
+		err   error
+	)
+	tdata, err = test.LoadData(`testdata/apiTargetRunHTTP_withTargetHeaders_test.txt`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var listCase = []testCase{{
+		tag: `global`,
+	}, {
+		tag: `override`,
+	}}
+
+	var (
+		c       testCase
+		runResp RunResponse
+		buf     bytes.Buffer
+		tag     string
+		exp     string
+	)
+	for _, c = range listCase {
+		var reqparams = httpRequestParams{
+			method: apiTargetRunHTTP.Method.String(),
+			path:   apiTargetRunHTTP.Path,
+			body:   tdata.Input[c.tag+`:request_body`],
+		}
+
+		_, runResp = dummyGorankusuServe(t, reqparams)
+
+		tag = c.tag + `:RunResponse.DumpRequest`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(runResp.DumpRequest))
+
+		tag = c.tag + `:RunResponse.DumpResponse`
+		exp = string(tdata.Output[tag])
+		test.Assert(t, tag, exp, string(runResp.DumpResponse))
+
+		tag = c.tag + `:RunResponse.ResponseBody`
+		exp = string(tdata.Output[tag])
+
+		buf.Reset()
+		err = json.Indent(&buf, runResp.ResponseBody, ``, `  `)
+		if err != nil {
+			t.Fatal(err)
+		}
+		test.Assert(t, tag, exp, buf.String())
 	}
 }
 
