@@ -9,7 +9,7 @@ import (
 	"io"
 	"net/http"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 // HTTPRunHandler define the function type that will be called when client
@@ -24,7 +24,7 @@ func DefaultHTTPRun() HTTPRunHandler {
 		var (
 			logp      = `DefaultHTTPRun`
 			httpcOpts = &libhttp.ClientOptions{
-				ServerUrl:     rr.Target.BaseURL,
+				ServerURL:     rr.Target.BaseURL,
 				AllowInsecure: true,
 			}
 			httpc  = libhttp.NewClient(httpcOpts)
@@ -58,7 +58,7 @@ func DefaultHTTPRun() HTTPRunHandler {
 
 		var httpRequest *http.Request
 
-		httpRequest, err = httpc.GenerateHttpRequest(
+		httpRequest, err = httpc.GenerateHTTPRequest(
 			rr.HTTPTarget.Method,
 			rr.HTTPTarget.Path,
 			rr.HTTPTarget.RequestType,

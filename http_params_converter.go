@@ -3,7 +3,7 @@
 
 package gorankusu
 
-import libhttp "github.com/shuLhan/share/lib/http"
+import libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 
 // HTTPParamsConverter is a handler that will be called inside the Run handler
 // to convert the Params values to type that will be send as request.

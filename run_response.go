@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 // RunResponse contains the raw request and response when running HTTP or

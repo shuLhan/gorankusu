@@ -12,9 +12,9 @@ import (
 	"strings"
 	"sync"
 
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/mlog"
-	libpath "github.com/shuLhan/share/lib/path"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	libpath "git.sr.ht/~shulhan/pakakeh.go/lib/path"
 )
 
 // HTTPPreAttackHandler define the function type that will be called before

@@ -11,8 +11,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/test"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test"
 )
 
 type httpRequestParams struct {

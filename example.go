@@ -14,10 +14,10 @@ import (
 	"sync"
 	"time"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/mlog"
-	"github.com/shuLhan/share/lib/websocket"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/websocket"
 )
 
 const (
@@ -483,11 +483,11 @@ func (ex *Example) registerNavLinks() (err error) {
 
 func (ex *Example) pathExampleGet(epr *libhttp.EndpointRequest) ([]byte, error) {
 	var data = &requestResponse{
-		Method:        epr.HttpRequest.Method,
-		URL:           epr.HttpRequest.URL.String(),
-		Headers:       epr.HttpRequest.Header,
-		Form:          epr.HttpRequest.Form,
-		MultipartForm: epr.HttpRequest.MultipartForm,
+		Method:        epr.HTTPRequest.Method,
+		URL:           epr.HTTPRequest.URL.String(),
+		Headers:       epr.HTTPRequest.Header,
+		Form:          epr.HTTPRequest.Form,
+		MultipartForm: epr.HTTPRequest.MultipartForm,
 		Body:          string(epr.RequestBody),
 	}
 
@@ -505,16 +505,16 @@ func (ex *Example) pathExampleErrorGet(_ *libhttp.EndpointRequest) ([]byte, erro
 
 func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, err error) {
 	var data = &requestResponse{
-		Method:        epr.HttpRequest.Method,
-		URL:           epr.HttpRequest.URL.String(),
-		Headers:       epr.HttpRequest.Header,
-		Form:          epr.HttpRequest.Form,
-		MultipartForm: epr.HttpRequest.MultipartForm,
+		Method:        epr.HTTPRequest.Method,
+		URL:           epr.HTTPRequest.URL.String(),
+		Headers:       epr.HTTPRequest.Header,
+		Form:          epr.HTTPRequest.Form,
+		MultipartForm: epr.HTTPRequest.MultipartForm,
 		Body:          string(epr.RequestBody),
 	}
 
 	var (
-		hdrXResponseCode = epr.HttpRequest.Header.Get(headerNameXResponseCode)
+		hdrXResponseCode = epr.HTTPRequest.Header.Get(headerNameXResponseCode)
 		expRespCode      int64
 	)
 	expRespCode, err = strconv.ParseInt(hdrXResponseCode, 10, 64)
@@ -528,8 +528,8 @@ func (ex *Example) pathExamplePost(epr *libhttp.EndpointRequest) (resb []byte, e
 	res.Message = pathExample
 	res.Data = data
 
-	epr.HttpWriter.Header().Set(libhttp.HeaderContentType, epr.Endpoint.ResponseType.String())
-	epr.HttpWriter.WriteHeader(res.Code)
+	epr.HTTPWriter.Header().Set(libhttp.HeaderContentType, epr.Endpoint.ResponseType.String())
+	epr.HTTPWriter.WriteHeader(res.Code)
 
 	return json.Marshal(&res)
 }
@@ -559,7 +559,7 @@ func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte,
 	var res = libhttp.EndpointResponse{}
 
 	res.Code = http.StatusOK
-	res.Data = epr.HttpRequest.MultipartForm.Value
+	res.Data = epr.HTTPRequest.MultipartForm.Value
 
 	resb, err = json.MarshalIndent(res, ``, `  `)
 	if err != nil {

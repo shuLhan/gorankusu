@@ -6,7 +6,7 @@ package gorankusu
 import (
 	"fmt"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 // Target contains group of HTTPTarget that can be tested by Gorankusu.

@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/shuLhan/share/lib/memfs"
-	"github.com/shuLhan/share/lib/mlog"
-	"github.com/shuLhan/share/lib/os/exec"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/os/exec"
 
 	"git.sr.ht/~shulhan/ciigo"
 	"git.sr.ht/~shulhan/gorankusu"

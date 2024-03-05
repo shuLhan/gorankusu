@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	libhttp "github.com/shuLhan/share/lib/http"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 )
 

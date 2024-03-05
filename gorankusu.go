@@ -11,9 +11,9 @@ import (
 
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/mlog"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
 )
 
 // Version of gorankusu module.

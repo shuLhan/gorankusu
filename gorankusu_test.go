@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	libnet "github.com/shuLhan/share/lib/net"
-	"github.com/shuLhan/share/lib/test/mock"
+	libnet "git.sr.ht/~shulhan/pakakeh.go/lib/net"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/test/mock"
 )
 
 // exGorankusu the Gorankusu instance that contains [Target] to be

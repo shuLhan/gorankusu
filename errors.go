@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 
-	liberrors "github.com/shuLhan/share/lib/errors"
-	libhttp "github.com/shuLhan/share/lib/http"
+	liberrors "git.sr.ht/~shulhan/pakakeh.go/lib/errors"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 )
 
 func errAttackConflict(rr *RunRequest) error {

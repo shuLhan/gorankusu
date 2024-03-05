@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"net/http"
 
-	libhttp "github.com/shuLhan/share/lib/http"
-	"github.com/shuLhan/share/lib/memfs"
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 )
 
 // List of HTTP APIs.
@@ -272,7 +272,7 @@ func (gorankusu *Gorankusu) apiAttackHTTPCancel(_ *libhttp.EndpointRequest) (res
 }
 
 func (gorankusu *Gorankusu) apiAttackResultDelete(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	name := epr.HttpRequest.Form.Get(paramNameName)
+	name := epr.HTTPRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
 	}
@@ -293,7 +293,7 @@ func (gorankusu *Gorankusu) apiAttackResultDelete(epr *libhttp.EndpointRequest) 
 }
 
 func (gorankusu *Gorankusu) apiAttackResultGet(epr *libhttp.EndpointRequest) (resbody []byte, err error) {
-	name := epr.HttpRequest.Form.Get(paramNameName)
+	name := epr.HTTPRequest.Form.Get(paramNameName)
 	if len(name) == 0 {
 		return nil, errInvalidParameter(paramNameName, name)
 	}

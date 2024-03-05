@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/shuLhan/share/lib/math/big"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/math/big"
 )
 
 // List of additional parameters to be generated and send if the [FormInput]
