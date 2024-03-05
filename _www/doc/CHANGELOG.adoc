@@ -3,8 +3,94 @@
 :sectanchors:
 :sectlinks:
 
+[#v0_6_0]
+== gorankusu v0.6.0 (2024-03-05)
+
+[#v0_6_0__breaking_changes]
+=== Breaking changes
+
+target: changes Opts to non-pointer::
++
+--
+Previously, we use pointer to indicated that the Target can be attacked
+or not.
+Since HTTPTarget now have AllowAttack, this options can be changes to
+non-pointer.
+--
+
+
+all: change the signature of default request/response dumper::
++
+--
+Instead of function that use the signature of HTTPRequestDumper/
+HTTPResponseDumper; change it to function that _return_ HTTPRequestDumper/
+HTTPResponseDumper.
+In this way, the documentation can show the clear relation between
+function and its type.
+--
+
+
+[#v0_6_0__new_features]
+=== New features
+
+all: add global HTTP headers for Target::
++
+--
+The Headers field on Target define the global headers that will be send
+along with all HTTPTarget or WebSocketTarget.
+The same header can also be defined on HTTPTarget that override the
+value of Target.
+--
+
+
+all: add default HTTPRunHandler::
++
+--
+Previously, the default HTTPRunHandler is hidden, called dynamically
+based on Run is nil or not.
+This changes make it exported as function that return HTTPRunHandler
+to show how define and create a custom HTTPRunHandler.
+--
+
+
+all: add default HTTPParamsConverter for [HTTPTarget.ParamsConverter]::
++
+--
+The DefaultParamsConverter define default function to convert
+[HTTPTarget.Params] to its equivalent parameters in HTTP, either as query
+in URL or as bytes in body.
+
+This changes introduce breaking changes in HTTPTarget where field
+ConvertParams renamed to ParamsConverter.
+--
+
+
+all: set default HTTPTarget Attack if its not set::
++
+--
+Previously, the function for Attack need to be coded manually.
+
+This changes introduce new function DefaultHTTPAttack that generate
+HTTPAttackHandler based on the HTTPTarget method, request type, and
+Params; if AllowAttack is true and Attack is nil.
+--
+
+
+[#v0_6_0__bug_fixes]
+=== Bug fixes
+
+all: fix null navigation links::
++
+--
+If the navLinks fields is empty, the HTTP API will return "null" and cause
+the rendering error.
+This changes fix this issue by allocating the slice navLinks with one
+capabilities to make JSON always return "[]" if its empty.
+--
+
+
 [#v0_5_0]
-== gorankusu v0.5.0 (2022-02-08)
+== gorankusu v0.5.0 (2024-02-08)
 
 This release rename the project from "trunks" to "gorankusu".
 
