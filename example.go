@@ -134,7 +134,7 @@ func (ex *Example) Stop() {
 
 // registerEndpoints register HTTP endpoints for testing.
 func (ex *Example) registerEndpoints() (err error) {
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -145,7 +145,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathExampleError,
 		RequestType:  libhttp.RequestTypeQuery,
@@ -156,7 +156,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExample,
 		RequestType:  libhttp.RequestTypeForm,
@@ -167,7 +167,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExampleNamePage,
 		RequestType:  libhttp.RequestTypeJSON,
@@ -178,7 +178,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExampleRawbodyJSON,
 		RequestType:  libhttp.RequestTypeJSON,
@@ -189,7 +189,7 @@ func (ex *Example) registerEndpoints() (err error) {
 		return err
 	}
 
-	err = ex.Gorankusu.Httpd.RegisterEndpoint(&libhttp.Endpoint{
+	err = ex.Gorankusu.Httpd.RegisterEndpoint(libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathExampleUpload,
 		RequestType:  libhttp.RequestTypeMultipartForm,

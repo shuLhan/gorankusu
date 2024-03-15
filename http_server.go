@@ -32,7 +32,7 @@ const (
 
 // List of HTTP APIs provided by Gorankusu HTTP server.
 var (
-	apiEnvironmentGet = &libhttp.Endpoint{
+	apiEnvironmentGet = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathAPIEnvironment,
 		RequestType:  libhttp.RequestTypeJSON,
@@ -52,40 +52,40 @@ var (
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiAttackResultDelete = &libhttp.Endpoint{
+	apiAttackResultDelete = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodDelete,
 		Path:         pathAPIAttackResult,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
-	apiAttackResultGet = &libhttp.Endpoint{
+	apiAttackResultGet = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathAPIAttackResult,
 		RequestType:  libhttp.RequestTypeQuery,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiNavLinks = &libhttp.Endpoint{
+	apiNavLinks = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathAPINavlinks,
 		RequestType:  libhttp.RequestTypeNone,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiTargetRunHTTP = &libhttp.Endpoint{
+	apiTargetRunHTTP = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathAPITargetRunHTTP,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
-	apiTargetRunWebSocket = &libhttp.Endpoint{
+	apiTargetRunWebSocket = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodPost,
 		Path:         pathAPITargetRunWebSocket,
 		RequestType:  libhttp.RequestTypeJSON,
 		ResponseType: libhttp.ResponseTypeJSON,
 	}
 
-	apiTargets = &libhttp.Endpoint{
+	apiTargets = libhttp.Endpoint{
 		Method:       libhttp.RequestMethodGet,
 		Path:         pathAPITargets,
 		RequestType:  libhttp.RequestTypeNone,
@@ -112,7 +112,7 @@ func (gorankusu *Gorankusu) initHTTPServer(isDevelopment bool) (err error) {
 		memfsWWW.Opts.TryDirect = isDevelopment
 	}
 
-	httpdOpts := &libhttp.ServerOptions{
+	var httpdOpts = libhttp.ServerOptions{
 		Memfs:   memfsWWW,
 		Address: gorankusu.Env.ListenAddress,
 	}
@@ -129,13 +129,13 @@ func (gorankusu *Gorankusu) initHTTPServer(isDevelopment bool) (err error) {
 	}
 
 	apiAttackHTTP.Call = gorankusu.apiAttackHTTP
-	err = gorankusu.Httpd.RegisterEndpoint(&apiAttackHTTP)
+	err = gorankusu.Httpd.RegisterEndpoint(apiAttackHTTP)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}
 
 	apiAttackHTTPCancel.Call = gorankusu.apiAttackHTTPCancel
-	err = gorankusu.Httpd.RegisterEndpoint(&apiAttackHTTPCancel)
+	err = gorankusu.Httpd.RegisterEndpoint(apiAttackHTTPCancel)
 	if err != nil {
 		return fmt.Errorf(`%s: %w`, logp, err)
 	}

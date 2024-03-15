@@ -23,7 +23,7 @@ func DefaultHTTPRun() HTTPRunHandler {
 	return func(rr *RunRequest) (res *RunResponse, err error) {
 		var (
 			logp      = `DefaultHTTPRun`
-			httpcOpts = &libhttp.ClientOptions{
+			httpcOpts = libhttp.ClientOptions{
 				ServerURL:     rr.Target.BaseURL,
 				AllowInsecure: true,
 			}
@@ -56,15 +56,18 @@ func DefaultHTTPRun() HTTPRunHandler {
 			}
 		}
 
-		var httpRequest *http.Request
-
-		httpRequest, err = httpc.GenerateHTTPRequest(
-			rr.HTTPTarget.Method,
-			rr.HTTPTarget.Path,
-			rr.HTTPTarget.RequestType,
-			headers,
-			params,
+		var (
+			clientReq = libhttp.ClientRequest{
+				Method: rr.HTTPTarget.Method,
+				Path:   rr.HTTPTarget.Path,
+				Type:   rr.HTTPTarget.RequestType,
+				Header: headers,
+				Params: params,
+			}
+			httpRequest *http.Request
 		)
+
+		httpRequest, err = httpc.GenerateHTTPRequest(clientReq)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
@@ -81,14 +84,14 @@ func DefaultHTTPRun() HTTPRunHandler {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
-		var httpResponse *http.Response
+		var clientRes *libhttp.ClientResponse
 
-		httpResponse, _, err = httpc.Do(httpRequest)
+		clientRes, err = httpc.Do(httpRequest)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
-		err = res.SetHTTPResponse(rr.HTTPTarget.ResponseDumper, httpResponse)
+		err = res.SetHTTPResponse(rr.HTTPTarget.ResponseDumper, clientRes.HTTPResponse)
 		if err != nil {
 			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
