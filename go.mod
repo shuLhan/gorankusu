@@ -3,11 +3,11 @@
 
 module git.sr.ht/~shulhan/gorankusu
 
-go 1.20
+go 1.21
 
 require (
-	git.sr.ht/~shulhan/ciigo v0.11.1-0.20240315064949-0a20cfd1fe3e
-	git.sr.ht/~shulhan/pakakeh.go v0.53.2-0.20240314175935-b9e12300d905
+	git.sr.ht/~shulhan/ciigo v0.11.1-0.20240315075820-8a9875b04ea3
+	git.sr.ht/~shulhan/pakakeh.go v0.53.2-0.20240315075343-713d51e4792f
 	github.com/tsenart/vegeta/v12 v12.11.1
 )
 

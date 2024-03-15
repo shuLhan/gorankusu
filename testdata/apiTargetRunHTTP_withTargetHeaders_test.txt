@@ -13,8 +13,8 @@ Test data for running HTTP target with global headers.
   },
   "HTTPTarget": {
     "id": "http_get",
-    "Method": 0,
-    "RequestType": 1,
+    "Method": "GET",
+    "RequestType": "query",
     "Path": "/example",
     "Params": {
       "Param1": {
@@ -82,8 +82,8 @@ Content-Type: application/json
   },
   "HTTPTarget": {
     "id": "http_get",
-    "Method": 0,
-    "RequestType": 1,
+    "Method": "GET",
+    "RequestType": "query",
     "Path": "/example",
     "Headers": {
       "Authorization": {

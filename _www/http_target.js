@@ -81,45 +81,45 @@ export class HTTPTarget {
             name: "",
             options: {
                 GET: {
-                    value: "0",
-                    selected: m === "0",
+                    value: "GET",
+                    selected: m === "GET",
                 },
                 CONNECT: {
-                    value: "1",
-                    selected: m === "1",
+                    value: "CONNECT",
+                    selected: m === "CONNECT",
                 },
                 DELETE: {
-                    value: "2",
-                    selected: m === "2",
+                    value: "DELETE",
+                    selected: m === "DELETE",
                 },
                 HEAD: {
-                    value: "3",
-                    selected: m === "3",
+                    value: "HEAD",
+                    selected: m === "HEAD",
                 },
                 OPTIONS: {
-                    value: "4",
-                    selected: m === "4",
+                    value: "OPTIONS",
+                    selected: m === "OPTIONS",
                 },
                 PATCH: {
-                    value: "5",
-                    selected: m === "5",
+                    value: "PATCH",
+                    selected: m === "PATCH",
                 },
                 POST: {
-                    value: "6",
-                    selected: m === "6",
+                    value: "POST",
+                    selected: m === "POST",
                 },
                 PUT: {
-                    value: "7",
-                    selected: m === "7",
+                    value: "PUT",
+                    selected: m === "PUT",
                 },
                 TRACE: {
-                    value: "8",
-                    selected: m === "8",
+                    value: "TRACE",
+                    selected: m === "TRACE",
                 },
             },
             is_disabled: !this.opts.IsCustomizable,
             onChangeHandler: (_, value) => {
-                this.opts.Method = parseInt(value);
+                this.opts.Method = value;
             },
         };
         const wuiRequestMethod = new WuiInputSelect(selectOpts);
@@ -143,31 +143,31 @@ export class HTTPTarget {
             name: "",
             options: {
                 "(none)": {
-                    value: "0",
-                    selected: ct === "0",
+                    value: "",
+                    selected: ct === "",
                 },
-                "(query)": {
-                    value: "1",
-                    selected: ct === "1",
+                query: {
+                    value: "query",
+                    selected: ct === "query",
                 },
                 "application/x-www-form-urlencoded": {
-                    value: "2",
-                    selected: ct === "2",
+                    value: "form-urlencoded",
+                    selected: ct === "form-urlencoded",
                 },
                 "multipart/form-data": {
-                    value: "3",
-                    selected: ct === "3",
+                    value: "form-data",
+                    selected: ct === "form-data",
                 },
                 "application/json": {
-                    value: "4",
-                    selected: ct === "4",
+                    value: "json",
+                    selected: ct === "json",
                 },
             },
             class_input: CLASS_INPUT,
             class_label: CLASS_INPUT_LABEL,
             is_disabled: !this.opts.IsCustomizable,
             onChangeHandler: (_, value) => {
-                this.opts.RequestType = parseInt(value);
+                this.opts.RequestType = value;
             },
         };
         const wuiRequestType = new WuiInputSelect(selectOpts);

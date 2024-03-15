@@ -61,14 +61,15 @@ type HTTPTarget struct {
 	Hint string // Description about what this HTTP target is doing.
 	Path string
 
+	Method      libhttp.RequestMethod
+	RequestType libhttp.RequestType
+
 	// RawBody contains raw request body that is being read and
 	// forwarded to target.
 	// It will be used only WithRawBody is true.
 	RawBody []byte
 
-	Results     []*AttackResult // Results contains list of load testing output.
-	RequestType libhttp.RequestType
-	Method      libhttp.RequestMethod
+	Results []*AttackResult // Results contains list of load testing output.
 
 	sync.Mutex `json:"-"` // Use this inside the Attack to lock resource.
 

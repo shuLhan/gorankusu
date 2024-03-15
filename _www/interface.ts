@@ -59,9 +59,9 @@ export interface HTTPTargetInterface {
   Name: string;
   Hint?: string;
   ID: string;
-  Method: number;
+  Method: string;
   Path: string;
-  RequestType: number;
+  RequestType: string;
   Headers: KeyFormInput;
   Params: KeyFormInput;
   RawBody: string;

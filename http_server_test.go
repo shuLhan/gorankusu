@@ -48,7 +48,7 @@ func TestGorankusuAPITargetRunHTTP_formInputFile(t *testing.T) {
 
 	for _, c = range listCase {
 		var reqparams = httpRequestParams{
-			method: apiTargetRunHTTP.Method.String(),
+			method: string(apiTargetRunHTTP.Method),
 			path:   apiTargetRunHTTP.Path,
 			body:   tdata.Input[c.tag+`:http_request_body`],
 		}
@@ -87,7 +87,7 @@ func TestGorankusuAPITargetRunHTTP_withRawBody_JSON(t *testing.T) {
 	)
 	for _, c = range listCase {
 		var reqparams = httpRequestParams{
-			method: apiTargetRunHTTP.Method.String(),
+			method: string(apiTargetRunHTTP.Method),
 			path:   apiTargetRunHTTP.Path,
 			body:   tdata.Input[c.tag+`:http_request_body`],
 		}
@@ -133,7 +133,7 @@ func TestGorankusuAPITargetRunHTTP_withTargetHeaders(t *testing.T) {
 	)
 	for _, c = range listCase {
 		var reqparams = httpRequestParams{
-			method: apiTargetRunHTTP.Method.String(),
+			method: string(apiTargetRunHTTP.Method),
 			path:   apiTargetRunHTTP.Path,
 			body:   tdata.Input[c.tag+`:request_body`],
 		}

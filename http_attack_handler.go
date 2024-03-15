@@ -27,7 +27,7 @@ func DefaultHTTPAttack() HTTPAttackHandler {
 		rr.HTTPTarget.paramsToPath()
 
 		var vegetaTarget = vegeta.Target{
-			Method: rr.HTTPTarget.Method.String(),
+			Method: string(rr.HTTPTarget.Method),
 			URL:    fmt.Sprintf(`%s%s`, rr.Target.BaseURL, rr.HTTPTarget.Path),
 			Header: rr.HTTPTarget.Headers.ToHTTPHeader(),
 		}

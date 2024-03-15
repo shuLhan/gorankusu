@@ -7,8 +7,8 @@ Test data for testing running HTTP with form kind is file (uploading file).
   },
   "HTTPTarget": {
     "id": "http_upload",
-    "Method": 6,
-    "RequestType": 3,
+    "Method": "POST",
+    "RequestType": "form-data",
     "Path": "/example/upload",
     "Params": {
       "file": {

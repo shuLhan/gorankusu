@@ -7,8 +7,8 @@ Test data for testing [HTTPTarget.WithRawBody].
   },
   "HTTPTarget": {
     "id": "http_rawbody_json",
-    "Method": 6,
-    "RequestType": 4,
+    "Method": "POST",
+    "RequestType": "json",
     "Path": "/example/rawbody/json",
     "RawBody": "eyJpZCI6MSwibmFtZSI6ImdvcmFua3VzdSJ9",
     "WithRawBody": true

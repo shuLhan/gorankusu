@@ -98,30 +98,6 @@ export function generateFormInput(parent: HTMLElement, fi: FormInput) {
   }
 }
 
-export function HTTPMethodToString(m: number): string {
-  switch (m) {
-    case 0:
-      return "GET";
-    case 1:
-      return "CONNECT";
-    case 2:
-      return "DELETE";
-    case 3:
-      return "HEAD";
-    case 4:
-      return "OPTIONS";
-    case 5:
-      return "PATCH";
-    case 6:
-      return "POST";
-    case 7:
-      return "PUT";
-    case 8:
-      return "TRACE";
-  }
-  return "???";
-}
-
 //
 // loadHTTPTargetHeader get HTTPTarget header from local storage by key.
 // If no header exist in storage return the one from HTTPTarget itself.
