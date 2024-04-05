@@ -3,6 +3,16 @@
 :sectanchors:
 :sectlinks:
 
+[#v0_6_1]
+== gorankusu v0.6.1 (2024-04-06)
+
+This release replace "share" module with "pakakeh.go".
+The "share" module repository has been moved to SourceHut with new name
+"pakakeh.go".
+For more information about the changes see "pakakeh.go" project page at
+https://sr.ht/~shulhan/pakakeh.go.
+
+
 [#v0_6_0]
 == gorankusu v0.6.0 (2024-03-05)
 
