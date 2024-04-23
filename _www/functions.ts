@@ -318,11 +318,15 @@ export function save(
   saveTargetOptRatePerSecond(target);
   saveTargetOptTimeout(target);
 
-  for (const [k, fi] of Object.entries(target.Headers)) {
-    saveTargetHeader(target, k, fi.value);
+  if (target.Headers) {
+    for (const [k, fi] of Object.entries(target.Headers)) {
+      saveTargetHeader(target, k, fi.value);
+    }
   }
-  for (const [k, fi] of Object.entries(target.Vars)) {
-    saveTargetVar(target, k, fi.value);
+  if (target.Vars) {
+    for (const [k, fi] of Object.entries(target.Vars)) {
+      saveTargetVar(target, k, fi.value);
+    }
   }
   if (httpTarget) {
     for (const [k, fi] of Object.entries(httpTarget.Headers)) {
