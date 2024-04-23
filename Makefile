@@ -8,6 +8,13 @@ COVER_HTML:=cover.html
 all: lint test
 	go run ./internal/cmd/gorankusu build
 
+.PHONY: init
+init:
+	git submodule update --init
+	go install golang.org/x/tools/go/analysis/passes/fieldalignment/cmd/fieldalignment
+	go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow
+	cd _www && yarn install
+
 .PHONY: lint
 lint: lint-www
 	-revive ./...
