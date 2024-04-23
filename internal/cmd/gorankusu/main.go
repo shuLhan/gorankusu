@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"strings"
@@ -30,7 +31,16 @@ func main() {
 
 	var subcmd = strings.ToLower(flag.Arg(0))
 
-	if subcmd == subCommandBuild {
+	switch subcmd {
+	case subCommandBuild:
+		var opts = &ciigo.ConvertOptions{
+			Root: `_www/doc`,
+		}
+		var err = ciigo.Convert(opts)
+		if err != nil {
+			log.Println(err)
+		}
+
 		workerBuild(true)
 		return
 	}
