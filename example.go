@@ -554,19 +554,7 @@ func (ex *Example) pathExampleRawbodyJSON(epr *libhttp.EndpointRequest) (resbody
 }
 
 func (ex *Example) pathExampleUpload(epr *libhttp.EndpointRequest) (resb []byte, err error) {
-	var logp = `pathExampleUpload`
-
-	var res = libhttp.EndpointResponse{}
-
-	res.Code = http.StatusOK
-	res.Data = epr.HTTPRequest.MultipartForm.Value
-
-	resb, err = json.MarshalIndent(res, ``, `  `)
-	if err != nil {
-		return nil, fmt.Errorf(`%s: %w`, logp, err)
-	}
-
-	return resb, nil
+	return epr.RequestBody, nil
 }
 
 func (ex *Example) handleWSExampleGet(_ context.Context, req *websocket.Request) (res websocket.Response) {

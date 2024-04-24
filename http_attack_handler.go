@@ -6,6 +6,7 @@ package gorankusu
 import (
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 
 	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	vegeta "github.com/tsenart/vegeta/v12/lib"
@@ -58,15 +59,17 @@ func DefaultHTTPAttack() HTTPAttackHandler {
 
 			case libhttp.RequestTypeMultipartForm:
 				var (
-					params map[string][]byte
+					params *multipart.Form
 					body   string
 				)
 
-				params = rr.HTTPTarget.Params.ToMultipartFormData()
-				contentType, body, err = libhttp.GenerateFormData(params)
+				params, err = rr.HTTPTarget.Params.ToMultipartFormData()
 				if err == nil {
-					vegetaTarget.Body = []byte(body)
-					vegetaTarget.Header.Set(libhttp.HeaderContentType, contentType)
+					contentType, body, err = libhttp.GenerateFormData(params)
+					if err == nil {
+						vegetaTarget.Body = []byte(body)
+						vegetaTarget.Header.Set(libhttp.HeaderContentType, contentType)
+					}
 				}
 			}
 		}

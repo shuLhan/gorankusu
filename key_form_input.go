@@ -4,11 +4,14 @@
 package gorankusu
 
 import (
+	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
+	libhttp "git.sr.ht/~shulhan/pakakeh.go/lib/http"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/math/big"
 )
 
@@ -69,38 +72,67 @@ func (kfi KeyFormInput) ToJSONObject() (data map[string]interface{}) {
 	return data
 }
 
-// ToMultipartFormData convert the KeyFormInput into map of string and raw
-// bytes.
-func (kfi KeyFormInput) ToMultipartFormData() (data map[string][]byte) {
-	data = make(map[string][]byte, len(kfi))
+// ToMultipartFormData convert the KeyFormInput into [*multipart.Form].
+func (kfi KeyFormInput) ToMultipartFormData() (data *multipart.Form, err error) {
+	var logp = `ToMultipartFormData`
+
+	data = &multipart.Form{
+		Value: map[string][]string{},
+		File:  map[string][]*multipart.FileHeader{},
+	}
 	if len(kfi) == 0 {
-		return data
+		return data, nil
 	}
-	for k, fi := range kfi {
-		if fi.Kind == FormInputKindFile {
-			var name string
 
-			if len(fi.Filename) != 0 {
-				name = fi.FormDataName(FormDataFilename)
-				data[name] = []byte(fi.Filename)
-			}
-			if len(fi.Filetype) != 0 {
-				name = fi.FormDataName(FormDataFiletype)
-				data[name] = []byte(fi.Filetype)
-			}
-			name = fi.FormDataName(FormDataFilesize)
-			data[name] = []byte(strconv.FormatInt(fi.Filesize, 10))
-
-			name = fi.FormDataName(FormDataFilemodms)
-			data[name] = []byte(strconv.FormatInt(fi.Filemodms, 10))
-
-			name = fi.FormDataName(FormDataFilecontent)
-			data[name] = []byte(fi.Value)
-		} else {
-			data[k] = []byte(fi.Value)
+	var (
+		k         string
+		fi        FormInput
+		listValue []string
+	)
+	for k, fi = range kfi {
+		if fi.Kind != FormInputKindFile {
+			listValue = data.Value[k]
+			listValue = append(listValue, fi.Value)
+			data.Value[k] = listValue
+			continue
 		}
+
+		// Process form with type File.
+
+		var (
+			filename  string
+			fieldname string
+		)
+
+		if len(fi.Filename) != 0 {
+			filename = fi.Filename
+		} else {
+			filename = k
+		}
+
+		if len(fi.Filetype) != 0 {
+			fieldname = fi.FormDataName(FormDataFiletype)
+			data.Value[fieldname] = []string{fi.Filetype}
+		}
+
+		fieldname = fi.FormDataName(FormDataFilesize)
+		data.Value[fieldname] = []string{strconv.FormatInt(fi.Filesize, 10)}
+
+		fieldname = fi.FormDataName(FormDataFilemodms)
+		data.Value[fieldname] = []string{strconv.FormatInt(fi.Filemodms, 10)}
+
+		var fh *multipart.FileHeader
+
+		fh, err = libhttp.CreateMultipartFileHeader(filename, []byte(fi.Value))
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
+		}
+
+		var listFH = data.File[k]
+		listFH = append(listFH, fh)
+		data.File[k] = listFH
 	}
-	return data
+	return data, nil
 }
 
 // ToURLValues convert the KeyFormInput to the standard url.Values.

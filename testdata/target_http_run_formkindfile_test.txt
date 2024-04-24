@@ -24,26 +24,24 @@ Test data for testing running HTTP with form kind is file (uploading file).
 
 <<< valid:RunResponse.DumpResponse
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 637
 Content-Type: application/json
 
-{
-  "data": {
-    "filecontent": [
-      "Q29udGVudCBvZiBmaWxlIHVwbG9hZA=="
-    ],
-    "filemodms": [
-      "0"
-    ],
-    "filesize": [
-      "22"
-    ],
-    "filetype": [
-      "text/plain"
-    ],
-    "name": [
-      "test.txt"
-    ]
-  },
-  "code": 200
-}
+--6f72616e6b7573756f72616e6b7573756f72616e6b7573756f72616e6b75
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: application/octet-stream
+
+Q29udGVudCBvZiBmaWxlIHVwbG9hZA==
+--6f72616e6b7573756f72616e6b7573756f72616e6b7573756f72616e6b75
+Content-Disposition: form-data; name="filemodms"
+
+0
+--6f72616e6b7573756f72616e6b7573756f72616e6b7573756f72616e6b75
+Content-Disposition: form-data; name="filesize"
+
+22
+--6f72616e6b7573756f72616e6b7573756f72616e6b7573756f72616e6b75
+Content-Disposition: form-data; name="filetype"
+
+text/plain
+--6f72616e6b7573756f72616e6b7573756f72616e6b7573756f72616e6b75--

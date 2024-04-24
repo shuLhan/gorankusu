@@ -2,8 +2,8 @@ git.sr.ht/~shulhan/asciidoctor-go v0.5.2 h1:tjG/NQJ1om2F70L7DwOvmr+n1kfgk9xhIBX+
 git.sr.ht/~shulhan/asciidoctor-go v0.5.2/go.mod h1:fHXUiw7IbOOMyoHHvnd351Jini/MNZgutiFTtsCQ+Yk=
 git.sr.ht/~shulhan/ciigo v0.12.0 h1:LSjFcA4nwJvPU2Xn/Mlz9520XSSvt6oyUtN1ARu0m6o=
 git.sr.ht/~shulhan/ciigo v0.12.0/go.mod h1:v5xCYhQK4JRJ7ZuW2J7lUknDLwzaNknZCw3jqaMDSYA=
-git.sr.ht/~shulhan/pakakeh.go v0.54.0 h1:pwTQiJSyE5xTaWNR0FnWsszJ+0Z5hB2ufNLXcy8z0y8=
-git.sr.ht/~shulhan/pakakeh.go v0.54.0/go.mod h1:ys7WNtXm03x0M59oqrqBjXnc+wRCX8JBXyE/W8+KVbw=
+git.sr.ht/~shulhan/pakakeh.go v0.54.1-0.20240424075702-072a5866613a h1:0UUJkeUzFGYdnoIpGi4n+ZGZG4MnQfg8YBZ1jQuhBDY=
+git.sr.ht/~shulhan/pakakeh.go v0.54.1-0.20240424075702-072a5866613a/go.mod h1:hJHTZtPS9bOKMNtLljEdJZKHj3eOAXe7fuHcfI6vceY=
 github.com/bmizerany/perks v0.0.0-20230307044200-03f9df79da1e h1:mWOqoK5jV13ChKf/aF3plwQ96laasTJgZi4f1aSOu+M=
 github.com/bmizerany/perks v0.0.0-20230307044200-03f9df79da1e/go.mod h1:ac9efd0D1fsDb3EJvhqgXRbFx7bs2wqZ10HQPeU8U/Q=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=

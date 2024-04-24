@@ -18,10 +18,10 @@ func DefaultParamsConverter() HTTPParamsConverter {
 		case libhttp.RequestTypeJSON:
 			params = target.Params.ToJSONObject()
 		case libhttp.RequestTypeMultipartForm:
-			params = target.Params.ToMultipartFormData()
+			params, err = target.Params.ToMultipartFormData()
 		default:
 			params = target.Params.ToURLValues()
 		}
-		return params, nil
+		return params, err
 	}
 }
