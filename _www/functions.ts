@@ -48,12 +48,12 @@ export function generateFormInput(parent: HTMLElement, fi: FormInput) {
         fi.value = "";
 
         reader = new FileReader();
-        reader.onload = (e) => {
-          if (e) {
-            fi.value = btoa(reader.result as string);
+        reader.onload = (ev) => {
+          if (ev && ev.target) {
+            fi.value = reader.result as string;
           }
         };
-        reader.readAsText(file);
+        reader.readAsBinaryString(file);
       };
       parent.appendChild(wuiInputFile.element());
       break;

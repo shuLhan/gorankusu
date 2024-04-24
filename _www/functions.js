@@ -29,12 +29,12 @@ export function generateFormInput(parent, fi) {
                 fi.filemodms = file.lastModified;
                 fi.value = "";
                 reader = new FileReader();
-                reader.onload = (e) => {
-                    if (e) {
-                        fi.value = btoa(reader.result);
+                reader.onload = (ev) => {
+                    if (ev && ev.target) {
+                        fi.value = reader.result;
                     }
                 };
-                reader.readAsText(file);
+                reader.readAsBinaryString(file);
             };
             parent.appendChild(wuiInputFile.element());
             break;
