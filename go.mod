@@ -7,7 +7,7 @@ go 1.21
 
 require (
 	git.sr.ht/~shulhan/ciigo v0.13.0
-	git.sr.ht/~shulhan/pakakeh.go v0.55.0
+	git.sr.ht/~shulhan/pakakeh.go v0.55.1-0.20240608161152-274ef1036f8a
 	github.com/tsenart/vegeta/v12 v12.11.1
 	golang.org/x/tools v0.22.0
 )

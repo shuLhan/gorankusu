@@ -231,7 +231,7 @@ func (ht *HTTPTarget) paramsToPath() {
 		}
 	}
 
-	ht.Path = rute.String()
+	ht.Path = rute.Path()
 }
 
 // refCopy copy original fields, methods, and handlers that cannot be
