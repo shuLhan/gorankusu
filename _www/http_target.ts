@@ -232,7 +232,7 @@ export class HTTPTarget {
   }
 
   private generateRequestParameters(parent: HTMLElement) {
-    if (!this.opts.Params || this.opts.WithRawBody) {
+    if (!this.opts.Params) {
       return;
     }
     if (Object.keys(this.opts.Params).length === 0) {
@@ -267,7 +267,7 @@ export class HTTPTarget {
     wrapper.appendChild(title);
 
     const elRawbody = document.createElement("textarea");
-    elRawbody.innerText = this.opts.RawBody;
+    elRawbody.innerText = atob(this.opts.RawBody);
     elRawbody.style.width = "100%";
     elRawbody.style.boxSizing = "border-box";
     elRawbody.style.height = "10em";

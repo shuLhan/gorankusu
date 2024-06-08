@@ -31,13 +31,11 @@ func DefaultHTTPRun() HTTPRunHandler {
 			params any
 		)
 
-		if !rr.HTTPTarget.WithRawBody {
-			rr.HTTPTarget.paramsToPath()
+		rr.HTTPTarget.paramsToPath()
 
-			params, err = rr.HTTPTarget.ParamsConverter(&rr.HTTPTarget)
-			if err != nil {
-				return nil, fmt.Errorf(`%s: %w`, logp, err)
-			}
+		params, err = rr.HTTPTarget.ParamsConverter(&rr.HTTPTarget)
+		if err != nil {
+			return nil, fmt.Errorf(`%s: %w`, logp, err)
 		}
 
 		var (
