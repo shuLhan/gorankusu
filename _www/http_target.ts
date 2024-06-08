@@ -195,6 +195,10 @@ export class HTTPTarget {
           value: "json",
           selected: ct === "json",
         },
+        "text/html": {
+          value: "text/html",
+          selected: ct === "html",
+        },
       },
       class_input: CLASS_INPUT,
       class_label: CLASS_INPUT_LABEL,
