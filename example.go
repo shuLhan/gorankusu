@@ -106,6 +106,11 @@ func NewExample(listenAddress string, isDev bool) (ex *Example, err error) {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
 	}
 
+	err = ex.registerTargetSourcehut()
+	if err != nil {
+		return nil, fmt.Errorf(`%s: %w`, logp, err)
+	}
+
 	err = ex.registerNavLinks()
 	if err != nil {
 		return nil, fmt.Errorf(`%s: %w`, logp, err)
@@ -415,6 +420,387 @@ func (ex *Example) registerTargetHTTP() (err error) {
 	}
 
 	err = ex.Gorankusu.RegisterTarget(targetHTTP)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ex *Example) registerTargetSourcehut() (err error) {
+	var target = &Target{
+		ID:      `git.sr.ht`,
+		Name:    `git.sr.ht`,
+		Hint:    `SourceHut Git APIs. See https://man.sr.ht/git.sr.ht/api.md`,
+		BaseURL: `https://git.sr.ht`,
+		Headers: KeyFormInput{
+			`Authorization`: FormInput{
+				Label: `Authorization`,
+				Hint:  `SourceHut personal access token, using format "token XXX".`,
+			},
+		},
+		HTTPTargets: []*HTTPTarget{{
+			ID:          `version`,
+			Name:        `API version`,
+			Hint:        `Get the API version.`,
+			Path:        `/api/version`,
+			RequestType: libhttp.RequestTypeJSON,
+		}, {
+			ID:          `user_info`,
+			Name:        `User resource`,
+			Hint:        `Get user resource.`,
+			Path:        `/api/user/:username`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username in SourceHut. If its empty, default to authenticated user.`,
+				},
+			},
+		}, {
+			ID:          `repo_info`,
+			Name:        `Repo - info`,
+			Hint:        `Get repository resource.`,
+			Path:        `/api/:username/repos/:name`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username in SourceHut. If its empty, default to authenticated user.`,
+				},
+				`name`: FormInput{
+					Label: `Name of repo`,
+				},
+			},
+		}, {
+			ID:          `repo_list`,
+			Name:        `Repo - list`,
+			Hint:        `List user repositories.`,
+			Path:        `/api/:username/repos`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username in SourceHut. If its empty, default to authenticated user.`,
+				},
+			},
+		}, {
+			ID:          `repo_create`,
+			Name:        `Repo - create`,
+			Hint:        `Creates a new repository.`,
+			Path:        `/api/repos`,
+			Method:      libhttp.RequestMethodPost,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name`,
+				},
+				`description`: FormInput{
+					Label: `Description`,
+					Hint:  `Optional, repository description (markdown).`,
+				},
+				`visibility`: FormInput{
+					Label: `Visibility`,
+					Hint:  `Can be public (default), unlisted, or private.`,
+				},
+			},
+		}, {
+			ID:          `repo_update`,
+			Name:        `Repo - update`,
+			Hint:        `Update a repository.`,
+			Path:        `/api/repos/:name`,
+			Method:      libhttp.RequestMethodPut,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Optional, repository name`,
+				},
+				`description`: FormInput{
+					Label: `Description`,
+					Hint:  `Optional, repository description (markdown).`,
+				},
+				`visibility`: FormInput{
+					Label: `Visibility`,
+					Hint:  `Optional, can be public (default), unlisted, or private.`,
+				},
+			},
+		}, {
+			ID:          `repo_delete`,
+			Name:        `Repo - delete`,
+			Hint:        `Delete a repository.`,
+			Path:        `/api/repos/:name`,
+			Method:      libhttp.RequestMethodDelete,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name to be deleted.`,
+				},
+			},
+		}, {
+			ID:          `repo_readme_get`,
+			Name:        `Repo - get README`,
+			Hint:        `Get the overridden repository README in HTML.`,
+			Path:        `/api/:username/repos/:name/readme`,
+			Method:      libhttp.RequestMethodGet,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username in SourceHut. If its empty, default to owner of token.`,
+				},
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+			},
+		}, {
+			ID:          `repo_readme_set`,
+			Name:        `Repo - set README`,
+			Hint:        `Set the repository README with HTML.`,
+			Method:      libhttp.RequestMethodPut,
+			Path:        `/api/repos/:name/readme`,
+			RequestType: libhttp.RequestTypeHTML,
+			WithRawBody: true,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+			},
+		}, {
+			ID:          `repo_readme_delete`,
+			Name:        `Repo - delete README`,
+			Hint:        `Unsets the repository README override, if any. The relevant files in the repository tip, if any, will be used.`,
+			Method:      libhttp.RequestMethodDelete,
+			Path:        `/api/repos/:name/readme`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+			},
+		}, {
+			ID:          `repo_tree`,
+			Name:        `Repo - tree`,
+			Hint:        `Get list of objects from the latest commit on the default branch.`,
+			Path:        `/api/:username/repos/:name/tree`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username that owns the repo. If its empty, default to owner of token.`,
+				},
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+			},
+		}, {
+			ID:          `repo_tree_ref`,
+			Name:        `Repo - tree ref`,
+			Hint:        `Get list of objects from the given reference.`,
+			Path:        `/api/:username/repos/:name/tree/:ref`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username that owns the repo. If its empty, default to owner of token.`,
+				},
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+				`ref`: FormInput{
+					Label: `Reference`,
+					Hint:  `The name of branch, tag, or commit hash.`,
+				},
+			},
+		}, {
+			ID:          `repo_tree_ref_path`,
+			Name:        `Repo - tree ref path`,
+			Hint:        `Get list of objects from the subdirectory.`,
+			Path:        `/api/:username/repos/:name/tree/:ref/:path`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username that owns the repo. If its empty, default to owner of token.`,
+				},
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+				`ref`: FormInput{
+					Label: `Reference`,
+					Hint:  `The name of branch, tag, or commit hash.`,
+				},
+				`path`: FormInput{
+					Label: `Path`,
+					Hint:  `The path to subdirectory, for example "_www/doc/".`,
+				},
+			},
+		}, {
+			ID:          `repo_blob_ref_path`,
+			Name:        `Repo - get blob`,
+			Hint:        `Get the blob, content of object, from the path.`,
+			Path:        `/api/:username/repos/:name/blob/:ref/:path`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`username`: FormInput{
+					Label: `Username`,
+					Hint:  `Optional, the username that owns the repo. If its empty, default to owner of token.`,
+				},
+				`name`: FormInput{
+					Label: `Name`,
+					Hint:  `Repository name.`,
+				},
+				`ref`: FormInput{
+					Label: `Reference`,
+					Hint:  `The name of branch, tag, or commit hash.`,
+				},
+				`path`: FormInput{
+					Label: `Path`,
+					Hint:  `The path to object, for example "_www/doc/README.md".`,
+				},
+			},
+		}, {
+			ID:   `webhook_user`,
+			Name: `Webhook - user`,
+			Hint: `Webhook for user events.
+Format
+<br/>
+<pre>
+{
+  "url": endpoint that will receive events.
+  "events": list of event as array of string.
+}
+</pre>
+List of known events are
+<ul>
+<li>"repo:create": triggered when user create new repository,</li>
+<li>"repo:update": triggered when user update the repository, </li>
+<li>"repo:delete": triggered when user delete the repository. </li>
+</ul>
+`,
+			Path:        `/api/user/webhooks`,
+			Method:      libhttp.RequestMethodPost,
+			RequestType: libhttp.RequestTypeJSON,
+			RawBody:     []byte(`{"url": "https://example.com/webhook/repo", "events": [ "repo:delete", "repo:create" ]}`),
+			WithRawBody: true,
+		}, {
+			ID:   `webhook_repo`,
+			Name: `Webhook - repo`,
+			Hint: `Webhook for repository events.
+Format
+<br/>
+<pre>
+{
+  "url": endpoint that will receive events.
+  "events": list of event as array of string.
+}
+</pre>
+List of known events are
+<ul>
+<li>"repo:post-update": triggered after refs has been updated, for pushing new commit to repository.</li>
+</ul>`,
+			Path:        `/api/:username/repos/:name/webhooks`,
+			Method:      libhttp.RequestMethodPost,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Repo name`,
+					Hint:  `The name of repository.`,
+				},
+				`username`: FormInput{
+					Label: `User name`,
+					Hint:  `The user that own the repository.`,
+				},
+			},
+			RawBody:     []byte(`{"url": "https://example.com/webhook/repo", "events": [ "repo:post-update" ]}`),
+			WithRawBody: true,
+		}, {
+			ID:          `webhook_list`,
+			Name:        `Webhook - list`,
+			Hint:        `List webhooks on repository.`,
+			Path:        `/api/:username/repos/:name/webhooks`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`name`: FormInput{
+					Label: `Repo name`,
+					Hint:  `The name of repository.`,
+				},
+				`username`: FormInput{
+					Label: `User name`,
+					Hint:  `The user that own the repository.`,
+				},
+			},
+		}, {
+			ID:          `webhook_info`,
+			Name:        `Webhook - info`,
+			Hint:        `Get webhook information by its ID`,
+			Path:        `/api/:username/repos/:name/webhooks/:webhook_id`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`webhook_id`: FormInput{
+					Label: `Webhook ID`,
+				},
+				`name`: FormInput{
+					Label: `Repo name`,
+					Hint:  `The name of repository.`,
+				},
+				`username`: FormInput{
+					Label: `User name`,
+					Hint:  `The user that own the repository.`,
+				},
+			},
+		}, {
+			ID:          `webhook_list_deliveries`,
+			Name:        `Webhook - list deliveries`,
+			Hint:        `List webhook deliveries by its ID`,
+			Path:        `/api/:username/repos/:name/webhooks/:webhook_id/deliveries`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`webhook_id`: FormInput{
+					Label: `Webhook ID`,
+				},
+				`name`: FormInput{
+					Label: `Repo name`,
+					Hint:  `The name of repository.`,
+				},
+				`username`: FormInput{
+					Label: `User name`,
+					Hint:  `The user that own the repository.`,
+				},
+			},
+		}, {
+			ID:          `webhook_info_deliveries`,
+			Name:        `Webhook - info delivery`,
+			Hint:        `Get webhook delivery information by its ID`,
+			Path:        `/api/:username/repos/:name/webhooks/:webhook_id/deliveries/:delivery_id`,
+			RequestType: libhttp.RequestTypeJSON,
+			Params: KeyFormInput{
+				`delivery_id`: FormInput{
+					Label: `Delivery ID`,
+				},
+				`name`: FormInput{
+					Label: `Repo name`,
+					Hint:  `The name of repository.`,
+				},
+				`username`: FormInput{
+					Label: `User name`,
+					Hint:  `The user that own the repository.`,
+				},
+				`webhook_id`: FormInput{
+					Label: `Webhook ID`,
+				},
+			},
+		}},
+	}
+
+	err = ex.Gorankusu.RegisterTarget(target)
 	if err != nil {
 		return err
 	}
