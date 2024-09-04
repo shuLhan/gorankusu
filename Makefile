@@ -5,8 +5,7 @@ COVER_OUT:=cover.out
 COVER_HTML:=cover.html
 
 .PHONY: all
-all: lint test
-	go run ./internal/cmd/gorankusu build
+all: lint test build
 
 .PHONY: init
 init:
@@ -29,6 +28,10 @@ lint-www:
 test:
 	CGO_ENABLED=1 go test -failfast -timeout=1m -race -coverprofile=$(COVER_OUT) ./...
 	go tool cover -html=$(COVER_OUT) -o $(COVER_HTML)
+
+.PHONY: build
+build:
+	go run ./internal/cmd/gorankusu build
 
 .PHONY: dev
 dev:
