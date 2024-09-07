@@ -4,5 +4,6 @@
 package gorankusu
 
 import (
+	// This import is for installing additional tools with "make init".
 	_ "golang.org/x/tools/go/analysis"
 )
