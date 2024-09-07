@@ -3,6 +3,69 @@
 :sectanchors:
 :sectlinks:
 
+
+[#v0_7_0]
+== gorankusu v0.7.0 (2024-09-07)
+
+[#v0_7_0__breaking_changes]
+=== Breaking changes
+
+all: refactoring form input for multipart form-data::
++
+This changes replace handling type for storing multipart form-data
+from "map[string][]byte" to [*multipart.Form] based on changes on
+module "pakakeh.go".
+
+[#v0_7_0__enhancements]
+=== Enhancements
+
+all: make HTTP Target Params works along with WithRawBody::
++
+Previously, if WithRawBody is true, the Params will not be rendered
+and parsed during Run.
+This changes makes the Params works along with WithRawBody.
+If Params are set it will be rendered along with text area for raw
+body.
+
+_www: support HTTP target with content type "text/html"::
++
+In the Target form, user can select to send body as "text/html".
+
+all: add git.sr.ht APIs into example::
++
+The APIs is created using https://man.sr.ht/git.sr.ht/api.md as
+reference.
+We also needs the API to create webhook since no other way to create
+it in current sourcehut web.
+
+[#v0_7_0__bug_fixes]
+=== Bug fixes
+
+_www: fix save on null Headers and Vars::
++
+If the user does not define the Headers, clicking Run on any HTTP
+Target will result in error when "save" function executed before it.
+
+_www: fix form input type file where content is binary::
++
+If the file in FormInput is binary, the conversion to
+"FormInput.value" will fail with an error like "invalid characters in
+String".
+
+all: use [route.Path] to generate parameters::
++
+Using [route.String] does not works if the parameter can be empty,
+while [route.Path] replace all keys and return the path as is.
+
+[#v0_7_0__chores]
+=== Chores
+
+all: add task to initialize the repository and tools::
++
+The task "init" include initializing git submodule, installing third
+party tools for linters, and installing node packages.
+
+
 [#v0_6_1]
 == gorankusu v0.6.1 (2024-04-06)
 
