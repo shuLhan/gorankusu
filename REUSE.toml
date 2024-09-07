@@ -1,0 +1,11 @@
+## SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+##
+## SPDX-License-Identifier: GPL-3.0-or-later
+
+version = 1
+
+[[annotations]]
+path = ["_www/**", ".gitignore", ".gitmodules", "go.sum", "README.md",
+  "_screenshots/**"]
+SPDX-FileCopyrightText = "2022 Shulhan <ms@kilabit.info>"
+SPDX-License-Identifier = "GPL-3.0-or-later"

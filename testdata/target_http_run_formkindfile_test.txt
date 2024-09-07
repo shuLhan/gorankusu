@@ -1,3 +1,6 @@
+## SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+## SPDX-License-Identifier: GPL-3.0-or-later
+
 Test data for testing running HTTP with form kind is file (uploading file).
 
 >>> valid:http_request_body
