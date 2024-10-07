@@ -33,7 +33,7 @@ func main() {
 
 	switch subcmd {
 	case subCommandBuild:
-		var opts = &ciigo.ConvertOptions{
+		var opts = ciigo.ConvertOptions{
 			Root: `_www/doc`,
 		}
 		var err = ciigo.Convert(opts)
@@ -222,7 +222,7 @@ func workerDocs() {
 
 	mlog.Outf(`%s: started ...`, logp)
 
-	var opts = &ciigo.ConvertOptions{
+	var opts = ciigo.ConvertOptions{
 		Root: `_www/doc`,
 	}
 	var err = ciigo.Watch(opts)
