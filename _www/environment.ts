@@ -1,8 +1,14 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js";
-import { WuiInputNumber, WuiInputNumberOpts } from "./wui/input/number.js";
+import {
+  WuiInputString,
+  WuiInputStringOpts,
+} from "./pakakeh_ts/input/string.js";
+import {
+  WuiInputNumber,
+  WuiInputNumberOpts,
+} from "./pakakeh_ts/input/number.js";
 
 import {
   CLASS_INPUT,

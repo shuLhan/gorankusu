@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
-import { WuiInputString } from "./wui/input/string.js";
-import { WuiInputNumber } from "./wui/input/number.js";
+import { WuiInputString, } from "./pakakeh_ts/input/string.js";
+import { WuiInputNumber, } from "./pakakeh_ts/input/number.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, CLASS_NAV_TARGET, HASH_ENVIRONMENT, } from "./interface.js";
 export class Environment {
     constructor(gorankusu, opts) {

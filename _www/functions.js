@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
-import { WuiInputFile } from "./wui/input/file.js";
-import { WuiInputNumber } from "./wui/input/number.js";
-import { WuiInputString } from "./wui/input/string.js";
+import { WuiInputFile } from "./pakakeh_ts/input/file.js";
+import { WuiInputNumber, } from "./pakakeh_ts/input/number.js";
+import { WuiInputString, } from "./pakakeh_ts/input/string.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, FormInputKindFile, FormInputKindNumber, } from "./interface.js";
 export function getDocumentHeight() {
     const D = document;

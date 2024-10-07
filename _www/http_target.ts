@@ -1,8 +1,14 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { WuiInputSelect, WuiInputSelectOpts } from "./wui/input/select.js";
-import { WuiInputString, WuiInputStringOpts } from "./wui/input/string.js";
+import {
+  WuiInputSelect,
+  WuiInputSelectOpts,
+} from "./pakakeh_ts/input/select.js";
+import {
+  WuiInputString,
+  WuiInputStringOpts,
+} from "./pakakeh_ts/input/string.js";
 
 import {
   generateFormInput,

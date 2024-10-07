@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
 // SPDX-License-Identifier: GPL-3.0-or-later
-import { WuiInputSelect } from "./wui/input/select.js";
-import { WuiInputString } from "./wui/input/string.js";
+import { WuiInputSelect, } from "./pakakeh_ts/input/select.js";
+import { WuiInputString, } from "./pakakeh_ts/input/string.js";
 import { generateFormInput, loadHTTPTargetHeader, loadHTTPTargetParam, } from "./functions.js";
 import { CLASS_INPUT, CLASS_INPUT_LABEL, } from "./interface.js";
 const CLASS_HTTP_TARGET = "http_target";
