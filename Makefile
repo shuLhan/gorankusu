@@ -35,4 +35,4 @@ build:
 
 .PHONY: dev
 dev:
-	go run ./internal/cmd/gorankusu
+	go run ./internal/cmd/gorankusu -dev

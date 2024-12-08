@@ -51,7 +51,7 @@ type requestResponse struct {
 //
 // To run the example, execute
 //
-//	$ go run ./internal/cmd/gorankusu
+//	$ go run ./internal/cmd/gorankusu -dev
 //
 // It will run a web user interface at http://127.0.0.1:8217 .
 type Example struct {

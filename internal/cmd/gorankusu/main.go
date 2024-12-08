@@ -23,10 +23,16 @@ import (
 
 const (
 	subCommandBuild = `build`
-	cmdTsc          = `tsc --project _www`
+	cmdTsc          = `_www/node_modules/.bin/tsc --project _www`
 )
 
 func main() {
+	var (
+		listenAddress string
+		isDev         bool
+	)
+	flag.BoolVar(&isDev, `dev`, false, `Run in development mode`)
+	flag.StringVar(&listenAddress, `http`, `127.0.0.1:10007`, `Address to serve`)
 	flag.Parse()
 
 	var subcmd = strings.ToLower(flag.Arg(0))
@@ -46,9 +52,6 @@ func main() {
 	}
 
 	var (
-		listenAddress = `127.0.0.1:18217`
-		isDev         = true
-
 		ex  *gorankusu.Example
 		err error
 	)
@@ -58,8 +61,10 @@ func main() {
 		mlog.Fatalf(`%s`, err)
 	}
 
-	go workerBuild(false)
-	go workerDocs()
+	if isDev {
+		go workerBuild(false)
+		go workerDocs()
+	}
 
 	go func() {
 		var c = make(chan os.Signal, 1)
@@ -112,6 +117,7 @@ func workerBuild(oneTime bool) {
 			VarName:     `memfsWWW`,
 			GoFileName:  `memfs_www_embed.go`,
 		},
+		TryDirect: true,
 	}
 
 	var (
