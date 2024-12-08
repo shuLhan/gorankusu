@@ -4,10 +4,10 @@ Gorankusu is a Go library that provide HTTP service with web user interface
 to test HTTP and/or WebSocket endpoints and for load testing HTTP endpoints.
 
 For testing HTTP endpoints it use the
-[lib/http](https://pkg.go.dev/github.com/shuLhan/share/lib/http)
+[lib/http](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/http)
 package as the client, a wrapper for standard Go HTTP package.
 For testing WebSocket endpoints it use the
-[lib/websocket](https://pkg.go.dev/github.com/shuLhan/share/lib/websocket)
+[lib/websocket](https://pkg.go.dev/git.sr.ht/~shulhan/pakakeh.go/lib/websocket)
 package as the client.
 For the load testing we use
 [vegeta](https://github.com/tsenart/vegeta)
