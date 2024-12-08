@@ -7,9 +7,9 @@ go 1.22.0
 
 require (
 	git.sr.ht/~shulhan/ciigo v0.14.0
-	git.sr.ht/~shulhan/pakakeh.go v0.58.0
+	git.sr.ht/~shulhan/pakakeh.go v0.58.1
 	github.com/tsenart/vegeta/v12 v12.12.0
-	golang.org/x/tools v0.26.0
+	golang.org/x/tools v0.28.0
 )
 
 require (
@@ -20,12 +20,12 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529 // indirect
-	github.com/yuin/goldmark v1.7.4 // indirect
+	github.com/yuin/goldmark v1.7.8 // indirect
 	github.com/yuin/goldmark-meta v1.1.0 // indirect
-	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
