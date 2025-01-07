@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"git.sr.ht/~shulhan/pakakeh.go/lib/memfs"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/os/exec"
+	"git.sr.ht/~shulhan/pakakeh.go/lib/watchfs/v2"
 
 	"git.sr.ht/~shulhan/ciigo"
 	"git.sr.ht/~shulhan/gorankusu"
@@ -142,27 +144,29 @@ func workerBuild(oneTime bool) {
 		return
 	}
 
-	var dirWatchWww = memfs.DirWatcher{
-		Options: memfs.Options{
-			Root: `_www`,
-			Includes: []string{
-				`.*\.(js|ts)$`,
-				`_www/tsconfig.json`,
-			},
-			Excludes: []string{
-				`.*\.adoc$`,
-				`.*\.d\.ts$`,
-				`.*\.git/.*`,
-				`/node_modules`,
-				`/pakakeh_ts/.*/example\.js$`,
-				`/pakakeh_ts/.*/index\.html$`,
-				`/pakakeh_ts/index\.html$`,
-				`doc`,
-			},
+	var watchOpts = watchfs.DirWatcherOptions{
+		FileWatcherOptions: watchfs.FileWatcherOptions{
+			File:     filepath.Join(`_www`, `.rescan`),
+			Interval: 5 * time.Second,
+		},
+		Root: `_www`,
+		Includes: []string{
+			`.*\.(html|js|ts)$`,
+			`_www/tsconfig.json`,
+		},
+		Excludes: []string{
+			`.*\.adoc$`,
+			`.*\.d\.ts$`,
+			`.*\.git/.*`,
+			`/node_modules`,
+			`/pakakeh_ts/.*/example\.js$`,
+			`/pakakeh_ts/.*/index\.html$`,
+			`/pakakeh_ts/index\.html$`,
 		},
 	}
 
-	err = dirWatchWww.Start()
+	var dirWatchWww *watchfs.DirWatcher
+	dirWatchWww, err = watchfs.WatchDir(watchOpts)
 	if err != nil {
 		mlog.Fatalf(`%s: %s`, logp, err)
 	}
@@ -170,38 +174,42 @@ func workerBuild(oneTime bool) {
 	mlog.Outf(`%s: started ...`, logp)
 
 	var (
-		ticker = time.NewTicker(5 * time.Second)
-		ns     memfs.NodeState
+		ticker      = time.NewTicker(5 * time.Second)
+		listChanges []os.FileInfo
 	)
 	for {
 		select {
-		case ns = <-dirWatchWww.C:
-			if strings.HasSuffix(ns.Node.SysPath, `.ts`) {
-				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
-				tsCount++
-			} else if strings.HasSuffix(ns.Node.SysPath, `.json`) {
-				mlog.Outf(`%s: update %s`, logp, ns.Node.SysPath)
-				tsCount++
-			} else if strings.HasSuffix(ns.Node.SysPath, `.js`) ||
-				strings.HasSuffix(ns.Node.SysPath, `.html`) {
-				embedCount++
-				mlog.Outf(`%s: update %s`, logp, ns.Node.Path)
+		case listChanges = <-dirWatchWww.C:
+			for _, fi := range listChanges {
+				var name = fi.Name()
+				name = strings.TrimPrefix(name, `_www`)
+				if strings.HasSuffix(name, `.ts`) {
+					mlog.Outf(`%s: update %s`, logp, name)
+					tsCount++
+				} else if strings.HasSuffix(name, `.json`) {
+					mlog.Outf(`%s: update %s`, logp, name)
+					tsCount++
+				} else if strings.HasSuffix(name, `.js`) ||
+					strings.HasSuffix(name, `.html`) {
+					embedCount++
+					mlog.Outf(`%s: update %s`, logp, name)
 
-				var node *memfs.Node
+					var node *memfs.Node
 
-				node, err = mfsWww.Get(ns.Node.Path)
-				if err != nil {
-					mlog.Errf(`%s: %q: %s`, logp, ns.Node.Path, err)
-					continue
-				}
-				if node != nil {
-					err = node.Update(nil, 0)
+					node, err = mfsWww.Get(name)
 					if err != nil {
-						mlog.Errf(`%s: %q: %s`, logp, node.Path, err)
+						mlog.Errf(`%s: %q: %s`, logp, name, err)
+						continue
 					}
+					if node != nil {
+						err = node.Update(nil, 0)
+						if err != nil {
+							mlog.Errf(`%s: %q: %s`, logp, node.Path, err)
+						}
+					}
+				} else {
+					mlog.Outf(`%s: unknown file updated %s`, logp, name)
 				}
-			} else {
-				mlog.Outf(`%s: unknown file updated %s`, logp, ns.Node.SysPath)
 			}
 
 		case <-ticker.C:

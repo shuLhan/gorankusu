@@ -21,7 +21,7 @@ Test data for testing [HTTPTarget.WithRawBody].
 <<< valid:RunResponse.DumpRequest
 POST /example/rawbody/json HTTP/1.1
 Host: 127.0.0.1:8217
-User-Agent: libhttp/0.58.0
+User-Agent: libhttp/0.59.0
 Content-Length: 27
 Content-Type: application/json
 Accept-Encoding: gzip
