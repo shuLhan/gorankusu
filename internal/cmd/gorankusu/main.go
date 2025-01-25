@@ -34,7 +34,7 @@ func main() {
 		isDev         bool
 	)
 	flag.BoolVar(&isDev, `dev`, false, `Run in development mode`)
-	flag.StringVar(&listenAddress, `http`, `127.0.0.1:10007`, `Address to serve`)
+	flag.StringVar(&listenAddress, `http`, `127.0.0.1:11007`, `Address to serve`)
 	flag.Parse()
 
 	var subcmd = strings.ToLower(flag.Arg(0))
