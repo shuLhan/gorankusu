@@ -4,14 +4,14 @@
 
 ==  Documentation
 
-link:CHANGELOG.html[CHANGELOG^]:: History of each release.
+link:/doc/CHANGELOG.html[CHANGELOG^]:: History of each release.
 
-link:README.html[README^]:: Manual page for gorankusu' users.
+link:/doc/README.html[README^]:: Manual page for gorankusu' users.
 
-link:SPECS.html[Specification^]:: Manual page for gorankusu' developers.
+link:/doc/SPECS.html[Specification^]:: Manual page for gorankusu' developers.
 
 
-== Development
+== Links
 
 https://git.sr.ht/~shulhan/gorankusu[Repository^]:: Link to the source code.
 
