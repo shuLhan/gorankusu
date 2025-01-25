@@ -1,0 +1,185 @@
+/**
+ * SPDX-FileCopyrightText: 2024 M. Shulhan <ms@kilabit.info>
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+a {
+  text-decoration: none;
+}
+body {
+  background-color: ivory;
+  margin: 0;
+  padding: 0;
+}
+fieldset {
+  margin-top: 16px;
+  min-width: 0px;
+}
+input:disabled,
+select:disabled {
+  background-color: gainsboro;
+  color: darkslategray;
+}
+input,
+select,
+button {
+  font-size: 16px;
+}
+h4 {
+  border-bottom: 1px silver solid;
+  padding-bottom: 4px;
+}
+
+.gorankusu_nav {
+  border-right: 1px solid lightgrey;
+  height: calc(100% - 48px);
+  overflow: auto;
+  padding: 8px;
+  position: fixed;
+  width: 240px;
+}
+.gorankusu_nav .nav_target {
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.gorankusu_nav .nav_http_target,
+.gorankusu_nav .nav_ws_target,
+.gorankusu_nav .nav_link {
+  cursor: pointer;
+  margin-bottom: 8px;
+  margin-left: 8px;
+}
+.gorankusu_nav .gorankusu_footer {
+  background-color: ivory;
+  bottom: 0;
+  font-size: 9pt;
+  left: 0;
+  padding: 8px;
+  position: fixed;
+  text-align: center;
+  width: calc(240px - 16px);
+}
+
+.gorankusu_main {
+  height: calc(100% - 32px);
+  left: 256px;
+  overflow: auto;
+  padding: 16px;
+  position: fixed;
+  width: calc(100% - 290px);
+}
+.gorankusu_main .gorankusu_attack_running {
+  border: 1px solid lightgrey;
+  padding: 8px;
+}
+
+.gorankusu_input {
+  border: 1px solid lightgray;
+  display: inline-block;
+  margin-left: 10px;
+  padding: 6px;
+  width: calc(100% - 250px);
+}
+.gorankusu_input_label {
+  display: inline-block;
+  text-align: right;
+  width: 200px;
+  word-wrap: break-word;
+}
+.wui_input_number_hint,
+.wui_input_string_hint {
+  background-color: unset !important;
+  margin: 4px 0 0 210px;
+}
+
+.http_target,
+.ws_target {
+  margin-top: 16px;
+}
+
+.http_target button,
+.ws_target button {
+  margin-left: 10px;
+}
+
+.http_target_out_mono,
+.ws_target_out_mono {
+  background-color: gainsboro;
+  font-family: monospace;
+  margin-top: 8px;
+  overflow: auto;
+  padding: 16px;
+  white-space: pre;
+}
+.http_target {
+  margin-top: 16px;
+}
+
+.http_target h3,
+.ws_target h3 {
+  background-color: beige;
+  border-left: 10px solid gold;
+  margin: 8px -14px;
+  padding: 12px;
+}
+
+.http_target_attack_result {
+  margin-bottom: 8px;
+}
+
+@media screen and (max-width: 740px) {
+  .gorankusu_nav {
+    border-bottom: 1px solid lightgrey;
+    border-right: unset;
+    height: unset;
+    overflow: unset;
+    padding: 8px;
+    position: unset;
+    width: calc(100% - 20px);
+  }
+  .gorankusu_nav .gorankusu_footer {
+    margin: 16px 0 0 0;
+    position: unset;
+    width: calc(100% - 20px);
+  }
+
+  .gorankusu_main {
+    height: unset;
+    overflow: unset;
+    position: unset;
+    padding: 8px;
+    width: calc(100% - 20px);
+  }
+
+  .gorankusu_input {
+    margin: 0;
+    width: calc(100% - 40px);
+  }
+  .gorankusu_input_label {
+    display: block;
+    text-align: left;
+    width: auto;
+  }
+  .wui_input_number_hint,
+  .wui_input_string_hint {
+    background-color: unset !important;
+    margin: 4px 0 0 0px;
+  }
+
+  .http_target_actions {
+    display: block;
+    margin-top: 10px;
+  }
+  .http_target_attack_result {
+    word-break: break-word;
+  }
+  .http_target_attack_result_actions {
+    display: block;
+    margin: 4px 0px;
+  }
+
+  .http_target h3,
+  .ws_target h3 {
+    margin: 8px 0px 0px -8px;
+    padding: 12px;
+  }
+}

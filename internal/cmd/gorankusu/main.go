@@ -100,7 +100,7 @@ func workerBuild(oneTime bool) {
 	var mfsOpts = &memfs.Options{
 		Root: `_www`,
 		Includes: []string{
-			`.*\.(js|ico|png|html)$`,
+			`.*\.(css|html|ico|js|png)$`,
 		},
 		Excludes: []string{
 			`.*\.adoc`,
