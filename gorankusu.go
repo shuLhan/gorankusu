@@ -72,7 +72,7 @@ func (gorankusu *Gorankusu) AttackHTTP(req *RunRequest) (err error) {
 	}
 
 	var origHTTPTarget = origTarget.getHTTPTarget(req.HTTPTarget.ID)
-	if origTarget == nil {
+	if origHTTPTarget == nil {
 		return errInvalidHTTPTarget(req.HTTPTarget.ID)
 	}
 	if !origHTTPTarget.AllowAttack {
