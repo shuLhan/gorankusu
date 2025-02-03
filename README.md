@@ -67,6 +67,24 @@ The "ResultsSuffix" is the one that defined in Environment.
 
 ## Development
 
+Clone the repository and its submodule,
+
+```
+$ git clone https://git.sr.ht/~shulhan/gorankusu
+$ git submodule update --init
+```
+
+Install the node tools inside the _www/ sub directory using `yarn`,
+
+```
+$ cd _www && yarn install
+```
+
+Made some changes and finally, run `make` to run lint and test the code.
+
+
+## Links
+
 [Repository](https://git.sr.ht/~shulhan/gorankusu):: Link to the source code.
 
 [Mailing list](https://lists.sr.ht/~shulhan/gorankusu):: Link to discussion and
@@ -79,6 +97,7 @@ feature.
 ## Credits
 
 The Gorankusu icon and image is provided by <https://www.spriters-resource.com/>.
+
 
 ## License
 
