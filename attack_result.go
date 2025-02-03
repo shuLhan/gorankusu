@@ -15,7 +15,6 @@ import (
 
 	vegeta "github.com/tsenart/vegeta/v12/lib"
 
-	libbytes "git.sr.ht/~shulhan/pakakeh.go/lib/bytes"
 	"git.sr.ht/~shulhan/pakakeh.go/lib/mlog"
 )
 
@@ -137,7 +136,7 @@ func (ar *AttackResult) finish() (err error) {
 		return err
 	}
 
-	ar.TextReport = libbytes.Copy(buf.Bytes())
+	ar.TextReport = bytes.Clone(buf.Bytes())
 
 	buf.Reset()
 	histWriter := vegeta.NewHistogramReporter(ar.hist)
@@ -146,7 +145,7 @@ func (ar *AttackResult) finish() (err error) {
 		return err
 	}
 
-	ar.HistReport = libbytes.Copy(buf.Bytes())
+	ar.HistReport = bytes.Clone(buf.Bytes())
 
 	ar.metrics = nil
 	ar.hist = nil

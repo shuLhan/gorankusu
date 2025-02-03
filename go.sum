@@ -1,9 +1,9 @@
-git.sr.ht/~shulhan/asciidoctor-go v0.6.2-0.20250106025231-ed20fc1c23e8 h1:8qzcug5hnyz1QPVxCf9J3JhIzPSnc+zUK5VQachVQf0=
-git.sr.ht/~shulhan/asciidoctor-go v0.6.2-0.20250106025231-ed20fc1c23e8/go.mod h1:QOHiOctWAPcVlTMOKnnwmpnLrobkv7oNAPAf4gZjtWs=
-git.sr.ht/~shulhan/ciigo v0.15.0 h1:wUtCLNCkUg+he0qtu4Sass9cp7g9eSRivywwFxUe5bs=
-git.sr.ht/~shulhan/ciigo v0.15.0/go.mod h1:JsCkrOX3WKssLWGEaxMhXm1NMXdVi/J6cQEfp8fIEV8=
-git.sr.ht/~shulhan/pakakeh.go v0.59.0 h1:haUyuusXQ0YVgHbbhi46Nkl/CEPhRe+cIJz22kQFGuM=
-git.sr.ht/~shulhan/pakakeh.go v0.59.0/go.mod h1:UsrvzhSUJZpm1Aub99RI/XwtNnbBlJmaNoWWd9++VyI=
+git.sr.ht/~shulhan/asciidoctor-go v0.6.2 h1:LCMSlHzsAMbEyruQW/2QYuiUqYru8bplcDqO9xLV9xI=
+git.sr.ht/~shulhan/asciidoctor-go v0.6.2/go.mod h1:7tX6GBgmTWUpGlwBYZK7yTC/u4KAiGsKkzeTbOnVfZk=
+git.sr.ht/~shulhan/ciigo v0.15.1 h1:EGx1R1bFdUInwSLtHhhIglafEvVzLsFD87AcQnCmRQo=
+git.sr.ht/~shulhan/ciigo v0.15.1/go.mod h1:jHr7QAPXzJpe5S1H9jRf9nNT0R0oXCNhBDuZtUbv/Tk=
+git.sr.ht/~shulhan/pakakeh.go v0.60.0 h1:Kf7PTW7uH2TachVY5hMNyt/ZhS9n+VVp9YiQEsZXyVk=
+git.sr.ht/~shulhan/pakakeh.go v0.60.0/go.mod h1:PJkRrsHnnnyL5BsvT9Ot52/S3ScNchlAnpOrON1cZT8=
 github.com/bmizerany/perks v0.0.0-20230307044200-03f9df79da1e h1:mWOqoK5jV13ChKf/aF3plwQ96laasTJgZi4f1aSOu+M=
 github.com/bmizerany/perks v0.0.0-20230307044200-03f9df79da1e/go.mod h1:ac9efd0D1fsDb3EJvhqgXRbFx7bs2wqZ10HQPeU8U/Q=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
@@ -40,8 +40,8 @@ github.com/yuin/goldmark v1.7.8/go.mod h1:uzxRWxtg69N339t3louHJ7+O03ezfj6PlliRla
 github.com/yuin/goldmark-meta v1.1.0 h1:pWw+JLHGZe8Rk0EGsMVssiNb/AaPMHfSRszZeUeiOUc=
 github.com/yuin/goldmark-meta v1.1.0/go.mod h1:U4spWENafuA7Zyg+Lj5RqK/MF+ovMYtBvXi1lBb2VP0=
 golang.org/x/exp v0.0.0-20180321215751-8460e604b9de/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
-golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8 h1:yqrTHse8TCMW1M1ZCP+VAR/l0kKxwaAIqN/il7x4voA=
-golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8/go.mod h1:tujkw807nyEEAamNbDrEGzRav+ilXA7PCRAd6xsmwiU=
+golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c h1:KL/ZBHXgKGVmuZBZ01Lt57yE5ws8ZPSkkihmEyq7FXc=
+golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c/go.mod h1:tujkw807nyEEAamNbDrEGzRav+ilXA7PCRAd6xsmwiU=
 golang.org/x/net v0.34.0 h1:Mb7Mrk043xzHgnRM88suvJFwzVrRfHEHJEl5/71CKw0=
 golang.org/x/net v0.34.0/go.mod h1:di0qlW3YNM5oh6GqDGQr92MyTozJPmybPK4Ev/Gm31k=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=

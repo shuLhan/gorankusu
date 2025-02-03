@@ -31,7 +31,7 @@ Test data for running HTTP target with global headers.
 <<< global:RunResponse.DumpRequest
 GET /example?Param1=value+of+param1 HTTP/1.1
 Host: 127.0.0.1:8217
-User-Agent: libhttp/0.59.0
+User-Agent: libhttp/0.60.0
 Authorization: global-auth-value
 Accept-Encoding: gzip
 
@@ -42,7 +42,7 @@ HTTP/1.1 200 OK
 Content-Length: 275
 Content-Type: application/json
 
-{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["global-auth-value"],"User-Agent":["libhttp/0.59.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
+{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["global-auth-value"],"User-Agent":["libhttp/0.60.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
 
 <<< global:RunResponse.ResponseBody
 {
@@ -57,7 +57,7 @@ Content-Type: application/json
         "global-auth-value"
       ],
       "User-Agent": [
-        "libhttp/0.59.0"
+        "libhttp/0.60.0"
       ]
     },
     "Form": {
@@ -106,7 +106,7 @@ Content-Type: application/json
 <<< override:RunResponse.DumpRequest
 GET /example?Param1=value+of+param1 HTTP/1.1
 Host: 127.0.0.1:8217
-User-Agent: libhttp/0.59.0
+User-Agent: libhttp/0.60.0
 Authorization: local-auth-value
 Accept-Encoding: gzip
 
@@ -117,7 +117,7 @@ HTTP/1.1 200 OK
 Content-Length: 274
 Content-Type: application/json
 
-{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["local-auth-value"],"User-Agent":["libhttp/0.59.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
+{"data":{"Method":"GET","URL":"/example?Param1=value+of+param1","Headers":{"Accept-Encoding":["gzip"],"Authorization":["local-auth-value"],"User-Agent":["libhttp/0.60.0"]},"Form":{"Param1":["value of param1"]},"MultipartForm":null,"Body":""},"message":"/example","code":200}
 
 <<< override:RunResponse.ResponseBody
 {
@@ -132,7 +132,7 @@ Content-Type: application/json
         "local-auth-value"
       ],
       "User-Agent": [
-        "libhttp/0.59.0"
+        "libhttp/0.60.0"
       ]
     },
     "Form": {
