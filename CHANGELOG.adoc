@@ -1,7 +1,37 @@
+// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 = gorankusu CHANGELOG
 :toc:
 :sectanchors:
 :sectlinks:
+
+
+[#v0_8_0]
+== gorankusu v0.8.0 (2025-02-03)
+
+[BREAKING CHANGES]
+The git submodule in "_www/wui" has been renamed to "_www/pakakeh_ts".
+If you have cloned this project before, you need to rename the sub directory
+manually and re-init it.
+----
+$ mv _www/wui _www/pakakeh_ts
+$ git submodule update --init
+----
+
+[CHORE]
+The linter has been replaced many times, from revive to "go vet", and from
+using binary form of fieldalignment and shadow; to use internal command
+gocheck that do the same things, which simplify our setup.
+
+[CHORE]
+Split the CSS into separate file.
+This is allow modifying the CSS without touching the index.html, and may be
+used by other HTML files later.
+
+[CHORE]
+Fix some broken links in the documentation pages, including link to
+Changelog, README, and SPEC.
 
 
 [#v0_7_0]
@@ -381,6 +411,3 @@ to test HTTP service, similar to Postman, and for load testing.
 For the load testing we use vegeta [1] as the backend.
 
 [1] https://github.com/tsenart/vegeta
-
-// SPDX-FileCopyrightText: 2021 M. Shulhan <ms@kilabit.info>
-// SPDX-License-Identifier: GPL-3.0-or-later

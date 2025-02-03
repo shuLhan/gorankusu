@@ -17,7 +17,7 @@ import (
 )
 
 // Version of gorankusu module.
-const Version = `0.7.0`
+const Version = `0.8.0`
 
 // Gorankusu is the HTTP server with web user interface and APIs for running and
 // load testing the registered HTTP endpoints.
