@@ -19,7 +19,7 @@ lint: lint-www
 
 .PHONY: lint-www
 lint-www:
-	cd _www && npx eslint --fix .
+	cd _www && ./node_modules/.bin/eslint .
 
 .PHONY: test
 test:
