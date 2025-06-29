@@ -18,13 +18,13 @@ as the backend.
 ## Usage
 
 See the
-[example](https://git.sr.ht/~shulhan/gorankusu/tree/main/item/example/)
-package on how to programmatically use and create service using this module,
+[example](https://git.sr.ht/~shulhan/gorankusu/tree/main/item/example.go)
+code on how to programmatically use and create service using this module,
 or,
 
 * clone this repository,
 * execute `make dev`, and
-* open <http://127.0.0.1:8217>.
+* open http://127.0.0.1:8217.
 
 
 ## Screenshots
@@ -43,7 +43,7 @@ metrics and vegeta histogram,
 ## Web user interface (WUI)
 
 By default, the Gorankusu user interface can be viewed by opening in browser at
-<http://127.0.0.1:8217>.
+http://127.0.0.1:8217.
 One can change address through Environment's ListenAddress.
 
 
@@ -93,6 +93,9 @@ where to send patches.
 [Issues](https://todo.sr.ht/~shulhan/gorankusu):: Link to report for bug or
 feature.
 
+[Changelog](https://kilabit.info/project/gorankusu/CHANGELOG.html):: Log for
+each releases.
+
 
 ## Credits
 
@@ -101,7 +104,7 @@ The Gorankusu icon and image is provided by <https://www.spriters-resource.com/>
 
 ## License
 
-Copyright (C) 2021 M. Shulhan  <ms@kilabit.info>
+Copyright (C) 2021 M. Shulhan &lt;ms@kilabit.info&gt;
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
